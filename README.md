@@ -1,0 +1,1 @@
+The platform offers rental access to electrical and electronic products such as cameras, laptops, generators, power tools, home appliances, e-scooters, and drones. Users can browse, book, and rent these items for specific durations, while owners list products and admins manage approvals and system oversight.
