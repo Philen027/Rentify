@@ -182,7 +182,7 @@
                     </button>
                 </div>
                 
-                <button onclick="app.goBackToLanding()" class="mt-8 text-sm text-slate-500 hover:text-white transition-colors flex items-center justify-center mx-auto gap-2">
+                <button onclick="app.goBackToLanding('landingPage.php')" class="mt-8 text-sm text-slate-500 hover:text-white transition-colors flex items-center justify-center mx-auto gap-2">
                     <i class="fa-solid fa-arrow-left"></i> Back to email
                 </button>
             </div>
@@ -415,7 +415,7 @@
             },
 
             goBackToLanding() {
-                window.location.href = 'index.html';
+                window.location.href = 'landingPage.php';
             },
 
             setRole(role) {
