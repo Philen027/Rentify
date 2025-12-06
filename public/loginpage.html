@@ -182,7 +182,7 @@
                     </button>
                 </div>
                 
-                <button onclick="app.goBackToLanding('landingPage.php')" class="mt-8 text-sm text-slate-500 hover:text-white transition-colors flex items-center justify-center mx-auto gap-2">
+                <button onclick="app.goBackToLanding()" class="mt-8 text-sm text-slate-500 hover:text-white transition-colors flex items-center justify-center mx-auto gap-2">
                     <i class="fa-solid fa-arrow-left"></i> Back to email
                 </button>
             </div>
@@ -408,14 +408,12 @@
                     this.state.email = email;
                     document.getElementById('display-email').textContent = email;
                 } else {
-                    // Redirect back if no email provided (optional safety check)
-                    // window.location.href = 'index.html'; 
                     document.getElementById('display-email').textContent = "guest";
                 }
             },
 
             goBackToLanding() {
-                window.location.href = 'landingPage.php';
+                window.location.href = 'landingPage.html';
             },
 
             setRole(role) {
@@ -424,7 +422,6 @@
                     document.getElementById('partner-overlay').classList.remove('hidden');
                     document.getElementById('partner-overlay').classList.add('flex');
                 } else {
-                    // Customer logic would go here
                     alert("Customer Registration path selected (Demo End)");
                 }
             },
@@ -433,8 +430,6 @@
                 document.getElementById('partner-overlay').classList.add('hidden');
                 document.getElementById('partner-overlay').classList.remove('flex');
             },
-
-            // --- ULTRA VALIDATION LOGIC ---
 
             validateStep(stepIndex) {
                 const stepContent = document.getElementById(`step-${stepIndex}`);
@@ -473,8 +468,6 @@
                 };
                 input.addEventListener('input', clearHandler, { once: true });
             },
-
-            // --- Multi-step Wizard Logic ---
 
             updateStepUI() {
                 document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
@@ -556,7 +549,6 @@
                 const formData = new FormData(document.getElementById('partner-form'));
                 formData.append('email', this.state.email);
                 
-                // Simulate network delay
                 await new Promise(r => setTimeout(r, 2000));
                 
                 alert("Application Submitted! Check your email (simulated).");

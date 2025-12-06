@@ -208,10 +208,9 @@
                     const btn = form.querySelector('button');
                     btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
                     
-                    // Simulate processing then redirect to login.html
+                    // Redirect to login page with email
                     setTimeout(() => {
-                        // Redirect to the login page passing the email in the URL
-                        window.location.href = `loginpage.php?email=${encodeURIComponent(email)}`;
+                        window.location.href = `loginpage.html?email=${encodeURIComponent(email)}`;
                     }, 500);
                 });
             },
