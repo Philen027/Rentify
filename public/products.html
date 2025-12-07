@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Partner Products – Rentify</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-50">
+  <div class="max-w-4xl mx-auto py-10 px-4">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold">Product Management</h1>
+      <button onclick="window.location.href='partner-dashboard.html'"
+              class="text-sm px-3 py-1 rounded bg-slate-800 hover:bg-slate-700">
+        ← Back to dashboard
+      </button>
+    </div>
+
+    <p class="text-sm text-slate-400 mb-4">
+      Here you’ll list, create and edit all products of this partner.  
+      (You already have product add/list logic – you can move it into this page.)
+    </p>
+
+    <div id="product-list" class="space-y-3 text-sm"></div>
+  </div>
+
+  <script src="/firebase.js"></script>
+  <script>
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return (window.location.href = "loginpage.html?role=partner");
+
+      const listEl = document.getElementById("product-list");
+      listEl.innerHTML = "<div class='text-slate-400'>Loading products…</div>";
+
+      const snap = await db.collection("products")
+        .where("partnerId", "==", user.uid)
+        .orderBy("createdAt", "desc")
+        .get();
+
+      if (snap.empty) {
+        listEl.innerHTML = "<div class='text-slate-400'>No products yet.</div>";
+        return;
+      }
+
+      let html = "";
+      snap.forEach(doc => {
+        const p = doc.data();
+        html += `
+          <div class="border border-slate-800 rounded-xl px-4 py-3 flex justify-between items-center">
+            <div>
+              <div class="font-medium">${p.name || "Untitled product"}</div>
+              <div class="text-xs text-slate-400">
+                ₹${p.rentPerDay || 0}/day · status: ${p.status || "draft"}
+              </div>
+            </div>
+          </div>`;
+      });
+      listEl.innerHTML = html;
+    });
+  </script>
+</body>
+</html>

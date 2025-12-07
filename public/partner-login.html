@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rentify - Partner Login</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            rentify: {
+              dark: '#0f172a',
+              accent: '#3b82f6',
+              glass: 'rgba(255, 255, 255, 0.08)',
+              glassBorder: 'rgba(255, 255, 255, 0.1)',
+            }
+          },
+          animation: {
+            'float': 'float 8s ease-in-out infinite',
+            'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-20px)' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { background-color: #020617; color: #ffffff; overflow-x: hidden; }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .input-premium {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white; transition: all 0.3s ease;
+    }
+    .input-premium:focus {
+      outline: none; border-color: #3b82f6;
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .video-background {
+      position: fixed; top: 50%; left: 50%;
+      min-width: 100%; min-height: 100%; width: auto; height: auto;
+      z-index: -10; transform: translate(-50%, -50%); object-fit: cover;
+    }
+
+    .cinematic-overlay {
+      position: fixed; inset: 0; z-index: -5;
+      background: radial-gradient(circle at 50% 50%, rgba(2, 6, 23, 0.3) 0%, rgba(2, 6, 23, 0.9) 90%);
+      pointer-events: none;
+    }
+
+    .glow-spot {
+      position: fixed; width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+      border-radius: 50%; filter: blur(80px); z-index: -6;
+      animation: pulse-slow 8s infinite;
+    }
+
+    /* Simple toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 60;
+      display: none;
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative selection:bg-blue-500 selection:text-white">
+
+  <!-- Background video (same as other pages) -->
+  <video autoplay muted loop playsinline class="video-background" id="bg-video">
+    <source src="Video_Generation_Request.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="cinematic-overlay"></div>
+  <div class="glow-spot" style="top: -20%; left: 20%;"></div>
+  <div class="glow-spot" style="bottom: -20%; right: 20%; background: radial-gradient(circle, rgba(20, 184, 166, 0.1) 0%, transparent 70%); animation-delay: 2s;"></div>
+
+  <!-- Toast -->
+  <div id="toast" class="glass-panel rounded-2xl px-4 py-3 flex items-center gap-3">
+    <div id="toast-icon" class="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/20 text-emerald-400">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <div class="text-sm">
+      <div id="toast-title" class="font-semibold">Success</div>
+      <div id="toast-message" class="text-slate-200/80"></div>
+    </div>
+  </div>
+
+  <main class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-12 w-full max-w-7xl mx-auto">
+    <div class="w-full max-w-xl glass-panel rounded-[28px] p-8 md:p-10 animate-fade-in-up">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <div class="text-xs uppercase tracking-[0.25em] text-blue-400 mb-2">Partner Portal</div>
+          <h1 class="font-display text-2xl md:text-3xl font-bold tracking-tight">Rentify Partner Access</h1>
+          <p class="text-slate-400 text-sm mt-2">Create your partner account, verify email, then configure your store.</p>
+        </div>
+        <button onclick="window.location.href='loginpage.html'" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+      </div>
+
+      <!-- Email display from landing page -->
+      <div class="mb-4 text-xs text-slate-400">
+        Using email: <span id="landing-email" class="text-blue-400 font-mono">-</span>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex mb-6 rounded-full bg-white/5 p-1">
+        <button id="tab-partner-login" class="flex-1 py-2 rounded-full text-sm font-medium bg-white text-black">
+          Login
+        </button>
+        <button id="tab-partner-register" class="flex-1 py-2 rounded-full text-sm font-medium text-slate-300">
+          Register
+        </button>
+      </div>
+
+      <!-- LOGIN VIEW -->
+      <div id="partner-login-view">
+        <div class="space-y-4 mb-4">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Email</label>
+            <input type="email" id="partner-login-email" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="partner@example.com">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Password</label>
+            <input type="password" id="partner-login-password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="••••••••">
+          </div>
+        </div>
+
+        <button id="partner-login-btn" class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-3">
+          <span>Login</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button id="partner-google-btn" class="w-full h-11 rounded-lg bg-white text-black font-semibold flex items-center justify-center gap-3 mb-2">
+          <i class="fa-brands fa-google"></i>
+          <span>Continue with Google</span>
+        </button>
+
+        <p class="text-[11px] text-slate-500 text-center mt-2">
+          Only email-verified accounts can access the partner dashboard.
+        </p>
+      </div>
+
+      <!-- REGISTER VIEW -->
+      <div id="partner-register-view" class="hidden">
+        <div class="space-y-4 mb-4">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Full Name</label>
+            <input type="text" id="partner-reg-fullname" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Your name">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Email</label>
+            <input type="email" id="partner-reg-email" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="partner@example.com">
+            <p class="text-[11px] text-slate-500 mt-1">
+              If you came from landing page, this email is auto-filled.
+            </p>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Phone</label>
+            <input type="tel" id="partner-reg-phone" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="+91 9876543210">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Password</label>
+            <input type="password" id="partner-reg-password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Create a strong password">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Confirm Password</label>
+            <input type="password" id="partner-reg-password2" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Repeat password">
+          </div>
+        </div>
+
+        <button id="partner-register-btn" class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-2">
+          <span>Register & Send Verification Email</span>
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+
+        <p class="text-[11px] text-slate-500 text-center mt-1">
+          A verification link will be sent to your email. You must verify before logging in.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase config (creates window.firebaseAuth & window.firebaseHelpers) -->
+  <script type="module" src="firebase-config.js"></script>
+
+  <!-- Page logic -->
+  <script>
+    const partnerAuthPage = {
+      init() {
+        // Read email from ?email=... (landing page)
+        const params = new URLSearchParams(window.location.search);
+        const landingEmail = params.get('email') || '';
+        const emailSpan = document.getElementById('landing-email');
+        emailSpan.textContent = landingEmail || 'not provided';
+
+        // Pre-fill in forms
+        const loginEmailInput = document.getElementById('partner-login-email');
+        const regEmailInput = document.getElementById('partner-reg-email');
+        if (landingEmail) {
+          if (loginEmailInput) loginEmailInput.value = landingEmail;
+          if (regEmailInput) regEmailInput.value = landingEmail;
+        }
+
+        this.initTabs();
+        this.initEvents();
+      },
+
+      showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const iconBox = document.getElementById('toast-icon');
+        const titleEl = document.getElementById('toast-title');
+        const msgEl = document.getElementById('toast-message');
+
+        if (type === 'success') {
+          iconBox.className = "w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/20 text-emerald-400";
+          iconBox.innerHTML = '<i class="fa-solid fa-check"></i>';
+          titleEl.textContent = "Success";
+        } else {
+          iconBox.className = "w-8 h-8 rounded-xl flex items-center justify-center bg-red-500/20 text-red-400";
+          iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+          titleEl.textContent = "Error";
+        }
+
+        msgEl.textContent = message;
+        toast.style.display = 'flex';
+        toast.style.opacity = '1';
+
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          setTimeout(() => { toast.style.display = 'none'; }, 300);
+        }, 3000);
+      },
+
+      initTabs() {
+        const tabLogin = document.getElementById('tab-partner-login');
+        const tabRegister = document.getElementById('tab-partner-register');
+        const loginView = document.getElementById('partner-login-view');
+        const registerView = document.getElementById('partner-register-view');
+
+        tabLogin.addEventListener('click', () => {
+          tabLogin.classList.add('bg-white', 'text-black');
+          tabRegister.classList.remove('bg-white', 'text-black');
+          tabRegister.classList.add('text-slate-300');
+          loginView.classList.remove('hidden');
+          registerView.classList.add('hidden');
+        });
+
+        tabRegister.addEventListener('click', () => {
+          tabRegister.classList.add('bg-white', 'text-black');
+          tabLogin.classList.remove('bg-white', 'text-black');
+          tabLogin.classList.add('text-slate-300');
+          registerView.classList.remove('hidden');
+          loginView.classList.add('hidden');
+        });
+      },
+
+      initEvents() {
+        const btnLogin = document.getElementById('partner-login-btn');
+        const btnGoogle = document.getElementById('partner-google-btn');
+        const btnRegister = document.getElementById('partner-register-btn');
+
+        if (btnLogin) btnLogin.addEventListener('click', () => this.loginEmail());
+        if (btnGoogle) btnGoogle.addEventListener('click', () => this.loginGoogle());
+        if (btnRegister) btnRegister.addEventListener('click', () => this.registerPartner());
+      },
+
+      async loginEmail() {
+        const email = document.getElementById('partner-login-email').value.trim();
+        const password = document.getElementById('partner-login-password').value;
+
+        if (!email || !password) {
+          this.showToast("Please enter email and password.", "error");
+          return;
+        }
+
+        const auth = window.firebaseAuth;
+        const helpers = window.firebaseHelpers;
+
+        try {
+          const cred = await helpers.signInWithEmailAndPassword(auth, email, password);
+
+          // For email/password, require emailVerified
+          if (!cred.user.emailVerified) {
+            await helpers.sendEmailVerification(cred.user);
+            this.showToast("Email not verified. Verification link sent again to " + cred.user.email, "error");
+            await helpers.signOut(auth);
+            return;
+          }
+
+          this.showToast("Login successful. Redirecting to dashboard...");
+          setTimeout(() => {
+            window.location.href = "partner-dashboard.html?email=" + encodeURIComponent(cred.user.email);
+          }, 800);
+        } catch (err) {
+          console.error(err);
+          this.showToast("Login failed: " + err.message, "error");
+        }
+      },
+
+      async loginGoogle() {
+        const auth = window.firebaseAuth;
+        const helpers = window.firebaseHelpers;
+
+        try {
+          const result = await helpers.signInWithPopup(auth, helpers.googleProvider);
+          const user = result.user;
+
+          // Google email is already verified
+          this.showToast("Google login successful. Redirecting to dashboard...");
+
+          setTimeout(() => {
+            window.location.href = "partner-dashboard.html?email=" + encodeURIComponent(user.email || '');
+          }, 800);
+        } catch (err) {
+          console.error(err);
+          this.showToast("Google login failed: " + err.message, "error");
+        }
+      },
+
+      async registerPartner() {
+        const fullname = document.getElementById('partner-reg-fullname').value.trim();
+        const email = document.getElementById('partner-reg-email').value.trim();
+        const phone = document.getElementById('partner-reg-phone').value.trim();
+        const password = document.getElementById('partner-reg-password').value;
+        const password2 = document.getElementById('partner-reg-password2').value;
+
+        if (!fullname || !email || !phone || !password || !password2) {
+          this.showToast("Please fill all fields.", "error");
+          return;
+        }
+
+        if (password !== password2) {
+          this.showToast("Passwords do not match.", "error");
+          return;
+        }
+
+        const auth = window.firebaseAuth;
+        const helpers = window.firebaseHelpers;
+        const db = window.firebaseDb;
+        const { collection, addDoc, serverTimestamp } = helpers;
+
+        try {
+          const cred = await helpers.createUserWithEmailAndPassword(auth, email, password);
+          await helpers.sendEmailVerification(cred.user);
+
+          // Save basic partner account stub
+          await addDoc(collection(db, "partnerAccounts"), {
+            uid: cred.user.uid,
+            fullname,
+            email,
+            phone,
+            createdAt: serverTimestamp(),
+            emailVerified: false,
+          });
+
+          this.showToast("Registered successfully. Verify your email before logging in.");
+        } catch (err) {
+          console.error(err);
+          this.showToast("Registration failed: " + err.message, "error");
+        }
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => partnerAuthPage.init());
+  </script>
+  <script type="module">
+
+// LOGIN WITH EMAIL
+document.getElementById("btn-partner-login").addEventListener("click", async () => {
+  const email = email_partner.value;
+  const password = password_partner.value;
+
+  try {
+    const user = await auth.signInWithEmailAndPassword(email, password);
+
+    if (!user.user.emailVerified) {
+      alert("Email not verified! Verification link sent again.");
+      user.user.sendEmailVerification();
+      return;
+    }
+
+    window.location.href = "partner-dashboard.html";
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+// GOOGLE LOGIN
+document.getElementById("btn-partner-google").addEventListener("click", async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  const result = await auth.signInWithPopup(provider);
+
+  // CREATE PARTNER PROFILE IF NEW
+  const doc = await db.collection("partners").doc(result.user.uid).get();
+  if (!doc.exists) {
+    await db.collection("partners").doc(result.user.uid).set({
+      email: result.user.email,
+      name: result.user.displayName,
+      createdAt: Date.now(),
+      plan: "free"
+    });
+  }
+
+  window.location.href = "partner-dashboard.html";
+});
+
+// REGISTER NEW PARTNER
+document.getElementById("btn-partner-register").addEventListener("click", async () => {
+  const email = reg_email.value;
+  const password = reg_password.value;
+
+  try {
+    const user = await auth.createUserWithEmailAndPassword(email, password);
+
+    await user.user.sendEmailVerification();
+
+    await db.collection("partners").doc(user.user.uid).set({
+      email: email,
+      name: reg_name.value,
+      phone: reg_phone.value,
+      city: reg_city.value,
+      state: reg_state.value,
+      createdAt: Date.now(),
+      plan: "free"
+    });
+
+    alert("Verification email sent. Please verify before logging in!");
+
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
+
+<script src="/firebase.js"></script>
+
+</body>
+</html>
