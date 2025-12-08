@@ -1,62 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Partner Products – Rentify</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Rentify - Rent Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 </head>
-<body class="bg-slate-950 text-slate-50">
-  <div class="max-w-4xl mx-auto py-10 px-4">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-semibold">Product Management</h1>
-      <button onclick="window.location.href='partner-dashboard.html'"
-              class="text-sm px-3 py-1 rounded bg-slate-800 hover:bg-slate-700">
-        ← Back to dashboard
-      </button>
+<body class="bg-slate-50 font-sans">
+
+  <nav class="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+    <div class="font-bold text-xl text-blue-600">Rentify.</div>
+    <div id="user-info" class="text-sm text-slate-600">Guest</div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto p-6">
+    <h2 class="text-2xl font-bold mb-6 text-slate-800">Available Equipment</h2>
+    <div id="grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        </div>
+  </main>
+
+  <div id="modal-rent" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl">
+        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between">
+            <h3 class="font-bold text-lg" id="rent-title">Rent Product</h3>
+            <button onclick="closeRentModal()" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="p-6 space-y-4">
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-slate-500">Start Date</label>
+                    <input type="date" id="date-start" class="w-full border p-2 rounded" onchange="calcTotal()">
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-slate-500">End Date</label>
+                    <input type="date" id="date-end" class="w-full border p-2 rounded" onchange="calcTotal()">
+                </div>
+            </div>
+
+            <div>
+                <label class="text-xs font-bold text-slate-500">Logistics</label>
+                <select id="logistics" class="w-full border p-2 rounded">
+                    <option value="pickup">Self Pickup (Free)</option>
+                    <option value="delivery">Home Delivery (+ ₹150)</option>
+                </select>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-lg space-y-2 text-sm">
+                <div class="flex justify-between"><span>Rental Cost:</span> <span id="bill-rent">₹0</span></div>
+                <div class="flex justify-between text-slate-500"><span>Security Deposit (Refundable):</span> <span id="bill-deposit">₹0</span></div>
+                <div class="flex justify-between font-bold text-lg border-t border-blue-200 pt-2 mt-2">
+                    <span>Total to Pay:</span> <span class="text-blue-600" id="bill-total">₹0</span>
+                </div>
+            </div>
+
+            <button onclick="confirmBooking()" id="btn-pay" class="w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-black">
+                Pay Securely & Book
+            </button>
+        </div>
     </div>
-
-    <p class="text-sm text-slate-400 mb-4">
-      Here you’ll list, create and edit all products of this partner.  
-      (You already have product add/list logic – you can move it into this page.)
-    </p>
-
-    <div id="product-list" class="space-y-3 text-sm"></div>
   </div>
 
-  <script src="/firebase.js"></script>
-  <script>
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) return (window.location.href = "loginpage.html?role=partner");
+  <script type="module" src="firebase-config.js"></script>
+<script>
+    let products = [];
+    let selectedProduct = null;
+    let currentUser = null;
 
-      const listEl = document.getElementById("product-list");
-      listEl.innerHTML = "<div class='text-slate-400'>Loading products…</div>";
-
-      const snap = await db.collection("products")
-        .where("partnerId", "==", user.uid)
-        .orderBy("createdAt", "desc")
-        .get();
-
-      if (snap.empty) {
-        listEl.innerHTML = "<div class='text-slate-400'>No products yet.</div>";
-        return;
-      }
-
-      let html = "";
-      snap.forEach(doc => {
-        const p = doc.data();
-        html += `
-          <div class="border border-slate-800 rounded-xl px-4 py-3 flex justify-between items-center">
-            <div>
-              <div class="font-medium">${p.name || "Untitled product"}</div>
-              <div class="text-xs text-slate-400">
-                ₹${p.rentPerDay || 0}/day · status: ${p.status || "draft"}
-              </div>
-            </div>
-          </div>`;
-      });
-      listEl.innerHTML = html;
+    document.addEventListener("DOMContentLoaded", async () => {
+        // Wait for Firebase to initialize from module
+        const checkFirebase = setInterval(() => {
+            if (window.firebaseHelpers) {
+                clearInterval(checkFirebase);
+                initApp();
+            }
+        }, 100);
     });
-  </script>
+
+    async function initApp() {
+        const db = window.firebaseDb;
+        const helpers = window.firebaseHelpers;
+        const auth = window.firebaseAuth;
+
+        // Check Auth State
+        helpers.onAuthStateChanged(auth, user => {
+            currentUser = user;
+            const userInfo = document.getElementById('user-info');
+            if(userInfo) userInfo.textContent = user ? (user.email || "User") : "Guest";
+        });
+
+        // Load Published Products
+        try {
+            const q = helpers.query(
+                helpers.collection(db, "products"), 
+                helpers.where("status", "==", "published")
+            );
+            const snap = await helpers.getDocs(q);
+            const grid = document.getElementById('grid');
+            
+            if(snap.empty) {
+                grid.innerHTML = '<div class="col-span-full text-center py-20 text-slate-500">No products available.</div>';
+                return;
+            }
+
+            grid.innerHTML = "";
+            snap.forEach(doc => {
+                const p = { id: doc.id, ...doc.data() };
+                products.push(p);
+                
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl shadow-sm border border-slate-100 hover:shadow-lg transition cursor-pointer flex flex-col h-full";
+                card.innerHTML = `
+                    <div class="h-48 bg-slate-100 relative">
+                         <img src="${p.imageUrl}" class="w-full h-full object-cover rounded-t-xl" loading="lazy">
+                         <span class="absolute top-2 right-2 bg-white/90 px-2 py-1 text-[10px] font-bold uppercase rounded shadow-sm">${p.category || 'Item'}</span>
+                    </div>
+                    <div class="p-4 flex flex-col flex-1">
+                        <h3 class="font-bold text-lg text-slate-800 line-clamp-1">${p.name}</h3>
+                        <div class="text-sm text-slate-500 mb-4 line-clamp-2">${p.description || ''}</div>
+                        
+                        <div class="mt-auto flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-blue-600 text-lg">₹${p.rentPerDay}<span class="text-xs text-slate-400 font-normal">/day</span></div>
+                                <div class="text-[10px] text-slate-400">Deposit: ₹${p.deposit || 0}</div>
+                            </div>
+                            <button onclick="openRentModal('${p.id}')" class="bg-slate-900 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Rent Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        } catch (err) {
+            console.error("Product load error", err);
+        }
+    }
+
+    // Modal & Booking Logic attached to window
+    window.openRentModal = (pid) => {
+        if(!currentUser) return alert("Please Login to rent products.");
+        selectedProduct = products.find(p => p.id === pid);
+        if(!selectedProduct) return;
+        
+        document.getElementById('rent-title').textContent = "Rent " + selectedProduct.name;
+        document.getElementById('modal-rent').classList.remove('hidden');
+        
+        // Reset inputs
+        document.getElementById('date-start').value = "";
+        document.getElementById('date-end').value = "";
+        document.getElementById('bill-total').textContent = "₹0";
+    };
+
+    window.closeRentModal = () => document.getElementById('modal-rent').classList.add('hidden');
+
+    window.calcTotal = () => {
+        if(!selectedProduct) return;
+        const d1Input = document.getElementById('date-start').value;
+        const d2Input = document.getElementById('date-end').value;
+        
+        if(!d1Input || !d2Input) return;
+
+        const d1 = new Date(d1Input);
+        const d2 = new Date(d2Input);
+        
+        let days = 1;
+        if(d2 > d1) {
+            const diff = d2 - d1;
+            days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        }
+
+        const rentCost = days * selectedProduct.rentPerDay;
+        const deposit = selectedProduct.deposit || 0;
+        
+        document.getElementById('bill-rent').textContent = `₹${rentCost}`;
+        document.getElementById('bill-deposit').textContent = `₹${deposit}`;
+        document.getElementById('bill-total').textContent = `₹${rentCost + deposit}`;
+    };
+
+    window.confirmBooking = async () => {
+        const helpers = window.firebaseHelpers;
+        const db = window.firebaseDb;
+        
+        const d1 = document.getElementById('date-start').value;
+        const d2 = document.getElementById('date-end').value;
+        
+        if(!d1 || !d2) return alert("Please select start and end dates.");
+
+        const btn = document.getElementById('btn-pay');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+        btn.disabled = true;
+
+        try {
+            // FIX: Use helpers.Timestamp correctly now that it's exported
+            const startDateTimestamp = helpers.Timestamp.fromDate(new Date(d1));
+            const endDateTimestamp = helpers.Timestamp.fromDate(new Date(d2));
+
+            await helpers.addDoc(helpers.collection(db, "bookings"), {
+                productId: selectedProduct.id,
+                productName: selectedProduct.name,
+                partnerId: selectedProduct.partnerId,
+                customerId: currentUser.uid,
+                customerName: currentUser.email,
+                startDate: startDateTimestamp,
+                endDate: endDateTimestamp,
+                depositAmount: selectedProduct.deposit || 0,
+                status: 'active',
+                createdAt: helpers.serverTimestamp()
+            });
+
+            alert("Booking Confirmed! Please pick up your item.");
+            closeRentModal();
+        } catch(e) {
+            console.error(e);
+            alert("Booking Failed: " + e.message);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    };
+</script>
 </body>
 </html>

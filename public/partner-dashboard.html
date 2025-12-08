@@ -4,465 +4,120 @@
   <meta charset="UTF-8" />
   <title>Rentify Partner Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Tailwind CDN (for layout only) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter",
-        "Segoe UI", sans-serif;
-    }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-thumb { background: #cbd5f5; border-radius: 999px; }
-    ::-webkit-scrollbar-track { background: #f3f4f6; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: "Inter", sans-serif; background-color: #f1f5f9; }
+    .glass { background: white; border: 1px solid #e2e8f0; }
+    .loader { border: 2px solid #f3f3f3; border-top: 2px solid #3b82f6; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-<div class="flex min-h-screen">
+<body class="text-slate-800">
 
-  <!-- SIDEBAR ------------------------------------------------------------- -->
-  <aside class="hidden md:flex md:w-60 lg:w-64 flex-col bg-white border-r border-gray-200">
-    <div class="flex items-center h-16 px-5 border-b border-gray-200">
-      <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded bg-blue-600 text-white flex items-center justify-center font-semibold">
-          R
-        </div>
-        <div class="flex flex-col leading-tight">
-          <span class="font-semibold text-gray-900 text-sm">Rentify Partner</span>
-          <span class="text-xs text-gray-400 tracking-wide uppercase">Dashboard</span>
-        </div>
-      </div>
-    </div>
-
-    <nav class="flex-1 overflow-y-auto py-4 text-sm">
-      <p class="px-5 text-xs font-semibold text-gray-400 uppercase mb-2">Main</p>
-
-      <a id="nav-home" href="#" class="flex items-center gap-3 px-5 py-2.5 bg-gray-100 text-blue-600 border-l-4 border-blue-600 font-medium">
-        <span class="inline-flex w-5 justify-center">🏠</span><span>Home</span>
-      </a>
-
-      <button id="nav-products" class="w-full flex items-center gap-3 px-5 py-2.5 text-left text-gray-700 hover:bg-gray-50">
-        <span class="inline-flex w-5 justify-center">🧰</span><span>Products</span>
-      </button>
-
-      <button id="nav-bookings" class="w-full flex items-center gap-3 px-5 py-2.5 text-left text-gray-700 hover:bg-gray-50">
-        <span class="inline-flex w-5 justify-center">📅</span><span>Bookings</span>
-      </button>
-
-      <button id="nav-customers" class="w-full flex items-center gap-3 px-5 py-2.5 text-left text-gray-700 hover:bg-gray-50">
-        <span class="inline-flex w-5 justify-center">👥</span><span>Customers</span>
-      </button>
-
-      <button id="nav-analytics" class="w-full flex items-center gap-3 px-5 py-2.5 text-left text-gray-700 hover:bg-gray-50">
-        <span class="inline-flex w-5 justify-center">📈</span><span>Analytics</span>
-      </button>
-
-      <button id="nav-billing" class="w-full flex items-center gap-3 px-5 py-2.5 text-left text-gray-700 hover:bg-gray-50">
-        <span class="inline-flex w-5 justify-center">💳</span><span>Plans &amp; Billing</span>
-      </button>
-
-      <button id="nav-audit" class="w-full flex items-center gap-3 px-5 py-2.5 text-left text-gray-700 hover:bg-gray-50">
-        <span class="inline-flex w-5 justify-center">📜</span><span>Audit Log</span>
-      </button>
-
-      <p class="px-5 mt-4 text-xs font-semibold text-gray-400 uppercase mb-2">Account</p>
-
-      <button id="nav-settings" class="w-full flex items-center gap-3 px-5 py-2.5 text-left text-gray-700 hover:bg-gray-50">
-        <span class="inline-flex w-5 justify-center">⚙️</span><span>Settings</span>
-      </button>
-
-      <button id="btn-logout" class="w-full flex items-center gap-3 px-5 py-2.5 text-left text-gray-700 hover:bg-gray-50">
-        <span class="inline-flex w-5 justify-center">🚪</span><span>Logout</span>
-      </button>
+<div class="flex h-screen overflow-hidden">
+  <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col z-20">
+    <div class="h-16 flex items-center px-6 border-b border-slate-100 font-bold text-xl text-blue-600 tracking-tight">Rentify.</div>
+    <nav class="flex-1 py-6 px-3 space-y-1">
+      <button onclick="switchTab('overview')" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-50 font-medium text-slate-600 flex gap-3"><i class="fa-solid fa-chart-pie"></i> Overview</button>
+      <button onclick="switchTab('tracking')" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-50 font-medium text-slate-600 flex gap-3"><i class="fa-solid fa-location-dot"></i> Live Tracking <span id="alert-badge" class="hidden ml-auto bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">!</span></button>
+      <button onclick="switchTab('products')" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-50 font-medium text-slate-600 flex gap-3"><i class="fa-solid fa-box"></i> Products</button>
+      <button id="btn-logout" class="mt-auto w-full text-left px-4 py-3 text-red-500 hover:bg-red-50 font-medium flex gap-3"><i class="fa-solid fa-power-off"></i> Logout</button>
     </nav>
-
-    <div class="p-4 border-t border-gray-200 text-xs text-gray-400">
-      <div>Plan: <span id="sidebar-plan-label" class="font-medium text-gray-700">Free</span></div>
-      <div class="mt-1">Store ID: <span class="text-gray-500" id="sidebar-store-id">–</span></div>
-    </div>
   </aside>
 
-  <!-- MOBILE TOP BAR ------------------------------------------------------ -->
-  <div class="md:hidden fixed inset-x-0 top-0 z-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 h-14">
-    <div class="flex items-center gap-2">
-      <button id="mobile-menu-toggle" class="p-2 rounded hover:bg-gray-100">☰</button>
-      <span class="font-semibold text-gray-900 text-sm">Rentify Partner</span>
-    </div>
-    <div class="text-xs text-gray-500">
-      Plan: <span id="mobile-plan-label" class="font-medium text-gray-700">Free</span>
-    </div>
-  </div>
-
-  <!-- MOBILE NAV PANEL -->
-  <div id="mobile-nav" class="md:hidden fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 transform -translate-x-full transition-transform duration-200 z-30">
-    <div class="flex items-center h-14 px-4 border-b border-gray-200">
-      <span class="font-semibold text-gray-900 text-sm">Navigation</span>
-    </div>
-    <nav class="py-4 text-sm">
-      <button id="mnav-home"      class="block w-full text-left px-4 py-2.5 bg-gray-100 text-blue-600">Home</button>
-      <button id="mnav-products"  class="block w-full text-left px-4 py-2.5 hover:bg-gray-50">Products</button>
-      <button id="mnav-bookings"  class="block w-full text-left px-4 py-2.5 hover:bg-gray-50">Bookings</button>
-      <button id="mnav-customers" class="block w-full text-left px-4 py-2.5 hover:bg-gray-50">Customers</button>
-      <button id="mnav-analytics" class="block w-full text-left px-4 py-2.5 hover:bg-gray-50">Analytics</button>
-      <button id="mnav-settings"  class="block w-full text-left px-4 py-2.5 hover:bg-gray-50">Settings</button>
-      <button id="btn-logout-mobile" class="block w-full text-left px-4 py-2.5 hover:bg-gray-50">Logout</button>
-    </nav>
-  </div>
-
-  <!-- MAIN CONTENT -------------------------------------------------------- -->
-  <main class="flex-1 flex flex-col w-full">
-    <div class="md:hidden h-14"></div>
-
-    <!-- TOP BAR -->
-    <header class="h-16 border-b border-gray-200 bg-white flex items-center justify-between px-4 lg:px-8">
-      <div class="flex items-center gap-4">
-        <div class="hidden sm:flex items-center gap-1 text-xs text-gray-500">
-          <span>Rentify</span><span>/</span><span class="text-gray-900 font-medium">Partner Dashboard</span>
-        </div>
-        <div>
-          <div class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">
-            Current store
-          </div>
-          <div class="flex items-center gap-1 text-sm font-medium text-gray-900">
-            <span id="store-name">Loading store…</span>
-            <button class="text-xs text-blue-600 hover:underline ml-1">Switch</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <div class="hidden sm:flex items-center">
-          <div class="relative">
-            <span class="absolute inset-y-0 left-2 flex items-center text-gray-400 text-sm">🔍</span>
-            <input
-              type="text"
-              placeholder="Search bookings, products…"
-              class="pl-7 pr-3 py-1.5 rounded-md border border-gray-200 text-xs bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-        </div>
-
-        <div class="hidden sm:flex flex-col text-right">
-          <span id="partner-name" class="text-xs font-semibold text-gray-900">Partner name</span>
-          <span id="partner-email" class="text-[11px] text-gray-400">partner@email.com</span>
-        </div>
-
-        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 text-white flex items-center justify-center text-xs font-semibold">
-          <span id="partner-avatar-initials">P</span>
-        </div>
-      </div>
+  <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+      <h2 class="font-bold text-lg" id="page-title">Overview</h2>
+      <button onclick="openAddModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg shadow-blue-500/20 flex gap-2 items-center">
+        <i class="fa-solid fa-plus"></i> Add Product
+      </button>
     </header>
 
-    <!-- PLAN BANNER -->
-    <section class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 lg:px-8 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-      <div class="text-sm">
-        <span class="font-semibold">Plan:
-          <span id="current-plan">Free</span>
-        </span>
-        <span class="mx-1">·</span>
-        <span id="plan-description">Good for testing and small rental shops.</span>
-      </div>
-      <div class="flex gap-2 text-xs">
-        <button id="btn-view-limits" class="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20">
-          View limits
-        </button>
-        <button id="btn-upgrade-plan" class="px-3 py-1 rounded-full bg-white text-blue-700 font-semibold shadow-sm hover:bg-blue-50">
-          Upgrade plan
-        </button>
-      </div>
-    </section>
-
-    <!-- GRID CONTENT -->
-    <div class="flex-1 overflow-y-auto px-4 lg:px-8 py-6">
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-        <!-- LEFT COLUMN --------------------------------------------------- -->
-        <div class="xl:col-span-2 space-y-6">
-
-          <!-- STORE OVERVIEW CARD -->
-          <section class="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div class="px-5 pt-4 pb-3 border-b border-gray-100 flex items-center justify-between">
-              <div>
-                <h2 class="text-sm font-semibold text-gray-900">Store overview</h2>
-                <p class="text-xs text-gray-500">
-                  Manage products, bookings and lifecycle for this store.
-                </p>
-              </div>
-              <div class="px-2.5 py-1 rounded-full border border-blue-100 bg-blue-50 text-[11px] text-blue-700 font-medium">
-                Status: <span id="store-status">Active</span>
-              </div>
-            </div>
-
-            <div class="px-5 py-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <div class="text-[11px] text-gray-400 uppercase tracking-wide font-semibold mb-1">Partner name</div>
-                <div class="font-medium text-gray-900" id="overview-partner-name">Loading…</div>
-
-                <div class="mt-3 text-[11px] text-gray-400 uppercase tracking-wide font-semibold mb-1">Store name</div>
-                <div class="text-gray-800 text-sm" id="overview-store-name">Not set</div>
-              </div>
-
-              <div>
-                <div class="text-[11px] text-gray-400 uppercase tracking-wide font-semibold mb-1">Store location</div>
-                <div class="text-gray-800" id="store-location">City / State (from onboarding)</div>
-
-                <div class="mt-3 text-[11px] text-gray-400 uppercase tracking-wide font-semibold mb-1">Audit log</div>
-                <div class="text-gray-800 text-xs">
-                  All approvals, damage reports &amp; updates are stored safely.
-                </div>
-              </div>
-
-              <div>
-                <div class="text-[11px] text-gray-400 uppercase tracking-wide font-semibold mb-1">Booking lifecycle</div>
-                <ol class="text-xs text-gray-700 space-y-0.5 list-decimal list-inside">
-                  <li>Request</li><li>Acceptance</li><li>Pickup</li><li>Return</li><li>Completion</li>
-                </ol>
-              </div>
-            </div>
-
-            <div class="px-5 pb-4 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
-              <button id="btn-go-product-management" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-medium hover:bg-blue-700">
-                Go to Product Management
-              </button>
-              <button id="btn-dashboard-add-product" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-gray-100 text-gray-800 text-xs font-medium hover:bg-gray-200">
-                Add product
-              </button>
-              <button id="btn-edit-store" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-gray-50 text-gray-700 text-xs hover:bg-gray-100">
-                Edit Store Details
-              </button>
-            </div>
-          </section>
-
-          <!-- GETTING STARTED CARDS -->
-          <section class="grid md:grid-cols-2 gap-5">
-            <!-- Add first product -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col">
-              <div class="p-4 border-b border-gray-100">
-                <h3 class="text-sm font-semibold text-gray-900">Add your first rental product</h3>
-                <p class="mt-1 text-xs text-gray-500">
-                  Import or create inventory for cameras, tools, generators, EVs and more.
-                </p>
-              </div>
-              <div class="p-4 flex flex-col gap-3 text-xs text-gray-600">
-                <ul class="list-disc list-inside space-y-1">
-                  <li>Set daily or hourly price and security deposit.</li>
-                  <li>Add photos, specifications and usage notes.</li>
-                  <li>Choose which store or city the item is available in.</li>
-                </ul>
-                <button id="btn-card-add-product" class="self-start mt-1 px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">
-                  Add product
-                </button>
-              </div>
-            </div>
-
-            <!-- Design store -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col">
-              <div class="p-4 border-b border-gray-100">
-                <h3 class="text-sm font-semibold text-gray-900">Design your storefront</h3>
-                <p class="mt-1 text-xs text-gray-500">
-                  Pick a built-in template or upload your own store design.
-                </p>
-              </div>
-              <div class="p-4 flex flex-col gap-3 text-xs text-gray-600">
-                <ul class="list-disc list-inside space-y-1">
-                  <li>Modern Grid and Editorial Minimal templates included.</li>
-                  <li>Upload your own logo, brand colors and hero banners.</li>
-                  <li>Configure SEO, social links and contact information.</li>
-                </ul>
-                <button id="btn-customize-storefront" class="self-start mt-1 px-3 py-1.5 rounded-md bg-gray-900 text-white text-xs font-semibold hover:bg-black">
-                  Customize storefront
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <!-- CHECKLIST -->
-          <section class="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div class="px-5 pt-4 pb-3 border-b border-gray-100 flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-900">Onboarding checklist</h3>
-              <span class="text-xs text-gray-500" id="checklist-progress">–</span>
-            </div>
-            <div class="px-5 py-4 space-y-3 text-sm">
-              <div class="flex items-start gap-3">
-                <span class="mt-0.5 text-green-500">✔</span>
-                <div>
-                  <div class="font-medium text-gray-800">Create partner profile</div>
-                  <p class="text-xs text-gray-500">
-                    Your contact details are stored securely in <code>partners</code> collection.
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="mt-0.5 text-green-500">✔</span>
-                <div>
-                  <div class="font-medium text-gray-800">Email verified</div>
-                  <p class="text-xs text-gray-500">
-                    Only verified accounts can access this dashboard and manage stores.
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="mt-0.5 text-gray-400">○</span>
-                <div>
-                  <div class="font-medium text-gray-800">Connect Razorpay payouts</div>
-                  <p class="text-xs text-gray-500">
-                    Link your Razorpay account so that deposits and rental fees can be settled automatically.
-                  </p>
-                  <button id="btn-connect-razorpay" class="mt-1 inline-flex text-xs text-blue-600 hover:underline">
-                    Connect payout account
-                  </button>
-                </div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="mt-0.5 text-gray-400">○</span>
-                <div>
-                  <div class="font-medium text-gray-800">Upgrade to a growth plan</div>
-                  <p class="text-xs text-gray-500">
-                    Unlock more product listings, staff seats and analytics with Growth, Business Pro, or Enterprise.
-                  </p>
-                  <button id="btn-view-plans" class="mt-1 inline-flex text-xs text-blue-600 hover:underline">
-                    View plans
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <!-- RIGHT COLUMN -------------------------------------------------- -->
-        <div class="space-y-6">
-
-          <!-- TODAY SNAPSHOT -->
-          <section class="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div class="px-5 pt-4 pb-3 border-b border-gray-100">
-              <h3 class="text-sm font-semibold text-gray-900">Today’s snapshot</h3>
-              <p class="text-xs text-gray-500">Quick view of live activity across your stores.</p>
-            </div>
-            <div class="px-5 py-4 grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <div class="text-[11px] text-gray-400 uppercase mb-1">New booking requests</div>
-                <div class="text-2xl font-semibold text-gray-900" id="stat-new-requests">0</div>
-                <p class="text-[11px] text-gray-500 mt-1">Across all rental products.</p>
-              </div>
-              <div>
-                <div class="text-[11px] text-gray-400 uppercase mb-1">Active rentals</div>
-                <div class="text-2xl font-semibold text-gray-900" id="stat-active-rentals">0</div>
-                <p class="text-[11px] text-gray-500 mt-1">Currently in “Pickup” or “Return” stage.</p>
-              </div>
-              <div>
-                <div class="text-[11px] text-gray-400 uppercase mb-1">Published products</div>
-                <div class="text-2xl font-semibold text-gray-900" id="stat-products">0</div>
-                <p class="text-[11px] text-gray-500 mt-1">Visible to customers on Rentify marketplace.</p>
-              </div>
-              <div>
-                <div class="text-[11px] text-gray-400 uppercase mb-1">Issues reported</div>
-                <div class="text-2xl font-semibold text-gray-900" id="stat-issues">0</div>
-                <p class="text-[11px] text-gray-500 mt-1">Damage reports &amp; disputes logged today.</p>
-              </div>
-            </div>
-          </section>
-
-          <!-- PLAN CARDS -->
-          <section class="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div class="px-5 pt-4 pb-3 border-b border-gray-100 flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-900">Choose your plan</h3>
-              <span class="text-[11px] text-gray-500">Powered by Razorpay</span>
-            </div>
-            <div class="px-5 py-4 space-y-3 text-xs">
-              <!-- FREE -->
-              <div class="border border-gray-200 rounded-lg px-3 py-3 flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                  <div class="font-semibold text-gray-800 text-sm">Free</div>
-                  <div class="text-sm font-bold">₹0</div>
-                </div>
-                <p class="text-[11px] text-gray-500">
-                  Good for testing and small single-store setups.
-                </p>
-                <ul class="mt-1 list-disc list-inside text-[11px] text-gray-600 space-y-0.5">
-                  <li>Up to 10 product listings</li>
-                  <li>Single store, basic analytics</li>
-                  <li>Email-based support</li>
-                </ul>
-                <button id="btn-plan-free" class="mt-2 inline-flex justify-center px-3 py-1.5 rounded-md bg-gray-900 text-white text-[11px] font-semibold hover:bg-black">
-                  Use Free plan
-                </button>
-              </div>
-
-              <!-- GROWTH -->
-              <div class="border border-blue-200 rounded-lg px-3 py-3 flex flex-col gap-1 bg-blue-50">
-                <div class="flex items-center justify-between">
-                  <div class="font-semibold text-gray-900 text-sm">Growth</div>
-                  <div class="text-sm font-bold">₹499 / month</div>
-                </div>
-                <p class="text-[11px] text-gray-600">
-                  For expanding rental shops with multiple staff.
-                </p>
-                <ul class="mt-1 list-disc list-inside text-[11px] text-gray-700 space-y-0.5">
-                  <li>Up to 50 product listings</li>
-                  <li>3 staff seats &amp; advanced analytics</li>
-                  <li>Priority support &amp; verified badge</li>
-                </ul>
-                <button id="btn-plan-growth" class="mt-2 inline-flex justify-center px-3 py-1.5 rounded-md bg-blue-600 text-white text-[11px] font-semibold hover:bg-blue-700">
-                  Pay &amp; activate Growth
-                </button>
-              </div>
-
-              <!-- BUSINESS PRO -->
-              <div class="border border-gray-200 rounded-lg px-3 py-3 flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                  <div class="font-semibold text-gray-800 text-sm">Business Pro</div>
-                  <div class="text-sm font-bold">₹1299 / month</div>
-                </div>
-                <p class="text-[11px] text-gray-500">
-                  Multi-city rental operations with roles &amp; templates.
-                </p>
-                <button id="btn-plan-business" class="mt-2 inline-flex justify-center px-3 py-1.5 rounded-md bg-gray-100 text-gray-900 text-[11px] font-semibold hover:bg-gray-200">
-                  View Business Pro details
-                </button>
-              </div>
-
-              <!-- ENTERPRISE -->
-              <div class="border border-gray-200 rounded-lg px-3 py-3 flex flex-col gap-1">
-                <div class="flex items-center justify-between">
-                  <div class="font-semibold text-gray-800 text-sm">Enterprise</div>
-                  <div class="text-sm font-bold">Custom</div>
-                </div>
-                <p class="text-[11px] text-gray-500">
-                  For large fleets, custom contracts &amp; integrations.
-                </p>
-                <button id="btn-plan-enterprise" class="mt-2 inline-flex justify-center px-3 py-1.5 rounded-md bg-gray-100 text-gray-900 text-[11px] font-semibold hover:bg-gray-200">
-                  Talk to sales / custom
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <!-- AUDIT LOG (static text for now) -->
-          <section class="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div class="px-5 pt-4 pb-3 border-b border-gray-100 flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-gray-900">Recent audit log</h3>
-              <button id="btn-view-audit" class="text-[11px] text-blue-600 hover:underline">View all</button>
-            </div>
-            <div class="px-5 py-3 text-xs text-gray-700 space-y-2" id="audit-log-list">
-              <!-- you can later populate this from Firestore -->
-              <div class="flex justify-between">
-                <span>Audit entries will appear here.</span>
-                <span class="text-gray-400">–</span>
-              </div>
-            </div>
-          </section>
-
+    <div class="flex-1 overflow-y-auto p-8" id="main-container">
+      
+      <div id="tab-overview" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+           <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+             <div class="text-slate-500 text-xs font-bold uppercase mb-2">Active Rentals</div>
+             <div class="text-3xl font-bold text-slate-800" id="stat-active">0</div>
+           </div>
+           <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+             <div class="text-slate-500 text-xs font-bold uppercase mb-2">Pending Returns</div>
+             <div class="text-3xl font-bold text-orange-600" id="stat-pending">0</div>
+           </div>
+           <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+             <div class="text-slate-500 text-xs font-bold uppercase mb-2">Total Earnings</div>
+             <div class="text-3xl font-bold text-green-600">₹<span id="stat-earnings">0</span></div>
+           </div>
         </div>
       </div>
+
+      <div id="tab-tracking" class="hidden space-y-6">
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="px-6 py-4">Product</th>
+                <th class="px-6 py-4">Customer</th>
+                <th class="px-6 py-4">Dates</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tracking-list" class="divide-y divide-slate-100">
+              </tbody>
+          </table>
+          <div id="empty-tracking" class="hidden p-8 text-center text-slate-400">No active rentals found.</div>
+        </div>
+      </div>
+
+      <div id="tab-products" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+        </div>
+
     </div>
   </main>
 </div>
 
-<!-- Your compat firebase bundle -->
-<script src="/firebase.js"></script>
+<div id="modal-add" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
+    <div class="flex justify-between mb-4">
+      <h3 class="font-bold text-lg">Add New Product</h3>
+      <button onclick="closeAddModal()" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="form-add" class="space-y-4">
+      <input type="text" id="inp-name" placeholder="Product Name" class="w-full border p-2 rounded-lg" required>
+      <div class="grid grid-cols-2 gap-4">
+        <input type="number" id="inp-price" placeholder="Rent/Day (₹)" class="w-full border p-2 rounded-lg" required>
+        <input type="number" id="inp-deposit" placeholder="Security Deposit (₹)" class="w-full border p-2 rounded-lg" required>
+      </div>
+      <textarea id="inp-desc" placeholder="Condition details..." class="w-full border p-2 rounded-lg"></textarea>
+      <div>
+        <label class="text-xs font-bold text-slate-500">Image (Max 500KB)</label>
+        <input type="file" id="inp-file" accept="image/*" class="w-full text-xs mt-1">
+      </div>
+      <button type="submit" id="btn-publish" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">Publish Product</button>
+    </form>
+  </div>
+</div>
 
-<!-- Dashboard logic -->
-<script src="/js/partner-dashboard.js"></script>
+<div id="modal-verify" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
+    <h3 class="font-bold text-lg mb-2">Verify Return Condition</h3>
+    <p class="text-sm text-slate-500 mb-4">Upload a photo of the product now to compare with the pre-rent condition.</p>
+    
+    <input type="file" id="inp-verify-file" accept="image/*" class="w-full mb-4 text-sm">
+    <textarea id="inp-damage-note" placeholder="Any new damages? Note them here..." class="w-full border p-2 rounded-lg mb-4"></textarea>
+    
+    <div class="grid grid-cols-2 gap-3">
+        <button onclick="processReturn(false)" class="bg-green-600 text-white py-2 rounded-lg font-bold">Good Condition</button>
+        <button onclick="processReturn(true)" class="bg-red-600 text-white py-2 rounded-lg font-bold">Report Damage</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="firebase-config.js"></script>
+<script src="partner-dashboard.js"></script>
 </body>
 </html>

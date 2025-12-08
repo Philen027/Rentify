@@ -185,7 +185,7 @@
     </main>
 
     <script>
-        const app = {
+        const myapp = {
             init() {
                 this.setupEmailForm();
             },
@@ -235,33 +235,28 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => app.init());
+        document.addEventListener('DOMContentLoaded', () => myapp.init());
     </script>
     <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+ // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBcK58xxuFEHFBunE7FxJ9OHzpUs5aKCfs",
-    authDomain: "rentify-93c05.firebaseapp.com",
-    projectId: "rentify-93c05",
-    storageBucket: "rentify-93c05.firebasestorage.app",
-    messagingSenderId: "652243130812",
-    appId: "1:652243130812:web:628fd64b4a69628eae73b9"
-  };
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY",
+  authDomain: "rentify-93c05.firebaseapp.com",
+  projectId: "rentify-93c05",
+  storageBucket: "rentify-93c05.firebasestorage.app",
+  messagingSenderId: "652243130812",
+  appId: "1:652243130812:web:628fd64b4a69628eae73b9"
+};
 
-  // Initialize Firebase
-  const myapp = initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
 </script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
-
-<script src="/firebase.js"></script>
 
 </body>
 </html>

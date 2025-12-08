@@ -1,298 +1,215 @@
-// public/js/partner-dashboard.js
-// Uses global `auth` and `db` from firebase.js (compat SDK)
+document.addEventListener("DOMContentLoaded", () => {
+    const auth = window.firebaseAuth;
+    const db = window.firebaseDb;
+    const helpers = window.firebaseHelpers;
+    
+    let currentUser = null;
+    let activeBookingId = null; // For verification modal
 
-// Simple helper for nav
-function go(url) {
-  window.location.href = url;
-}
-
-const Dashboard = {
-  user: null,
-  partner: null,
-  store: null,
-
-  init() {
-    // mobile nav
-    const mobileToggle = document.getElementById("mobile-menu-toggle");
-    const mobileNav = document.getElementById("mobile-nav");
-    if (mobileToggle && mobileNav) {
-      mobileToggle.addEventListener("click", () => {
-        mobileNav.classList.toggle("-translate-x-full");
-      });
-    }
-
-    // auth guard
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        go("loginpage.html?role=partner");
-        return;
-      }
-      if (!user.emailVerified) {
-        alert("Your email is not verified yet. Please verify and login again.");
-        await auth.signOut();
-        go("loginpage.html?role=partner");
-        return;
-      }
-
-      this.user = user;
-      await this.loadPartner();
-      await this.loadStore();
-      await this.fillHeader();
-      await this.loadStats();
-      this.wireButtons();
-    });
-  },
-
-  async loadPartner() {
-    try {
-      const snap = await db.collection("partners").doc(this.user.uid).get();
-      this.partner = snap.exists ? snap.data() : {};
-    } catch (e) {
-      console.error("loadPartner error", e);
-      this.partner = {};
-    }
-  },
-
-  async loadStore() {
-    try {
-      const storeSnap = await db
-        .collection("stores")
-        .where("partnerId", "==", this.user.uid)
-        .limit(1)
-        .get();
-
-      if (!storeSnap.empty) {
-        const doc = storeSnap.docs[0];
-        this.store = { id: doc.id, ...doc.data() };
-      } else {
-        this.store = null;
-      }
-    } catch (e) {
-      console.error("loadStore error", e);
-      this.store = null;
-    }
-  },
-
-  async fillHeader() {
-    const name =
-      this.partner.fullname ||
-      this.partner.name ||
-      this.user.displayName ||
-      this.user.email ||
-      "Partner";
-
-    const email = this.partner.email || this.user.email || "";
-
-    const partnerNameEl = document.getElementById("partner-name");
-    const partnerEmailEl = document.getElementById("partner-email");
-    const avatarInitialsEl = document.getElementById("partner-avatar-initials");
-    const overviewPartnerNameEl = document.getElementById("overview-partner-name");
-    const storeNameHeaderEl = document.getElementById("store-name");
-    const storeNameOverviewEl = document.getElementById("overview-store-name");
-    const storeLocationEl = document.getElementById("store-location");
-    const sidebarStoreIdEl = document.getElementById("sidebar-store-id");
-    const currentPlanEl = document.getElementById("current-plan");
-    const sidebarPlanLabelEl = document.getElementById("sidebar-plan-label");
-    const mobilePlanLabelEl = document.getElementById("mobile-plan-label");
-    const planDescEl = document.getElementById("plan-description");
-
-    const plan = this.partner.plan || "Free";
-
-    if (partnerNameEl) partnerNameEl.textContent = name;
-    if (partnerEmailEl) partnerEmailEl.textContent = email;
-    if (overviewPartnerNameEl) overviewPartnerNameEl.textContent = name;
-
-    if (avatarInitialsEl) {
-      avatarInitialsEl.textContent = (name || "?").charAt(0).toUpperCase();
-    }
-
-    if (this.store) {
-      const sname = this.store.name || this.store.storeName || "Your store";
-      if (storeNameHeaderEl) storeNameHeaderEl.textContent = sname;
-      if (storeNameOverviewEl) storeNameOverviewEl.textContent = sname;
-      if (storeLocationEl) {
-        const city = this.store.city || "";
-        const state = this.store.state || "";
-        storeLocationEl.textContent = city || state ? `${city}, ${state}` : "Location not set";
-      }
-      if (sidebarStoreIdEl) sidebarStoreIdEl.textContent = this.store.id;
-    } else {
-      if (storeNameHeaderEl) storeNameHeaderEl.textContent = "Create your first store";
-      if (storeNameOverviewEl) storeNameOverviewEl.textContent = "No store yet";
-      if (storeLocationEl) storeLocationEl.textContent = "Location not set";
-      if (sidebarStoreIdEl) sidebarStoreIdEl.textContent = "—";
-    }
-
-    if (currentPlanEl) currentPlanEl.textContent = plan;
-    if (sidebarPlanLabelEl) sidebarPlanLabelEl.textContent = plan;
-    if (mobilePlanLabelEl) mobilePlanLabelEl.textContent = plan;
-
-    if (planDescEl) {
-      if (plan === "Free") {
-        planDescEl.textContent = "Good for testing and small rental shops.";
-      } else if (plan === "Growth") {
-        planDescEl.textContent = "Extra listings, analytics and staff seats for growing partners.";
-      } else {
-        planDescEl.textContent = "Advanced plan with additional features.";
-      }
-    }
-  },
-
-  async loadStats() {
-    // products
-    try {
-      const prodSnap = await db
-        .collection("products")
-        .where("partnerId", "==", this.user.uid)
-        .get();
-
-      let totalProducts = 0;
-      let publishedProducts = 0;
-
-      prodSnap.forEach((doc) => {
-        totalProducts++;
-        const p = doc.data();
-        if (p.status === "published") publishedProducts++;
-      });
-
-      const prodEl = document.getElementById("stat-products");
-      if (prodEl) prodEl.textContent = String(publishedProducts);
-
-      // you could also display totalProducts somewhere if you want
-    } catch (e) {
-      console.error("loadStats products error", e);
-    }
-
-    // bookings snapshot (optional, safe if collection missing)
-    try {
-      const bookSnap = await db
-        .collection("bookings")
-        .where("partnerId", "==", this.user.uid)
-        .get();
-
-      let newRequests = 0;
-      let active = 0;
-
-      bookSnap.forEach((doc) => {
-        const b = doc.data();
-        const status = (b.status || "").toLowerCase();
-        if (status === "requested" || status === "request") newRequests++;
-        if (["active", "pickup", "return"].includes(status)) active++;
-      });
-
-      const reqEl = document.getElementById("stat-new-requests");
-      const activeEl = document.getElementById("stat-active-rentals");
-      if (reqEl) reqEl.textContent = String(newRequests);
-      if (activeEl) activeEl.textContent = String(active);
-    } catch (e) {
-      console.warn("bookings stats skipped (collection may not exist yet)", e);
-    }
-
-    // issues snapshot (optional)
-    try {
-      const issuesSnap = await db
-        .collection("issues")
-        .where("partnerId", "==", this.user.uid)
-        .get();
-      const issuesEl = document.getElementById("stat-issues");
-      if (issuesEl) issuesEl.textContent = String(issuesSnap.size);
-    } catch (e) {
-      console.warn("issues stats skipped", e);
-    }
-
-    // simple checklist “2 of 4 steps”
-    const checklistEl = document.getElementById("checklist-progress");
-    if (checklistEl) checklistEl.textContent = "2 of 4 steps completed";
-  },
-
-  wireButtons() {
-    // logout
-    const logoutButtons = [
-      document.getElementById("btn-logout"),
-      document.getElementById("btn-logout-mobile"),
-    ];
-    logoutButtons.forEach((btn) => {
-      if (!btn) return;
-      btn.addEventListener("click", async () => {
-        try {
-          await auth.signOut();
-          go("loginpage.html?role=partner");
-        } catch (e) {
-          console.error(e);
-          alert("Logout failed: " + e.message);
+    // --- 1. AUTH & INIT ---
+    helpers.onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "loginpage.html";
+            return;
         }
-      });
+        currentUser = user;
+        loadDashboard();
+        loadTracking();
     });
 
-    // sidebar / mobile nav
-    const mapNav = (id, mobileId, target) => {
-      const el = document.getElementById(id);
-      const mel = document.getElementById(mobileId);
-      const handler = () => go(target);
-      if (el) el.addEventListener("click", handler);
-      if (mel) mel.addEventListener("click", handler);
+    // --- 2. IMAGE COMPRESSOR (Fixes "Publishing..." stuck) ---
+    const compressImage = (file) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600; // Resize to max 600px width
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compress to 70% quality JPEG
+                };
+            };
+        });
     };
 
-    mapNav("nav-products",  "mnav-products",  "products.html");
-    mapNav("nav-bookings",  "mnav-bookings",  "bookings.html");
-    mapNav("nav-customers", "mnav-customers", "customers.html");
-    mapNav("nav-analytics", "mnav-analytics", "analytics.html");
-    mapNav("nav-settings",  "mnav-settings",  "settings.html");
-    // home just reloads dashboard
-    mapNav("nav-home", "mnav-home", "partner-dashboard.html");
+    // --- 3. PUBLISH PRODUCT ---
+    document.getElementById('form-add').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-publish');
+        btn.innerHTML = "Processing...";
+        btn.disabled = true;
 
-    // top buttons
-    const goProductPage = () => go("products.html");
-    const addProductButtons = [
-      document.getElementById("btn-dashboard-add-product"),
-      document.getElementById("btn-card-add-product"),
-    ];
-    const goMgmtButtons = [document.getElementById("btn-go-product-management")];
-
-    addProductButtons.forEach((b) => b && b.addEventListener("click", goProductPage));
-    goMgmtButtons.forEach((b) => b && b.addEventListener("click", goProductPage));
-
-    // Plan buttons – only update partner.plan in Firestore
-    const planButtons = {
-      "btn-plan-free": "Free",
-      "btn-plan-growth": "Growth",
-    };
-    Object.keys(planButtons).forEach((id) => {
-      const btn = document.getElementById(id);
-      if (!btn) return;
-      btn.addEventListener("click", async () => {
-        const newPlan = planButtons[id];
         try {
-          await db.collection("partners").doc(this.user.uid).set(
-            { plan: newPlan },
-            { merge: true }
-          );
-          this.partner.plan = newPlan;
-          await this.fillHeader();
-          alert(`Plan updated to ${newPlan}. (Payment integration can be added later.)`);
-        } catch (e) {
-          console.error(e);
-          alert("Failed to update plan: " + e.message);
+            const file = document.getElementById('inp-file').files[0];
+            if (!file) throw new Error("Image required");
+
+            const base64 = await compressImage(file);
+
+            await helpers.addDoc(helpers.collection(db, "products"), {
+                partnerId: currentUser.uid,
+                name: document.getElementById('inp-name').value,
+                rentPerDay: Number(document.getElementById('inp-price').value),
+                deposit: Number(document.getElementById('inp-deposit').value),
+                description: document.getElementById('inp-desc').value,
+                imageUrl: base64,
+                status: "published",
+                createdAt: helpers.serverTimestamp()
+            });
+
+            alert("Product Published!");
+            closeAddModal();
+            document.getElementById('form-add').reset();
+            loadProductsTab(); // Refresh list
+
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            btn.innerHTML = "Publish Product";
+            btn.disabled = false;
         }
-      });
     });
 
-    // View limits / view plans / Razorpay buttons – for now just info to user
-    const simpleInfo = (id, msg) => {
-      const btn = document.getElementById(id);
-      if (btn) btn.addEventListener("click", () => alert(msg));
+    // --- 4. TRACKING SYSTEM ---
+    async function loadTracking() {
+        const list = document.getElementById('tracking-list');
+        list.innerHTML = "";
+        
+        const q = helpers.query(
+            helpers.collection(db, "bookings"),
+            helpers.where("partnerId", "==", currentUser.uid),
+            helpers.orderBy("createdAt", "desc")
+        );
+
+        const snap = await helpers.getDocs(q);
+        
+        let activeCount = 0;
+        let pendingReturns = 0;
+
+        if(snap.empty) {
+            document.getElementById('empty-tracking').classList.remove('hidden');
+            return;
+        }
+
+        snap.forEach(doc => {
+            const b = doc.data();
+            const today = new Date();
+            const endDate = b.endDate ? b.endDate.toDate() : new Date();
+            
+            // Check for Alerts (Overdue)
+            let isOverdue = false;
+            if (b.status === 'active' && today > endDate) {
+                isOverdue = true;
+                document.getElementById('alert-badge').classList.remove('hidden');
+                pendingReturns++;
+            }
+            if (b.status === 'active') activeCount++;
+
+            const row = document.createElement('tr');
+            row.className = "bg-white border-b hover:bg-slate-50";
+            row.innerHTML = `
+                <td class="px-6 py-4 font-medium text-slate-900">${b.productName}</td>
+                <td class="px-6 py-4 text-slate-500">
+                    <div>${b.customerName || 'Customer'}</div>
+                    <div class="text-xs text-slate-400">Paid Deposit: ₹${b.depositAmount}</div>
+                </td>
+                <td class="px-6 py-4 text-xs text-slate-500">
+                    <div>Start: ${b.startDate ? b.startDate.toDate().toLocaleDateString() : '-'}</div>
+                    <div class="${isOverdue ? 'text-red-600 font-bold' : ''}">End: ${endDate.toLocaleDateString()}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="px-2 py-1 rounded text-xs font-bold 
+                        ${b.status==='active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">
+                        ${isOverdue ? 'OVERDUE' : b.status.toUpperCase()}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    ${b.status === 'active' ? 
+                        `<button onclick="openVerifyModal('${doc.id}')" class="text-blue-600 hover:underline text-xs font-bold">
+                            Verify Return
+                        </button>` : 
+                        `<span class="text-xs text-slate-400">Completed</span>`
+                    }
+                </td>
+            `;
+            list.appendChild(row);
+        });
+
+        // Update Stats
+        document.getElementById('stat-active').textContent = activeCount;
+        document.getElementById('stat-pending').textContent = pendingReturns;
+    }
+
+    // --- 5. DAMAGE VERIFICATION LOGIC ---
+    window.openVerifyModal = (bookingId) => {
+        activeBookingId = bookingId;
+        document.getElementById('modal-verify').classList.remove('hidden');
     };
 
-    simpleInfo("btn-view-limits", "Plan limits view is not implemented yet.");
-    simpleInfo("btn-upgrade-plan", "Upgrade flow will use Razorpay. For now just change plan below.");
-    simpleInfo("btn-connect-razorpay", "Here you can later integrate Razorpay payouts.");
-    simpleInfo("btn-view-plans", "Opens a page with detailed plan comparison (to be built).");
-    simpleInfo("btn-plan-business", "Business Pro: open a marketing / sales page.");
-    simpleInfo("btn-plan-enterprise", "Enterprise: open a contact / sales page.");
-    simpleInfo("btn-view-audit", "Audit log full view page can be added later.");
-    simpleInfo("btn-customize-storefront", "You can route this to a storefront designer page.");
-    simpleInfo("btn-edit-store", "You can route this to store settings page.");
-  },
-};
+    window.processReturn = async (hasDamage) => {
+        if(!activeBookingId) return;
+        
+        const note = document.getElementById('inp-damage-note').value;
+        const file = document.getElementById('inp-verify-file').files[0];
+        let proofImg = null;
 
-document.addEventListener("DOMContentLoaded", () => Dashboard.init());
+        if (file) {
+            proofImg = await compressImage(file);
+        }
+
+        const bookingRef = helpers.doc(db, "bookings", activeBookingId);
+        
+        await helpers.updateDoc(bookingRef, {
+            status: hasDamage ? "disputed" : "completed",
+            returnDate: helpers.serverTimestamp(),
+            damageReported: hasDamage,
+            damageNote: note,
+            returnProofImage: proofImg
+        });
+
+        alert(hasDamage ? "Damage reported! Deposit held." : "Return verified! Deposit released.");
+        document.getElementById('modal-verify').classList.add('hidden');
+        loadTracking();
+    };
+
+    // --- UI HELPERS ---
+    window.openAddModal = () => document.getElementById('modal-add').classList.remove('hidden');
+    window.closeAddModal = () => document.getElementById('modal-add').classList.add('hidden');
+    window.switchTab = (tab) => {
+        ['overview', 'tracking', 'products'].forEach(t => {
+            document.getElementById(`tab-${t}`).classList.add('hidden');
+        });
+        document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        if(tab === 'products') loadProductsTab();
+    };
+
+    // Simple product loader for 'Products' tab
+    async function loadProductsTab() {
+        const container = document.getElementById('tab-products');
+        container.innerHTML = '<div class="loader"></div>';
+        const q = helpers.query(helpers.collection(db, "products"), helpers.where("partnerId", "==", currentUser.uid));
+        const snap = await helpers.getDocs(q);
+        container.innerHTML = "";
+        snap.forEach(doc => {
+            const p = doc.data();
+            container.innerHTML += `
+                <div class="bg-white p-4 rounded-xl border shadow-sm">
+                    <img src="${p.imageUrl}" class="w-full h-32 object-cover rounded-lg mb-2">
+                    <h4 class="font-bold">${p.name}</h4>
+                    <p class="text-sm text-slate-500">₹${p.rentPerDay}/day</p>
+                </div>
+            `;
+        });
+    }
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        helpers.signOut(auth).then(() => window.location.href = "loginpage.html");
+    });
+});
