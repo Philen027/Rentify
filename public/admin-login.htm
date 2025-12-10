@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rentify - Admin Access</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: white; }
+    
+    .video-background {
+      position: fixed; top: 50%; left: 50%;
+      min-width: 100%; min-height: 100%; width: auto; height: auto;
+      z-index: -10; transform: translate(-50%, -50%); object-fit: cover;
+    }
+    .overlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85); z-index: -5; }
+    
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center h-screen">
+
+  <video autoplay muted loop playsinline class="video-background">
+    <source src="Video_Generation_Request.mp4" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+
+  <div class="glass-panel w-full max-w-md p-10 rounded-3xl animate-[fadeIn_0.5s_ease-out]">
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-red-500/20">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <h1 class="text-2xl font-bold">Admin Restricted Area</h1>
+      <p class="text-slate-400 text-sm mt-2">Authorized personnel only.</p>
+    </div>
+
+    <form id="admin-form" class="space-y-5">
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Admin Email</label>
+        <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-slate-500"></i>
+            <input type="email" id="adm-email" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-red-500 transition" placeholder="admin@rentify.com">
+        </div>
+      </div>
+      
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Password</label>
+        <div class="relative">
+            <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-500"></i>
+            <input type="password" id="adm-pass" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-red-500 transition" placeholder="••••••••">
+        </div>
+      </div>
+
+      <button type="submit" id="btn-login" class="w-full py-3.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold rounded-xl shadow-lg shadow-red-900/20 transition flex justify-center items-center gap-2">
+        <span>Authenticate</span> <i class="fa-solid fa-fingerprint"></i>
+      </button>
+    </form>
+
+    <div class="mt-8 text-center">
+      <a href="loginpage.html" class="text-xs text-slate-500 hover:text-white transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-arrow-left"></i> Back to Main Site
+      </a>
+    </div>
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const auth = window.firebaseAuth;
+      const helpers = window.firebaseHelpers;
+      const ADMIN_EMAIL = "philenkuriakose027@gmail.com"; // RESTRICTED EMAIL
+
+      document.getElementById('admin-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('adm-email').value.trim();
+        const pass = document.getElementById('adm-pass').value;
+        const btn = document.getElementById('btn-login');
+
+        // 1. Client-Side Block
+        if (email !== ADMIN_EMAIL) {
+          alert("ACCESS DENIED: This email is not authorized for Admin access.");
+          return;
+        }
+
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
+        btn.disabled = true;
+
+        try {
+          // 2. Firebase Auth
+          await helpers.signInWithEmailAndPassword(auth, email, pass);
+          
+          // Success
+          window.location.href = "admin-dashboard.html";
+        } catch (err) {
+          console.error(err);
+          alert("Authentication Failed: " + err.message);
+          btn.innerHTML = '<span>Authenticate</span> <i class="fa-solid fa-fingerprint"></i>';
+          btn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

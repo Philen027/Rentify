@@ -757,7 +757,7 @@
 
       document.getElementById('btn-back-email').addEventListener('click', () => {
         // go back to landing page (same as before)
-        window.location.href = 'public/index.html';
+        window.location.href = 'index.html';
       });
 
       document.getElementById('btn-close-partner').addEventListener('click', backToRoleView);
@@ -975,6 +975,21 @@
   </script>
 
 <script src="login.js"></script>
+<div class="fixed bottom-6 right-6 z-50">
+ <div class="fixed bottom-6 right-6 z-50">
+    <a href="admin-login.htm" class="group flex items-center gap-3 px-4 py-2.5 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-full shadow-2xl hover:bg-slate-800 hover:border-red-500/50 hover:shadow-red-900/20 transition-all duration-300 hover:-translate-y-1">
+        
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+        </span>
 
+        <div class="flex items-center gap-2 text-xs font-bold text-slate-300 group-hover:text-white transition-colors">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span class="tracking-wide uppercase">Admin Access</span>
+        </div>
+    </a>
+</div>
+</div>
 </body>
 </html>

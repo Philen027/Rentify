@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rentify Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans p-10">
+
+  <div class="max-w-5xl mx-auto">
+      <div class="flex justify-between items-center mb-8">
+          <div>
+              <h1 class="text-3xl font-bold text-slate-900">Partner Requests</h1>
+              <p class="text-sm text-slate-500 mt-1">Logged in as: <span id="admin-user" class="font-bold text-blue-600">...</span></p>
+          </div>
+          <div class="flex gap-2">
+              <button onclick="location.reload()" class="bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition">
+                  <i class="fa-solid fa-rotate mr-2"></i> Refresh
+              </button>
+              <button id="btn-logout" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-sm text-sm font-bold hover:bg-red-700 transition">
+                  Logout
+              </button>
+          </div>
+      </div>
+
+      <div id="requests-list" class="space-y-4">
+          <div class="text-center py-20 bg-white rounded-xl border border-slate-200">
+              <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500 mb-4"></i>
+              <p class="text-slate-400">Verifying Admin Access...</p>
+          </div>
+      </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY",
+      authDomain: "rentify-93c05.firebaseapp.com",
+      projectId: "rentify-93c05",
+      storageBucket: "rentify-93c05.firebasestorage.app",
+      messagingSenderId: "652243130812",
+      appId: "1:652243130812:web:628fd64b4a69628eae73b9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // 1. STRICT AUTH CHECK (Fixes Permission Error)
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // Not logged in? Go to login page immediately.
+            window.location.href = "admin-login.html";
+        } else {
+            // Logged in? Load data.
+            document.getElementById('admin-user').textContent = user.email;
+            loadRequests();
+        }
+    });
+
+    // 2. LOAD REQUESTS
+    function loadRequests() {
+        const q = query(collection(db, "partners"), where("verificationStatus", "==", "submitted"));
+        
+        onSnapshot(q, (snap) => {
+            const list = document.getElementById('requests-list');
+            list.innerHTML = "";
+
+            if (snap.empty) {
+                list.innerHTML = `
+                    <div class="text-center py-16 bg-white rounded-xl border border-dashed border-slate-300">
+                        <i class="fa-solid fa-check-circle text-4xl text-green-500 mb-3 opacity-50"></i>
+                        <p class="text-slate-500 font-medium">All caught up! No pending requests.</p>
+                    </div>`;
+                return;
+            }
+
+            snap.forEach(d => {
+                const p = d.data();
+                const docId = d.id;
+                
+                // Store Base64 image globally for viewing
+                window['doc_' + docId] = p.verificationDoc;
+
+                list.innerHTML += `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 transition hover:shadow-md">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="font-bold text-lg text-slate-900">${p.businessName || 'Unknown Business'}</h3>
+                                <span class="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-200 uppercase">Pending</span>
+                            </div>
+                            <p class="text-sm text-slate-500 mb-3"><i class="fa-solid fa-location-dot mr-1"></i> ${p.businessAddress || 'No Address'}</p>
+                            
+                            <div class="flex gap-4 text-xs font-bold text-blue-600">
+                                <button onclick="viewDoc('${docId}')" class="flex items-center gap-1 hover:underline">
+                                    <i class="fa-solid fa-id-card"></i> View ID Image
+                                </button>
+                                <span class="text-slate-300 font-normal">|</span>
+                                <span class="text-slate-500 font-normal">${p.email}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateStatus('${docId}', 'rejected')" class="px-5 py-2.5 rounded-lg border border-red-200 text-red-600 font-bold text-sm hover:bg-red-50 transition">Reject</button>
+                            <button onclick="updateStatus('${docId}', 'approved')" class="px-5 py-2.5 rounded-lg bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 shadow-lg shadow-slate-200 transition">Approve</button>
+                        </div>
+                    </div>`;
+            });
+        });
+    }
+
+    // 3. ACTIONS
+    window.viewDoc = (id) => {
+        const base64Data = window['doc_' + id];
+        if (base64Data) {
+            const w = window.open("");
+            w.document.write(
+                `<title>ID Verification</title>
+                 <body style="background:#0f172a; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+                    <img src="${base64Data}" style="max-width:90%; max-height:90%; border:4px solid white; border-radius:8px; box-shadow:0 0 50px rgba(0,0,0,0.5);">
+                 </body>`
+            );
+        } else {
+            alert("Error: No document data found.");
+        }
+    };
+
+    window.updateStatus = async (id, status) => {
+        if(confirm(`Mark as ${status.toUpperCase()}?`)) {
+            try {
+                await updateDoc(doc(db, "partners", id), { verificationStatus: status });
+                // Success! No alert needed as UI updates automatically
+            } catch(e) {
+                console.error(e);
+                alert("Permission Error: Are you logged in? \n\nDetails: " + e.message);
+            }
+        }
+    };
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = "admin-login.html");
+    });
+  </script>
+</body>
+</html>
