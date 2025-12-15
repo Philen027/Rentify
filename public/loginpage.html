@@ -1,14 +1,20 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rentify – Login</title>
 
+  <!-- Fonts + Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -28,135 +34,587 @@
       },
     };
   </script>
+
   <style>
-    body { background-color: #020617; color: #ffffff; overflow-x: hidden; }
-    .video-background { position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%; width: auto; height: auto; z-index: -10; transform: translate(-50%, -50%); object-fit: cover; }
-    .cinematic-overlay { position: fixed; inset: 0; z-index: -5; background: radial-gradient(circle at 50% 50%, rgba(2, 6, 23, 0.3) 0%, rgba(2, 6, 23, 0.9) 90%); pointer-events: none; }
-    .glass-panel { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(148, 163, 184, 0.3); box-shadow: 0 24px 60px rgba(15, 23, 42, 0.8); }
-    .input-premium { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.4); color: #e5e7eb; transition: all 0.25s ease; }
-    .input-premium:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.35); background: rgba(15, 23, 42, 0.95); }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-    #toast { opacity: 0; pointer-events: none; transition: opacity 200ms ease, transform 200ms ease; transform: translateY(10px); }
-    #toast.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    body {
+      background-color: #020617;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    .video-background {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: -10;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+    }
+
+    .cinematic-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: -5;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(2, 6, 23, 0.3) 0%,
+        rgba(2, 6, 23, 0.9) 90%
+      );
+      pointer-events: none;
+    }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.8);
+    }
+
+    .input-premium {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: #e5e7eb;
+      transition: all 0.25s ease;
+    }
+
+    .input-premium:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.35);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+
+    /* toast */
+    #toast {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease, transform 200ms ease;
+      transform: translateY(10px);
+    }
+
+    #toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
 
+  <!-- Background -->
   <video autoplay muted loop playsinline class="video-background" id="bg-video">
     <source src="Video_Generation_Request.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
   <div class="cinematic-overlay"></div>
 
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl glass-panel text-sm flex items-center gap-2">
+  <!-- Toast -->
+  <div
+    id="toast"
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl glass-panel text-sm flex items-center gap-2"
+  >
     <i id="toast-icon" class="fa-solid fa-circle-info text-blue-400"></i>
     <span id="toast-message" class="text-slate-200"></span>
   </div>
 
-  <main class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-10 w-full max-w-6xl mx-auto">
-    
-    <section id="role-view" class="glass-panel rounded-[30px] px-8 py-10 md:px-14 md:py-12 w-full max-w-3xl">
+  <!-- MAIN CONTENT -->
+  <main
+    class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-10 w-full max-w-6xl mx-auto"
+  >
+    <!-- ROLE VIEW (Partner / Customer) -->
+    <section
+      id="role-view"
+      class="glass-panel rounded-[30px] px-8 py-10 md:px-14 md:py-12 w-full max-w-3xl"
+    >
       <div class="flex justify-between items-start mb-8">
-        <div><p class="text-sm uppercase tracking-[0.2em] text-slate-500 mb-1">Welcome to</p><h1 class="font-display text-3xl md:text-4xl font-bold">Rentify</h1></div>
+        <div>
+          <p class="text-sm uppercase tracking-[0.2em] text-slate-500 mb-1">
+            Welcome to
+          </p>
+          <h1 class="font-display text-3xl md:text-4xl font-bold">
+            Rentify
+          </h1>
+        </div>
       </div>
-      <p class="text-slate-400 mb-6">How would you like to proceed with <span id="display-email" class="text-blue-400 font-medium"></span>?</p>
+
+      <p class="text-slate-400 mb-6">
+        How would you like to proceed
+        with <span id="display-email" class="text-blue-400 font-medium"></span>?
+      </p>
+
       <div class="grid md:grid-cols-2 gap-5">
-        <button id="btn-role-partner" class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-left hover:border-blue-500/60 hover:bg-blue-500/10 transition-all">
+        <!-- Partner card -->
+        <button
+          id="btn-role-partner"
+          class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-left hover:border-blue-500/60 hover:bg-blue-500/10 transition-all"
+        >
           <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-blue-500/10 to-transparent"></div>
           <div class="relative flex flex-col gap-4">
-            <div class="w-11 h-11 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fa-solid fa-briefcase text-lg"></i></div>
-            <div><h3 class="font-semibold text-lg mb-1 group-hover:text-blue-400">Partner / Owner</h3><p class="text-sm text-slate-400">List electronics, tools, and manage inventory.</p></div>
+            <div
+              class="w-11 h-11 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400"
+            >
+              <i class="fa-solid fa-briefcase text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-1 group-hover:text-blue-400">
+                Partner / Owner
+              </h3>
+              <p class="text-sm text-slate-400">
+                List electronics, tools, and manage inventory for rentals.
+              </p>
+            </div>
           </div>
         </button>
-        <button id="btn-role-customer" class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-left hover:border-emerald-500/60 hover:bg-emerald-500/10 transition-all">
+
+        <!-- Customer card -->
+        <button
+          id="btn-role-customer"
+          class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-left hover:border-emerald-500/60 hover:bg-emerald-500/10 transition-all"
+        >
           <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-emerald-500/10 to-transparent"></div>
           <div class="relative flex flex-col gap-4">
-            <div class="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-user text-lg"></i></div>
-            <div><h3 class="font-semibold text-lg mb-1 group-hover:text-emerald-400">Customer</h3><p class="text-sm text-slate-400">Rent verified equipment for your next project.</p></div>
+            <div
+              class="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400"
+            >
+              <i class="fa-solid fa-user text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-1 group-hover:text-emerald-400">
+                Customer
+              </h3>
+              <p class="text-sm text-slate-400">
+                Rent verified electrical & electronic equipment for your next
+                project.
+              </p>
+            </div>
           </div>
         </button>
       </div>
-      <button id="btn-back-email" class="mt-7 text-xs text-slate-500 hover:text-slate-300 flex items-center gap-2"><i class="fa-solid fa-arrow-left text-[10px]"></i> Back to email landing</button>
+
+      <button
+        id="btn-back-email"
+        class="mt-7 text-xs text-slate-500 hover:text-slate-300 flex items-center gap-2"
+      >
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        Back to email landing
+      </button>
     </section>
 
-    <section id="partner-auth" class="hidden glass-panel rounded-[30px] px-6 py-8 md:px-10 md:py-10 w-full max-w-2xl">
+    <!-- PARTNER AUTH OVERLAY -->
+    <section
+      id="partner-auth"
+      class="hidden glass-panel rounded-[30px] px-6 py-8 md:px-10 md:py-10 w-full max-w-2xl"
+    >
       <div class="flex items-center justify-between mb-6">
-        <div><p class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-1">Partner access</p><h2 class="font-display text-2xl font-bold">Partner / Owner</h2></div>
-        <button id="btn-close-partner" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div>
+          <p class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-1">
+            Partner access
+          </p>
+          <h2 class="font-display text-2xl font-bold">Partner / Owner</h2>
+        </div>
+        <button
+          id="btn-close-partner"
+          class="text-slate-400 hover:text-white"
+        >
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
       </div>
+
       <div class="flex mb-6 rounded-full bg-white/5 p-1">
-        <button id="tab-partner-login" class="flex-1 py-2 rounded-full text-sm font-medium bg-white text-black">Login</button>
-        <button id="tab-partner-register" class="flex-1 py-2 rounded-full text-sm font-medium text-slate-300">Register</button>
+        <button
+          id="tab-partner-login"
+          class="flex-1 py-2 rounded-full text-sm font-medium bg-white text-black"
+        >
+          Login
+        </button>
+        <button
+          id="tab-partner-register"
+          class="flex-1 py-2 rounded-full text-sm font-medium text-slate-300"
+        >
+          Register
+        </button>
       </div>
+
+      <!-- Partner LOGIN -->
       <div id="partner-login-view">
         <div class="space-y-4 mb-4">
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Email</label><input id="partner-login-email" type="email" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="you@example.com"/></div>
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Password</label><input id="partner-login-password" type="password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="••••••••"/></div>
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Email
+            </label>
+            <input
+              id="partner-login-email"
+              type="email"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Password
+            </label>
+            <input
+              id="partner-login-password"
+              type="password"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="••••••••"
+            />
+          </div>
         </div>
-        <button id="btn-partner-login" class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-3"><span>Login</span><i class="fa-solid fa-arrow-right"></i></button>
-        <button id="btn-partner-google" class="w-full h-11 rounded-lg bg-white text-black font-semibold flex items-center justify-center gap-3 mb-2"><i class="fa-brands fa-google"></i><span>Continue with Google</span></button>
+
+        <button
+          id="btn-partner-login"
+          class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-3"
+        >
+          <span>Login</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button
+          id="btn-partner-google"
+          class="w-full h-11 rounded-lg bg-white text-black font-semibold flex items-center justify-center gap-3 mb-2"
+        >
+          <i class="fa-brands fa-google"></i>
+          <span>Continue with Google</span>
+        </button>
+
+        <p class="text-[11px] text-slate-500 text-center mt-2">
+          Only verified accounts can access the partner dashboard.
+        </p>
       </div>
+
+      <!-- Partner REGISTER -->
       <div id="partner-register-view" class="hidden">
         <div class="space-y-4 mb-4">
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Email</label><input id="partner-reg-email" type="email" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="you@example.com"/></div>
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Password</label><input id="partner-reg-password" type="password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Create a strong password"/></div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">Full Name</label><input id="partner-reg-name" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Your name"/></div>
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">Phone</label><input id="partner-reg-phone" type="tel" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="+91 9876543210"/></div>
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Email
+            </label>
+            <input
+              id="partner-reg-email"
+              type="email"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="you@example.com"
+            />
           </div>
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Address Line 1</label><input id="partner-reg-address1" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Street, Building"/></div>
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Password
+            </label>
+            <input
+              id="partner-reg-password"
+              type="password"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="Create a strong password"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                Full Name
+              </label>
+              <input
+                id="partner-reg-name"
+                type="text"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+                placeholder="Your name"
+              />
+            </div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                Phone
+              </label>
+              <input
+                id="partner-reg-phone"
+                type="tel"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+                placeholder="+91 9876543210"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Address Line 1
+            </label>
+            <input
+              id="partner-reg-address1"
+              type="text"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="Street, Building"
+            />
+          </div>
+
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">City</label><input id="partner-reg-city" type="text" class="w-full h-11 rounded-lg px-4 input-premium"/></div>
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">State</label><input id="partner-reg-state" type="text" class="w-full h-11 rounded-lg px-4 input-premium"/></div>
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">PIN / ZIP</label><input id="partner-reg-pin" type="text" class="w-full h-11 rounded-lg px-4 input-premium"/></div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                City
+              </label>
+              <input
+                id="partner-reg-city"
+                type="text"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+              />
+            </div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                State
+              </label>
+              <input
+                id="partner-reg-state"
+                type="text"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+              />
+            </div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                PIN / ZIP
+              </label>
+              <input
+                id="partner-reg-pin"
+                type="text"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+              />
+            </div>
           </div>
         </div>
-        <button id="btn-partner-register" class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-2"><span>Create Partner Account</span><i class="fa-solid fa-check"></i></button>
+
+        <button
+          id="btn-partner-register"
+          class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-2"
+        >
+          <span>Create Partner Account</span>
+          <i class="fa-solid fa-check"></i>
+        </button>
+
+        <p class="text-[11px] text-slate-500 text-center mt-1">
+          A verification email will be sent to your address. Please verify and
+          then log in to access the partner dashboard.
+        </p>
       </div>
     </section>
 
-    <section id="customer-auth" class="hidden glass-panel rounded-[30px] px-6 py-8 md:px-10 md:py-10 w-full max-w-2xl">
+    <!-- CUSTOMER AUTH OVERLAY -->
+    <section
+      id="customer-auth"
+      class="hidden glass-panel rounded-[30px] px-6 py-8 md:px-10 md:py-10 w-full max-w-2xl"
+    >
       <div class="flex items-center justify-between mb-6">
-        <div><p class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-1">Customer access</p><h2 class="font-display text-2xl font-bold">Customer</h2></div>
-        <button id="btn-close-customer" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div>
+          <p class="text-xs uppercase tracking-[0.2em] text-slate-500 mb-1">
+            Customer access
+          </p>
+          <h2 class="font-display text-2xl font-bold">Customer</h2>
+        </div>
+        <button
+          id="btn-close-customer"
+          class="text-slate-400 hover:text-white"
+        >
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
       </div>
+
       <div class="flex mb-6 rounded-full bg-white/5 p-1">
-        <button id="tab-customer-login" class="flex-1 py-2 rounded-full text-sm font-medium bg-white text-black">Login</button>
-        <button id="tab-customer-register" class="flex-1 py-2 rounded-full text-sm font-medium text-slate-300">Register</button>
+        <button
+          id="tab-customer-login"
+          class="flex-1 py-2 rounded-full text-sm font-medium bg-white text-black"
+        >
+          Login
+        </button>
+        <button
+          id="tab-customer-register"
+          class="flex-1 py-2 rounded-full text-sm font-medium text-slate-300"
+        >
+          Register
+        </button>
       </div>
+
+      <!-- Customer LOGIN -->
       <div id="customer-login-view">
         <div class="space-y-4 mb-4">
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Email</label><input id="customer-login-email" type="email" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="you@example.com"/></div>
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Password</label><input id="customer-login-password" type="password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="••••••••"/></div>
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Email
+            </label>
+            <input
+              id="customer-login-email"
+              type="email"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Password
+            </label>
+            <input
+              id="customer-login-password"
+              type="password"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="••••••••"
+            />
+          </div>
         </div>
-        <button id="btn-customer-login" class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-3"><span>Login</span><i class="fa-solid fa-arrow-right"></i></button>
-        <button id="btn-customer-google" class="w-full h-11 rounded-lg bg-white text-black font-semibold flex items-center justify-center gap-3 mb-2"><i class="fa-brands fa-google"></i><span>Continue with Google</span></button>
+
+        <button
+          id="btn-customer-login"
+          class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-3"
+        >
+          <span>Login</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button
+          id="btn-customer-google"
+          class="w-full h-11 rounded-lg bg-white text-black font-semibold flex items-center justify-center gap-3 mb-2"
+        >
+          <i class="fa-brands fa-google"></i>
+          <span>Continue with Google</span>
+        </button>
+
+        <p class="text-[11px] text-slate-500 text-center mt-2">
+          Only verified email/password accounts can access the product page.
+        </p>
       </div>
+
+      <!-- Customer REGISTER -->
       <div id="customer-register-view" class="hidden">
         <div class="space-y-4 mb-4">
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Email</label><input id="customer-reg-email" type="email" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="you@example.com"/></div>
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">Password</label><input id="customer-reg-password" type="password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Create a strong password"/></div>
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Email
+            </label>
+            <input
+              id="customer-reg-email"
+              type="email"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              Password
+            </label>
+            <input
+              id="customer-reg-password"
+              type="password"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="Create a strong password"
+            />
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">Full Name</label><input id="customer-reg-name" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Your name"/></div>
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">Phone</label><input id="customer-reg-phone" type="tel" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="+91 9876543210"/></div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                Full Name
+              </label>
+              <input
+                id="customer-reg-name"
+                type="text"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+                placeholder="Your name"
+              />
+            </div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                Phone
+              </label>
+              <input
+                id="customer-reg-phone"
+                type="tel"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+                placeholder="+91 9876543210"
+              />
+            </div>
           </div>
+
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">Country</label><input id="customer-reg-country" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="India"/></div>
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">State</label><input id="customer-reg-state" type="text" class="w-full h-11 rounded-lg px-4 input-premium"/></div>
-            <div><label class="block text-xs mb-1 text-slate-400 uppercase">City</label><input id="customer-reg-city" type="text" class="w-full h-11 rounded-lg px-4 input-premium"/></div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                Country
+              </label>
+              <input
+                id="customer-reg-country"
+                type="text"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+                placeholder="India"
+              />
+            </div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                State
+              </label>
+              <input
+                id="customer-reg-state"
+                type="text"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+              />
+            </div>
+            <div>
+              <label class="block text-xs mb-1 text-slate-400 uppercase">
+                City
+              </label>
+              <input
+                id="customer-reg-city"
+                type="text"
+                class="w-full h-11 rounded-lg px-4 input-premium"
+              />
+            </div>
           </div>
-          <div><label class="block text-xs mb-1 text-slate-400 uppercase">PIN / ZIP</label><input id="customer-reg-pin" type="text" class="w-full h-11 rounded-lg px-4 input-premium"/></div>
+
+          <div>
+            <label class="block text-xs mb-1 text-slate-400 uppercase">
+              PIN / ZIP
+            </label>
+            <input
+              id="customer-reg-pin"
+              type="text"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+            />
+          </div>
         </div>
-        <button id="btn-customer-register" class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-2"><span>Create Customer Account</span><i class="fa-solid fa-check"></i></button>
+
+        <button
+          id="btn-customer-register"
+          class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-2"
+        >
+          <span>Create Customer Account</span>
+          <i class="fa-solid fa-check"></i>
+        </button>
+
+        <p class="text-[11px] text-slate-500 text-center mt-1">
+          A verification email will be sent to your address. Please verify and
+          then log in to access Rentify products.
+        </p>
       </div>
     </section>
   </main>
 
+  <!-- Firebase config (your existing file) -->
   <script type="module" src="firebase-config.js"></script>
 
+  <!-- Page Logic -->
   <script>
+    // CHANGE THESE TO YOUR REAL PAGES
     const CUSTOMER_PRODUCTS_URL = 'products.html';
     const PARTNER_DASHBOARD_URL = 'partner-dashboard.html';
 
@@ -164,13 +622,24 @@
       const toast = document.getElementById('toast');
       const msg = document.getElementById('toast-message');
       const icon = document.getElementById('toast-icon');
+
       msg.textContent = message;
+
       icon.className = 'fa-solid';
-      if (type === 'success') icon.classList.add('fa-circle-check', 'text-emerald-400');
-      else if (type === 'error') icon.classList.add('fa-circle-xmark', 'text-rose-400');
-      else icon.classList.add('fa-circle-info', 'text-blue-400');
+      if (type === 'success') {
+        icon.classList.add('fa-circle-check', 'text-emerald-400');
+      } else if (type === 'error') {
+        icon.classList.add('fa-circle-xmark', 'text-rose-400');
+      } else {
+        icon.classList.add('fa-circle-info', 'text-blue-400');
+      }
+
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 4000);
+
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -178,106 +647,333 @@
       const helpers = window.firebaseHelpers || {};
       const db = window.firebaseDb;
 
-      // 1. Helper Functions for UI Switching
+      if (!auth || !helpers || !db) {
+        console.error('Firebase not initialised – check firebase-config.js');
+        showToast('Firebase not initialised. Check console.', 'error');
+        return;
+      }
+
+      const {
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        signInWithPopup,
+        sendEmailVerification,
+        signOut,
+        googleProvider,
+        doc,
+        setDoc,
+        serverTimestamp,
+      } = helpers;
+
+      // --- DOM references ---
       const roleView = document.getElementById('role-view');
       const partnerAuth = document.getElementById('partner-auth');
       const customerAuth = document.getElementById('customer-auth');
 
-      function openPartner() { roleView.classList.add('hidden'); partnerAuth.classList.remove('hidden'); customerAuth.classList.add('hidden'); }
-      function openCustomer() { roleView.classList.add('hidden'); customerAuth.classList.remove('hidden'); partnerAuth.classList.add('hidden'); }
-      function backToRoleView() { partnerAuth.classList.add('hidden'); customerAuth.classList.add('hidden'); roleView.classList.remove('hidden'); }
-
-      // 2. URL Parameters Handling (The Integration Logic)
+      // email from URL (landing page)
       const urlParams = new URLSearchParams(window.location.search);
-      const emailParam = urlParams.get('email') || '';
-      const roleParam = urlParams.get('role'); // Reads 'partner' or 'customer'
-
-      if (emailParam) {
-        document.getElementById('display-email').textContent = emailParam;
-        document.getElementById('partner-login-email').value = emailParam;
-        document.getElementById('partner-reg-email').value = emailParam;
-        document.getElementById('customer-login-email').value = emailParam;
-        document.getElementById('customer-reg-email').value = emailParam;
+      const emailFromLanding = urlParams.get('email') || '';
+      if (emailFromLanding) {
+        document.getElementById('display-email').textContent = emailFromLanding;
       } else {
         document.getElementById('display-email').textContent = 'your email';
       }
 
-      // Auto-open specific tabs based on Landing Page click
-      if (roleParam === 'partner') {
-        openPartner();
-      } else if (roleParam === 'customer') {
-        openCustomer();
+      // Helper show/hide panels
+      function openPartner() {
+        roleView.classList.add('hidden');
+        partnerAuth.classList.remove('hidden');
+      }
+      function openCustomer() {
+        roleView.classList.add('hidden');
+        customerAuth.classList.remove('hidden');
+      }
+      function backToRoleView() {
+        partnerAuth.classList.add('hidden');
+        customerAuth.classList.add('hidden');
+        roleView.classList.remove('hidden');
       }
 
-      // 3. UI Event Listeners
-      document.getElementById('btn-role-partner').addEventListener('click', openPartner);
-      document.getElementById('btn-role-customer').addEventListener('click', openCustomer);
-      document.getElementById('btn-back-email').addEventListener('click', () => window.location.href = 'index.html');
+      // Tabs
+      function setPartnerTab(tab) {
+        const loginTab = document.getElementById('tab-partner-login');
+        const regTab = document.getElementById('tab-partner-register');
+        const loginView = document.getElementById('partner-login-view');
+        const regView = document.getElementById('partner-register-view');
+
+        if (tab === 'login') {
+          loginTab.classList.add('bg-white', 'text-black');
+          regTab.classList.remove('bg-white', 'text-black');
+          regTab.classList.add('text-slate-300');
+          loginView.classList.remove('hidden');
+          regView.classList.add('hidden');
+        } else {
+          regTab.classList.add('bg-white', 'text-black');
+          loginTab.classList.remove('bg-white', 'text-black');
+          loginTab.classList.add('text-slate-300');
+          regView.classList.remove('hidden');
+          loginView.classList.add('hidden');
+        }
+      }
+
+      function setCustomerTab(tab) {
+        const loginTab = document.getElementById('tab-customer-login');
+        const regTab = document.getElementById('tab-customer-register');
+        const loginView = document.getElementById('customer-login-view');
+        const regView = document.getElementById('customer-register-view');
+
+        if (tab === 'login') {
+          loginTab.classList.add('bg-white', 'text-black');
+          regTab.classList.remove('bg-white', 'text-black');
+          regTab.classList.add('text-slate-300');
+          loginView.classList.remove('hidden');
+          regView.classList.add('hidden');
+        } else {
+          regTab.classList.add('bg-white', 'text-black');
+          loginTab.classList.remove('bg-white', 'text-black');
+          loginTab.classList.add('text-slate-300');
+          regView.classList.remove('hidden');
+          loginView.classList.add('hidden');
+        }
+      }
+
+      // Role buttons
+      document.getElementById('btn-role-partner').addEventListener('click', () => {
+        // prefill email in partner forms
+        if (emailFromLanding) {
+          document.getElementById('partner-login-email').value = emailFromLanding;
+          document.getElementById('partner-reg-email').value = emailFromLanding;
+        }
+        openPartner();
+      });
+
+      document.getElementById('btn-role-customer').addEventListener('click', () => {
+        if (emailFromLanding) {
+          document.getElementById('customer-login-email').value = emailFromLanding;
+          document.getElementById('customer-reg-email').value = emailFromLanding;
+        }
+        openCustomer();
+      });
+
+      document.getElementById('btn-back-email').addEventListener('click', () => {
+        // go back to landing page (same as before)
+        window.location.href = 'landingPage.html';
+      });
+
       document.getElementById('btn-close-partner').addEventListener('click', backToRoleView);
       document.getElementById('btn-close-customer').addEventListener('click', backToRoleView);
 
-      // Tab Switching Logic
-      function setTab(type, mode) {
-        const loginTab = document.getElementById(`tab-${type}-login`);
-        const regTab = document.getElementById(`tab-${type}-register`);
-        const loginView = document.getElementById(`${type}-login-view`);
-        const regView = document.getElementById(`${type}-register-view`);
-        
-        if (mode === 'login') {
-            loginTab.classList.add('bg-white', 'text-black');
-            regTab.classList.remove('bg-white', 'text-black'); regTab.classList.add('text-slate-300');
-            loginView.classList.remove('hidden'); regView.classList.add('hidden');
-        } else {
-            regTab.classList.add('bg-white', 'text-black');
-            loginTab.classList.remove('bg-white', 'text-black'); loginTab.classList.add('text-slate-300');
-            regView.classList.remove('hidden'); loginView.classList.add('hidden');
+      // Partner tabs
+      document.getElementById('tab-partner-login').addEventListener('click', () => setPartnerTab('login'));
+      document.getElementById('tab-partner-register').addEventListener('click', () => setPartnerTab('register'));
+
+      // Customer tabs
+      document.getElementById('tab-customer-login').addEventListener('click', () => setCustomerTab('login'));
+      document.getElementById('tab-customer-register').addEventListener('click', () => setCustomerTab('register'));
+
+      // ---------- PARTNER AUTH ----------
+      async function partnerEmailLogin() {
+        const email = document.getElementById('partner-login-email').value.trim();
+        const password = document.getElementById('partner-login-password').value.trim();
+
+        if (!email || !password) {
+          showToast('Enter email & password', 'error');
+          return;
+        }
+
+        try {
+          const cred = await signInWithEmailAndPassword(auth, email, password);
+
+          if (!cred.user.emailVerified) {
+            await sendEmailVerification(cred.user);
+            await signOut(auth);
+            showToast('Email not verified. Verification link sent again.', 'error');
+            return;
+          }
+
+          // ensure partner profile exists
+          const ref = doc(db, 'partners', cred.user.uid);
+          await setDoc(ref, {
+            email,
+            lastLoginAt: serverTimestamp(),
+          }, { merge: true });
+
+          showToast('Logged in as partner', 'success');
+          window.location.href = PARTNER_DASHBOARD_URL;
+        } catch (err) {
+          console.error(err);
+          showToast('Partner login failed: ' + err.message, 'error');
         }
       }
-      document.getElementById('tab-partner-login').addEventListener('click', () => setTab('partner', 'login'));
-      document.getElementById('tab-partner-register').addEventListener('click', () => setTab('partner', 'register'));
-      document.getElementById('tab-customer-login').addEventListener('click', () => setTab('customer', 'login'));
-      document.getElementById('tab-customer-register').addEventListener('click', () => setTab('customer', 'register'));
 
-      // 4. AUTH LOGIC (Partner)
-      // ... (Rest of your existing auth logic remains exactly the same) ...
-      const { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, sendEmailVerification, signOut, googleProvider, doc, setDoc, serverTimestamp } = helpers;
+      async function partnerGoogleLogin() {
+        try {
+          const result = await signInWithPopup(auth, googleProvider);
+          const user = result.user;
 
-      async function partnerEmailLogin() {
-          // ... existing logic ...
-          const email = document.getElementById('partner-login-email').value;
-          const pass = document.getElementById('partner-login-password').value;
-          try {
-              const cred = await signInWithEmailAndPassword(auth, email, pass);
-              if (!cred.user.emailVerified) return showToast('Email not verified', 'error');
-              window.location.href = PARTNER_DASHBOARD_URL;
-          } catch (e) { showToast(e.message, 'error'); }
+          const ref = doc(db, 'partners', user.uid);
+          await setDoc(ref, {
+            email: user.email,
+            displayName: user.displayName || '',
+            phone: user.phoneNumber || '',
+            provider: 'google',
+            lastLoginAt: serverTimestamp(),
+          }, { merge: true });
+
+          showToast('Google login successful', 'success');
+          window.location.href = PARTNER_DASHBOARD_URL;
+        } catch (err) {
+          console.error(err);
+          showToast('Google login failed: ' + err.message, 'error');
+        }
       }
+
+      async function partnerRegister() {
+        const email = document.getElementById('partner-reg-email').value.trim();
+        const password = document.getElementById('partner-reg-password').value.trim();
+        const fullname = document.getElementById('partner-reg-name').value.trim();
+        const phone = document.getElementById('partner-reg-phone').value.trim();
+        const address1 = document.getElementById('partner-reg-address1').value.trim();
+        const city = document.getElementById('partner-reg-city').value.trim();
+        const state = document.getElementById('partner-reg-state').value.trim();
+        const pin = document.getElementById('partner-reg-pin').value.trim();
+
+        if (!email || !password || !fullname) {
+          showToast('Email, password & name are required', 'error');
+          return;
+        }
+
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          await sendEmailVerification(cred.user);
+
+          const ref = doc(db, 'partners', cred.user.uid);
+          await setDoc(ref, {
+            email,
+            fullname,
+            phone,
+            address: { line1: address1, city, state, pin },
+            createdAt: serverTimestamp(),
+          }, { merge: true });
+
+          await signOut(auth);
+
+          showToast('Partner account created. Please verify your email and then login.', 'success');
+          setPartnerTab('login');
+        } catch (err) {
+          console.error(err);
+          showToast('Partner registration failed: ' + err.message, 'error');
+        }
+      }
+
       document.getElementById('btn-partner-login').addEventListener('click', partnerEmailLogin);
-      
-      // (Similar hooks for other buttons, ensuring existing functionality is preserved)
-      document.getElementById('btn-customer-login').addEventListener('click', async () => {
-          const email = document.getElementById('customer-login-email').value;
-          const pass = document.getElementById('customer-login-password').value;
-          try {
-              const cred = await signInWithEmailAndPassword(auth, email, pass);
-              if (!cred.user.emailVerified) return showToast('Email not verified', 'error');
-              window.location.href = CUSTOMER_PRODUCTS_URL;
-          } catch (e) { showToast(e.message, 'error'); }
-      });
+      document.getElementById('btn-partner-google').addEventListener('click', partnerGoogleLogin);
+      document.getElementById('btn-partner-register').addEventListener('click', partnerRegister);
+
+      // ---------- CUSTOMER AUTH ----------
+      async function customerEmailLogin() {
+        const email = document.getElementById('customer-login-email').value.trim();
+        const password = document.getElementById('customer-login-password').value.trim();
+
+        if (!email || !password) {
+          showToast('Enter email & password', 'error');
+          return;
+        }
+
+        try {
+          const cred = await signInWithEmailAndPassword(auth, email, password);
+
+          if (!cred.user.emailVerified) {
+            await sendEmailVerification(cred.user);
+            await signOut(auth);
+            showToast('Email not verified. Verification link sent again.', 'error');
+            return;
+          }
+
+          const ref = doc(db, 'customers', cred.user.uid);
+          await setDoc(ref, {
+            email,
+            lastLoginAt: serverTimestamp(),
+          }, { merge: true });
+
+          showToast('Logged in as customer', 'success');
+          window.location.href = CUSTOMER_PRODUCTS_URL;
+        } catch (err) {
+          console.error(err);
+          showToast('Customer login failed: ' + err.message, 'error');
+        }
+      }
+
+      async function customerGoogleLogin() {
+        try {
+          const result = await signInWithPopup(auth, googleProvider);
+          const user = result.user;
+
+          const ref = doc(db, 'customers', user.uid);
+          await setDoc(ref, {
+            email: user.email,
+            displayName: user.displayName || '',
+            phone: user.phoneNumber || '',
+            provider: 'google',
+            lastLoginAt: serverTimestamp(),
+          }, { merge: true });
+
+          showToast('Google login successful', 'success');
+          window.location.href = CUSTOMER_PRODUCTS_URL;
+        } catch (err) {
+          console.error(err);
+          showToast('Google login failed: ' + err.message, 'error');
+        }
+      }
+
+      async function customerRegister() {
+        const email = document.getElementById('customer-reg-email').value.trim();
+        const password = document.getElementById('customer-reg-password').value.trim();
+        const fullname = document.getElementById('customer-reg-name').value.trim();
+        const phone = document.getElementById('customer-reg-phone').value.trim();
+        const country = document.getElementById('customer-reg-country').value.trim();
+        const state = document.getElementById('customer-reg-state').value.trim();
+        const city = document.getElementById('customer-reg-city').value.trim();
+        const pin = document.getElementById('customer-reg-pin').value.trim();
+
+        if (!email || !password || !fullname) {
+          showToast('Email, password & name are required', 'error');
+          return;
+        }
+
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          await sendEmailVerification(cred.user);
+
+          const ref = doc(db, 'customers', cred.user.uid);
+          await setDoc(ref, {
+            email,
+            fullname,
+            phone,
+            address: { country, state, city, pin },
+            createdAt: serverTimestamp(),
+          }, { merge: true });
+
+          await signOut(auth);
+
+          showToast('Customer account created. Please verify your email and then login.', 'success');
+          setCustomerTab('login');
+        } catch (err) {
+          console.error(err);
+          showToast('Customer registration failed: ' + err.message, 'error');
+        }
+      }
+
+      document.getElementById('btn-customer-login').addEventListener('click', customerEmailLogin);
+      document.getElementById('btn-customer-google').addEventListener('click', customerGoogleLogin);
+      document.getElementById('btn-customer-register').addEventListener('click', customerRegister);
+
+      // default tabs
+      setPartnerTab('login');
+      setCustomerTab('login');
     });
   </script>
+   <script type="module" src="firebase-config.js"></script>
 
-  <div class="fixed bottom-6 right-6 z-50">
-    <a href="admin-login.htm" class="group flex items-center gap-3 px-4 py-2.5 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-full shadow-2xl hover:bg-slate-800 hover:border-red-500/50 hover:shadow-red-900/20 transition-all duration-300 hover:-translate-y-1">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-        </span>
-        <div class="flex items-center gap-2 text-xs font-bold text-slate-300 group-hover:text-white transition-colors">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span class="tracking-wide uppercase">Admin Access</span>
-        </div>
-    </a>
-  </div>
 </body>
 </html>
