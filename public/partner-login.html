@@ -1,477 +1,424 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rentify - Partner Login</title>
-
-  <!-- Fonts & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>Rentify Partner Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            display: ['Space Grotesk', 'sans-serif'],
-          },
-          colors: {
-            rentify: {
-              dark: '#0f172a',
-              accent: '#3b82f6',
-              glass: 'rgba(255, 255, 255, 0.08)',
-              glassBorder: 'rgba(255, 255, 255, 0.1)',
-            }
-          },
-          animation: {
-            'float': 'float 8s ease-in-out infinite',
-            'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-20px)' },
-            },
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(10px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
-    body { background-color: #020617; color: #ffffff; overflow-x: hidden; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-    }
+    .hidden-force { display: none !important; }
+    
+    /* THEME STYLES */
+    .bg-video-mode { background-color: #020617; color: white; }
+    .video-bg { position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%; width: auto; height: auto; z-index: -10; transform: translate(-50%, -50%); object-fit: cover; }
+    .video-overlay { position: fixed; inset: 0; z-index: -5; background: radial-gradient(circle at 50% 50%, rgba(2, 6, 23, 0.6) 0%, rgba(2, 6, 23, 0.95) 90%); }
+    .glass-modal { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); }
 
-    .input-premium {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: white; transition: all 0.3s ease;
-    }
-    .input-premium:focus {
-      outline: none; border-color: #3b82f6;
-      background: rgba(0, 0, 0, 0.6);
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-    }
+    .dashboard-container { display: flex; height: 100vh; background-color: #F3F4F6; color: #111827; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px; background-color: #111827; color: #9CA3AF; display: flex; flex-direction: column; flex-shrink: 0; transition: all 0.3s; }
+    .sidebar-logo { color: white; font-weight: 700; font-size: 1.25rem; padding: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+    
+    .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+    .nav-link:hover { color: white; background-color: rgba(255,255,255,0.05); }
+    .nav-link.active { color: white; background-color: rgba(255,255,255,0.05); border-left-color: #3b82f6; }
+    .nav-section { text-transform: uppercase; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; padding: 1.5rem 1.5rem 0.5rem; opacity: 0.5; }
+    .badge { background-color: #374151; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; margin-left: auto; }
 
-    .video-background {
-      position: fixed; top: 50%; left: 50%;
-      min-width: 100%; min-height: 100%; width: auto; height: auto;
-      z-index: -10; transform: translate(-50%, -50%); object-fit: cover;
-    }
+    /* CONTENT */
+    .main-content { flex: 1; overflow-y: auto; padding: 2rem; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card-dark { background: #111827; color: white; }
 
-    .cinematic-overlay {
-      position: fixed; inset: 0; z-index: -5;
-      background: radial-gradient(circle at 50% 50%, rgba(2, 6, 23, 0.3) 0%, rgba(2, 6, 23, 0.9) 90%);
-      pointer-events: none;
-    }
+    /* PLAN CARD STYLES */
+    .plan-card { border: 1px solid #E5E7EB; border-radius: 1rem; padding: 2rem; transition: all 0.3s; position: relative; overflow: hidden; }
+    .plan-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border-color: #3b82f6; }
+    .plan-card.active-plan { border: 2px solid #3b82f6; background-color: #EFF6FF; }
+    .plan-badge { position: absolute; top: 1rem; right: 1rem; background: #3b82f6; color: white; font-size: 0.7rem; font-weight: bold; padding: 0.25rem 0.75rem; border-radius: 99px; }
 
-    .glow-spot {
-      position: fixed; width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-      border-radius: 50%; filter: blur(80px); z-index: -6;
-      animation: pulse-slow 8s infinite;
-    }
-
-    /* Simple toast */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 60;
-      display: none;
-    }
+    /* TABLES */
+    .table-container { overflow-x: auto; background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    table { width: 100%; text-align: left; border-collapse: collapse; }
+    th { padding: 1rem; font-size: 0.8rem; text-transform: uppercase; color: #6B7280; font-weight: 600; border-bottom: 1px solid #E5E7EB; }
+    td { padding: 1rem; font-size: 0.9rem; border-bottom: 1px solid #F3F4F6; color: #374151; }
+    .status-badge { padding: 0.25rem 0.75rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+    .status-active { background: #DCFCE7; color: #166534; }
+    .status-pending { background: #FEF9C3; color: #854D0E; }
+    .status-completed { background: #DBEAFE; color: #1E40AF; }
   </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col relative selection:bg-blue-500 selection:text-white">
+<body id="main-body" class="bg-video-mode h-screen overflow-hidden">
 
-  <!-- Background video (same as other pages) -->
-  <video autoplay muted loop playsinline class="video-background" id="bg-video">
-    <source src="Video_Generation_Request.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+  <div id="view-verification" class="flex flex-col items-center justify-center h-full p-4 relative w-full">
+      <video autoplay muted loop playsinline class="video-bg"><source src="Video_Generation_Request.mp4" type="video/mp4"></video>
+      <div class="video-overlay"></div>
 
-  <div class="cinematic-overlay"></div>
-  <div class="glow-spot" style="top: -20%; left: 20%;"></div>
-  <div class="glow-spot" style="bottom: -20%; right: 20%; background: radial-gradient(circle, rgba(20, 184, 166, 0.1) 0%, transparent 70%); animation-delay: 2s;"></div>
+      <div id="state-loading" class="text-center">
+          <i class="fa-solid fa-circle-notch fa-spin text-4xl text-emerald-500 mb-4"></i>
+          <h2 class="text-xl font-medium tracking-wide">Connecting...</h2>
+      </div>
 
-  <!-- Toast -->
-  <div id="toast" class="glass-panel rounded-2xl px-4 py-3 flex items-center gap-3">
-    <div id="toast-icon" class="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/20 text-emerald-400">
-      <i class="fa-solid fa-check"></i>
-    </div>
-    <div class="text-sm">
-      <div id="toast-title" class="font-semibold">Success</div>
-      <div id="toast-message" class="text-slate-200/80"></div>
+      <div id="state-form" class="hidden-force w-full max-w-xl glass-modal rounded-3xl p-8">
+          <div class="mb-6"><h1 class="text-2xl font-bold">Partner Application</h1><p class="text-slate-400 text-sm">Submit details to activate your seller account.</p></div>
+          <form id="form-verify" class="space-y-4">
+              <input type="text" id="v-biz-name" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none" placeholder="Business Name">
+              <input type="text" id="v-biz-addr" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none" placeholder="Location">
+              <div class="p-4 bg-slate-800/50 rounded-xl border border-dashed border-slate-600">
+                  <label class="block text-xs font-bold text-slate-400 uppercase mb-2">ID Proof (Image &lt; 50KB)</label>
+                  <input type="file" id="v-file-doc" required accept="image/*" class="text-sm text-slate-400 w-full cursor-pointer">
+              </div>
+              <button type="submit" id="btn-submit-app" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition">Submit Application</button>
+          </form>
+          <button onclick="logout()" class="w-full mt-4 text-xs text-slate-500 hover:text-white">Logout</button>
+      </div>
+
+      <div id="state-pending" class="hidden-force text-center max-w-md glass-modal p-10 rounded-3xl">
+          <i class="fa-solid fa-clock text-4xl text-yellow-400 mb-4"></i>
+          <h2 class="text-2xl font-bold mb-2">Verification Pending</h2>
+          <p class="text-slate-400 mb-6 text-sm">Your application is being reviewed.</p>
+          <button onclick="location.reload()" class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition">Refresh Status</button>
+          <div class="mt-4"><button onclick="logout()" class="text-xs text-slate-500 hover:text-white">Logout</button></div>
+      </div>
+  </div>
+
+  <div id="view-dashboard" class="hidden-force dashboard-container">
+      
+      <aside class="sidebar">
+          <div class="sidebar-logo"><i class="fa-brands fa-react text-2xl text-blue-500"></i> Rentify.</div>
+          
+          <div class="flex flex-col gap-1 mt-4">
+              <div class="nav-section">Dashboard</div>
+              <div onclick="switchTab('overview')" id="nav-overview" class="nav-link active">
+                  <i class="fa-solid fa-chart-pie w-5 text-center"></i> Summary
+              </div>
+              <div onclick="switchTab('products')" id="nav-products" class="nav-link">
+                  <i class="fa-solid fa-box w-5 text-center"></i> Products
+              </div>
+              <div onclick="switchTab('store')" id="nav-store" class="nav-link">
+                  <i class="fa-solid fa-shop w-5 text-center"></i> Store Settings
+              </div>
+              <div onclick="switchTab('subscriptions')" id="nav-subscriptions" class="nav-link">
+                  <i class="fa-solid fa-crown w-5 text-center"></i> Subscription
+              </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+              <div class="nav-section">Management</div>
+              <div onclick="switchTab('messages')" id="nav-messages" class="nav-link">
+                  <i class="fa-solid fa-envelope w-5 text-center"></i> Messages 
+                  <span id="badge-msg" class="badge">0</span>
+              </div>
+              <div onclick="switchTab('orders')" id="nav-orders" class="nav-link">
+                  <i class="fa-solid fa-receipt w-5 text-center"></i> Orders
+                  <span id="badge-orders" class="badge">0</span>
+              </div>
+              <div onclick="switchTab('customers')" id="nav-customers" class="nav-link">
+                  <i class="fa-solid fa-users w-5 text-center"></i> Customers
+              </div>
+          </div>
+
+          <div class="mt-auto p-4 border-t border-gray-800 space-y-2">
+             <div onclick="window.resetData()" class="nav-link text-yellow-500 hover:bg-yellow-900/20 rounded-lg cursor-pointer">
+                <i class="fa-solid fa-eraser w-5 text-center"></i> Reset Data
+             </div>
+             <div onclick="logout()" class="nav-link text-red-400 hover:bg-red-900/20 rounded-lg cursor-pointer">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Logout
+             </div>
+          </div>
+      </aside>
+
+      <div class="main-content">
+          
+          <div class="header">
+              <div>
+                  <h1 class="text-2xl font-bold">Partner Dashboard</h1>
+                  <p class="text-sm text-gray-500">Manage your business & inventory.</p>
+              </div>
+              <div class="flex items-center bg-white p-1 rounded-xl shadow-sm border border-gray-200">
+                  <button onclick="window.open('store.html?id='+currentUser.uid, '_blank')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                      <i class="fa-solid fa-external-link-alt"></i> Visit My Store
+                  </button>
+                  <div class="w-px h-6 bg-gray-200 mx-1"></div>
+                  <button onclick="openAddModal()" class="flex items-center gap-2 px-5 py-2 bg-black text-white rounded-lg text-sm font-bold shadow-md hover:bg-gray-800 transition">
+                      <i class="fa-solid fa-plus"></i> Add Item
+                  </button>
+              </div>
+          </div>
+
+          <div id="tab-overview" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="card card-dark">
+                      <div class="p-2 bg-white/10 rounded-lg w-fit mb-4"><i class="fa-solid fa-wallet"></i></div>
+                      <p class="text-gray-400 text-sm">Total Sales</p>
+                      <h2 class="text-3xl font-bold mt-1">₹<span id="val-earnings">0</span></h2>
+                  </div>
+                  <div class="card">
+                      <div class="p-2 bg-gray-100 rounded-lg w-fit mb-4"><i class="fa-solid fa-users"></i></div>
+                      <p class="text-gray-500 text-sm">Customers Rented</p>
+                      <h2 class="text-3xl font-bold mt-1" id="val-customers">0</h2>
+                  </div>
+                  <div class="card">
+                      <div class="p-2 bg-gray-100 rounded-lg w-fit mb-4"><i class="fa-solid fa-box-open"></i></div>
+                      <p class="text-gray-500 text-sm">Total Orders</p>
+                      <h2 class="text-3xl font-bold mt-1" id="val-orders">0</h2>
+                  </div>
+              </div>
+              <div class="card"><h3 class="font-bold mb-4">Sales Chart</h3><div class="h-64"><canvas id="salesChart"></canvas></div></div>
+          </div>
+
+          <div id="tab-products" class="hidden">
+              <h2 class="text-xl font-bold mb-6">Inventory</h2>
+              <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+          </div>
+
+          <div id="tab-store" class="hidden">
+              <h2 class="text-xl font-bold mb-6">Store Customization</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div class="card">
+                      <h3 class="font-bold mb-4">Branding</h3>
+                      <form id="form-store-settings" class="space-y-4">
+                          <div><label class="block text-sm font-bold text-gray-700">Logo</label><input type="file" id="inp-logo" accept="image/*" class="w-full text-sm"></div>
+                          <div><label class="block text-sm font-bold text-gray-700">Cover</label><input type="file" id="inp-cover" accept="image/*" class="w-full text-sm"></div>
+                          <button type="submit" id="btn-save-store" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">Save Changes</button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+
+          <div id="tab-subscriptions" class="hidden">
+              <div class="text-center mb-10">
+                  <h2 class="text-3xl font-bold text-slate-900">Upgrade your Plan</h2>
+                  <p class="text-slate-500 mt-2">Unlock lower fees and more products.</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto" id="plans-container">
+                  <div class="plan-card bg-white" id="plan-card-free">
+                      <h3 class="text-xl font-bold text-slate-900">Starter</h3>
+                      <p class="text-4xl font-bold mt-4 mb-6">Free</p>
+                      <ul class="space-y-3 text-sm text-slate-600 mb-8">
+                          <li><i class="fa-solid fa-check text-green-500 mr-2"></i> 5 Active Products</li>
+                          <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Standard Support</li>
+                          <li><i class="fa-solid fa-check text-green-500 mr-2"></i> 10% Platform Fee</li>
+                      </ul>
+                      <button onclick="upgradePlan('free')" class="w-full py-3 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition">Current Plan</button>
+                  </div>
+
+                  <div class="plan-card bg-white relative overflow-hidden" id="plan-card-growth">
+                      <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">POPULAR</div>
+                      <h3 class="text-xl font-bold text-slate-900">Growth</h3>
+                      <p class="text-4xl font-bold mt-4 mb-6">₹999<span class="text-sm font-normal text-slate-400">/mo</span></p>
+                      <ul class="space-y-3 text-sm text-slate-600 mb-8">
+                          <li><i class="fa-solid fa-check text-blue-500 mr-2"></i> 50 Active Products</li>
+                          <li><i class="fa-solid fa-check text-blue-500 mr-2"></i> Priority Support</li>
+                          <li><i class="fa-solid fa-check text-blue-500 mr-2"></i> 5% Platform Fee</li>
+                          <li><i class="fa-solid fa-check text-blue-500 mr-2"></i> Verified Badge</li>
+                      </ul>
+                      <button onclick="upgradePlan('growth')" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">Upgrade Now</button>
+                  </div>
+
+                  <div class="plan-card bg-slate-900 text-white" id="plan-card-business">
+                      <h3 class="text-xl font-bold">Business</h3>
+                      <p class="text-4xl font-bold mt-4 mb-6">₹2999<span class="text-sm font-normal text-slate-400">/mo</span></p>
+                      <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                          <li><i class="fa-solid fa-check text-yellow-400 mr-2"></i> Unlimited Products</li>
+                          <li><i class="fa-solid fa-check text-yellow-400 mr-2"></i> Dedicated Manager</li>
+                          <li><i class="fa-solid fa-check text-yellow-400 mr-2"></i> 0% Platform Fee</li>
+                          <li><i class="fa-solid fa-check text-yellow-400 mr-2"></i> Featured Store</li>
+                      </ul>
+                      <button onclick="upgradePlan('business')" class="w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-100 transition">Contact Sales</button>
+                  </div>
+              </div>
+          </div>
+
+          <div id="tab-messages" class="hidden"><h2 class="text-xl font-bold mb-6">Messages</h2><div class="card p-0 overflow-hidden"><div id="messages-list" class="divide-y divide-gray-100"></div></div></div>
+
+          <div id="tab-orders" class="hidden"><h2 class="text-xl font-bold mb-6">Orders</h2><div class="table-container"><table><thead><tr><th>Order ID</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead><tbody id="orders-table-body"></tbody></table></div></div>
+
+          <div id="tab-customers" class="hidden"><h2 class="text-xl font-bold mb-6">Customers</h2><div class="table-container"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Spent</th></tr></thead><tbody id="customers-table-body"></tbody></table></div></div>
+
+      </div>
+  </div>
+
+  <div id="modal-add" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6">
+        <h3 class="font-bold text-xl mb-6">Add New Item</h3>
+        <form id="form-add" class="space-y-4">
+            <input type="text" id="inp-name" required placeholder="Product Name" class="w-full p-3 border rounded-xl bg-gray-50">
+            <input type="number" id="inp-price" required placeholder="Rent (₹)" class="w-full p-3 border rounded-xl bg-gray-50">
+            <select id="inp-category" class="w-full p-3 border rounded-xl bg-gray-50"><option>Electronics</option><option>Cameras</option><option>Tools</option><option>Vehicles</option></select>
+            <textarea id="inp-desc" placeholder="Description..." class="w-full p-3 border rounded-xl bg-gray-50"></textarea>
+            <input type="file" id="inp-file" accept="image/*" class="w-full text-xs">
+            <button type="submit" id="btn-publish" class="w-full py-3 bg-black text-white font-bold rounded-xl shadow-lg hover:bg-gray-800">Publish</button>
+        </form>
+        <button onclick="closeAddModal()" class="mt-4 w-full text-sm text-gray-400">Cancel</button>
     </div>
   </div>
 
-  <main class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-12 w-full max-w-7xl mx-auto">
-    <div class="w-full max-w-xl glass-panel rounded-[28px] p-8 md:p-10 animate-fade-in-up">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <div class="text-xs uppercase tracking-[0.25em] text-blue-400 mb-2">Partner Portal</div>
-          <h1 class="font-display text-2xl md:text-3xl font-bold tracking-tight">Rentify Partner Access</h1>
-          <p class="text-slate-400 text-sm mt-2">Create your partner account, verify email, then configure your store.</p>
-        </div>
-        <button onclick="window.location.href='loginpage.html'" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
-          <i class="fa-solid fa-arrow-left"></i> Back
-        </button>
-      </div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, setDoc, getDoc, updateDoc, query, where, getDocs, serverTimestamp, Timestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-      <!-- Email display from landing page -->
-      <div class="mb-4 text-xs text-slate-400">
-        Using email: <span id="landing-email" class="text-blue-400 font-mono">-</span>
-      </div>
+    const firebaseConfig = { apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY", authDomain: "rentify-93c05.firebaseapp.com", projectId: "rentify-93c05", storageBucket: "rentify-93c05.firebasestorage.app", messagingSenderId: "652243130812", appId: "1:652243130812:web:628fd64b4a69628eae73b9" };
+    const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
+    let currentUser = null; let salesChartInstance = null;
 
-      <!-- Tabs -->
-      <div class="flex mb-6 rounded-full bg-white/5 p-1">
-        <button id="tab-partner-login" class="flex-1 py-2 rounded-full text-sm font-medium bg-white text-black">
-          Login
-        </button>
-        <button id="tab-partner-register" class="flex-1 py-2 rounded-full text-sm font-medium text-slate-300">
-          Register
-        </button>
-      </div>
-
-      <!-- LOGIN VIEW -->
-      <div id="partner-login-view">
-        <div class="space-y-4 mb-4">
-          <div>
-            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Email</label>
-            <input type="email" id="partner-login-email" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="partner@example.com">
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Password</label>
-            <input type="password" id="partner-login-password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="••••••••">
-          </div>
-        </div>
-
-        <button id="partner-login-btn" class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-3">
-          <span>Login</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-
-        <button id="partner-google-btn" class="w-full h-11 rounded-lg bg-white text-black font-semibold flex items-center justify-center gap-3 mb-2">
-          <i class="fa-brands fa-google"></i>
-          <span>Continue with Google</span>
-        </button>
-
-        <p class="text-[11px] text-slate-500 text-center mt-2">
-          Only email-verified accounts can access the partner dashboard.
-        </p>
-      </div>
-
-      <!-- REGISTER VIEW -->
-      <div id="partner-register-view" class="hidden">
-        <div class="space-y-4 mb-4">
-          <div>
-            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Full Name</label>
-            <input type="text" id="partner-reg-fullname" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Your name">
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Email</label>
-            <input type="email" id="partner-reg-email" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="partner@example.com">
-            <p class="text-[11px] text-slate-500 mt-1">
-              If you came from landing page, this email is auto-filled.
-            </p>
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Phone</label>
-            <input type="tel" id="partner-reg-phone" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="+91 9876543210">
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Password</label>
-            <input type="password" id="partner-reg-password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Create a strong password">
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1 uppercase tracking-wide">Confirm Password</label>
-            <input type="password" id="partner-reg-password2" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Repeat password">
-          </div>
-        </div>
-
-        <button id="partner-register-btn" class="w-full h-11 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 mb-2">
-          <span>Register & Send Verification Email</span>
-          <i class="fa-solid fa-paper-plane"></i>
-        </button>
-
-        <p class="text-[11px] text-slate-500 text-center mt-1">
-          A verification link will be sent to your email. You must verify before logging in.
-        </p>
-      </div>
-    </div>
-  </main>
-
-  <!-- Firebase config (creates window.firebaseAuth & window.firebaseHelpers) -->
-  <script type="module" src="firebase-config.js"></script>
-
-  <!-- Page logic -->
-  <script>
-    const partnerAuthPage = {
-      init() {
-        // Read email from ?email=... (landing page)
-        const params = new URLSearchParams(window.location.search);
-        const landingEmail = params.get('email') || '';
-        const emailSpan = document.getElementById('landing-email');
-        emailSpan.textContent = landingEmail || 'not provided';
-
-        // Pre-fill in forms
-        const loginEmailInput = document.getElementById('partner-login-email');
-        const regEmailInput = document.getElementById('partner-reg-email');
-        if (landingEmail) {
-          if (loginEmailInput) loginEmailInput.value = landingEmail;
-          if (regEmailInput) regEmailInput.value = landingEmail;
-        }
-
-        this.initTabs();
-        this.initEvents();
-      },
-
-      showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        const iconBox = document.getElementById('toast-icon');
-        const titleEl = document.getElementById('toast-title');
-        const msgEl = document.getElementById('toast-message');
-
-        if (type === 'success') {
-          iconBox.className = "w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/20 text-emerald-400";
-          iconBox.innerHTML = '<i class="fa-solid fa-check"></i>';
-          titleEl.textContent = "Success";
-        } else {
-          iconBox.className = "w-8 h-8 rounded-xl flex items-center justify-center bg-red-500/20 text-red-400";
-          iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-          titleEl.textContent = "Error";
-        }
-
-        msgEl.textContent = message;
-        toast.style.display = 'flex';
-        toast.style.opacity = '1';
-
-        setTimeout(() => {
-          toast.style.opacity = '0';
-          setTimeout(() => { toast.style.display = 'none'; }, 300);
-        }, 3000);
-      },
-
-      initTabs() {
-        const tabLogin = document.getElementById('tab-partner-login');
-        const tabRegister = document.getElementById('tab-partner-register');
-        const loginView = document.getElementById('partner-login-view');
-        const registerView = document.getElementById('partner-register-view');
-
-        tabLogin.addEventListener('click', () => {
-          tabLogin.classList.add('bg-white', 'text-black');
-          tabRegister.classList.remove('bg-white', 'text-black');
-          tabRegister.classList.add('text-slate-300');
-          loginView.classList.remove('hidden');
-          registerView.classList.add('hidden');
-        });
-
-        tabRegister.addEventListener('click', () => {
-          tabRegister.classList.add('bg-white', 'text-black');
-          tabLogin.classList.remove('bg-white', 'text-black');
-          tabLogin.classList.add('text-slate-300');
-          registerView.classList.remove('hidden');
-          loginView.classList.add('hidden');
-        });
-      },
-
-      initEvents() {
-        const btnLogin = document.getElementById('partner-login-btn');
-        const btnGoogle = document.getElementById('partner-google-btn');
-        const btnRegister = document.getElementById('partner-register-btn');
-
-        if (btnLogin) btnLogin.addEventListener('click', () => this.loginEmail());
-        if (btnGoogle) btnGoogle.addEventListener('click', () => this.loginGoogle());
-        if (btnRegister) btnRegister.addEventListener('click', () => this.registerPartner());
-      },
-
-      async loginEmail() {
-        const email = document.getElementById('partner-login-email').value.trim();
-        const password = document.getElementById('partner-login-password').value;
-
-        if (!email || !password) {
-          this.showToast("Please enter email and password.", "error");
-          return;
-        }
-
-        const auth = window.firebaseAuth;
-        const helpers = window.firebaseHelpers;
-
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) return window.location.href = "loginpage.html";
+        currentUser = user;
+        window.currentUser = user;
         try {
-          const cred = await helpers.signInWithEmailAndPassword(auth, email, password);
+            const snap = await getDoc(doc(db, "partners", currentUser.uid));
+            document.getElementById('state-loading').style.display = 'none';
+            let status = snap.exists() ? (snap.data().verificationStatus || 'new') : 'new';
+            let currentPlan = snap.exists() ? (snap.data().plan || 'free') : 'free';
 
-          // For email/password, require emailVerified
-          if (!cred.user.emailVerified) {
-            await helpers.sendEmailVerification(cred.user);
-            this.showToast("Email not verified. Verification link sent again to " + cred.user.email, "error");
-            await helpers.signOut(auth);
-            return;
-          }
+            if (status === 'approved') {
+                document.getElementById('main-body').className = "h-screen overflow-hidden bg-gray-50"; 
+                document.getElementById('view-verification').classList.add('hidden-force');
+                document.getElementById('view-dashboard').classList.remove('hidden-force');
+                
+                highlightCurrentPlan(currentPlan); // Highlight plan
+                startDashboard();
+            } else if (status === 'submitted') {
+                document.getElementById('state-pending').classList.remove('hidden-force');
+            } else {
+                document.getElementById('state-form').classList.remove('hidden-force');
+            }
+        } catch (e) { console.error(e); }
+    });
 
-          this.showToast("Login successful. Redirecting to dashboard...");
-          setTimeout(() => {
-            window.location.href = "partner-dashboard.html?email=" + encodeURIComponent(cred.user.email);
-          }, 800);
-        } catch (err) {
-          console.error(err);
-          this.showToast("Login failed: " + err.message, "error");
+    function highlightCurrentPlan(plan) {
+        // Reset all cards
+        document.querySelectorAll('.plan-card').forEach(el => el.classList.remove('active-plan'));
+        // Highlight active one
+        const activeCard = document.getElementById(`plan-card-${plan}`);
+        if(activeCard) {
+            activeCard.classList.add('active-plan');
+            const btn = activeCard.querySelector('button');
+            if(btn) { btn.innerText = "Current Plan"; btn.disabled = true; btn.className = "w-full py-3 bg-green-100 text-green-700 rounded-xl font-bold cursor-default"; }
         }
-      },
-
-      async loginGoogle() {
-        const auth = window.firebaseAuth;
-        const helpers = window.firebaseHelpers;
-
-        try {
-          const result = await helpers.signInWithPopup(auth, helpers.googleProvider);
-          const user = result.user;
-
-          // Google email is already verified
-          this.showToast("Google login successful. Redirecting to dashboard...");
-
-          setTimeout(() => {
-            window.location.href = "partner-dashboard.html?email=" + encodeURIComponent(user.email || '');
-          }, 800);
-        } catch (err) {
-          console.error(err);
-          this.showToast("Google login failed: " + err.message, "error");
-        }
-      },
-
-      async registerPartner() {
-        const fullname = document.getElementById('partner-reg-fullname').value.trim();
-        const email = document.getElementById('partner-reg-email').value.trim();
-        const phone = document.getElementById('partner-reg-phone').value.trim();
-        const password = document.getElementById('partner-reg-password').value;
-        const password2 = document.getElementById('partner-reg-password2').value;
-
-        if (!fullname || !email || !phone || !password || !password2) {
-          this.showToast("Please fill all fields.", "error");
-          return;
-        }
-
-        if (password !== password2) {
-          this.showToast("Passwords do not match.", "error");
-          return;
-        }
-
-        const auth = window.firebaseAuth;
-        const helpers = window.firebaseHelpers;
-        const db = window.firebaseDb;
-        const { collection, addDoc, serverTimestamp } = helpers;
-
-        try {
-          const cred = await helpers.createUserWithEmailAndPassword(auth, email, password);
-          await helpers.sendEmailVerification(cred.user);
-
-          // Save basic partner account stub
-          await addDoc(collection(db, "partnerAccounts"), {
-            uid: cred.user.uid,
-            fullname,
-            email,
-            phone,
-            createdAt: serverTimestamp(),
-            emailVerified: false,
-          });
-
-          this.showToast("Registered successfully. Verify your email before logging in.");
-        } catch (err) {
-          console.error(err);
-          this.showToast("Registration failed: " + err.message, "error");
-        }
-      }
-    };
-
-    document.addEventListener('DOMContentLoaded', () => partnerAuthPage.init());
-  </script>
-  <script type="module">
-
-// LOGIN WITH EMAIL
-document.getElementById("btn-partner-login").addEventListener("click", async () => {
-  const email = email_partner.value;
-  const password = password_partner.value;
-
-  try {
-    const user = await auth.signInWithEmailAndPassword(email, password);
-
-    if (!user.user.emailVerified) {
-      alert("Email not verified! Verification link sent again.");
-      user.user.sendEmailVerification();
-      return;
     }
 
-    window.location.href = "partner-dashboard.html";
-  } catch (err) {
-    alert(err.message);
-  }
-});
+    // UPGRADE PLAN LOGIC
+    window.upgradePlan = async (plan) => {
+        if(confirm(`Upgrade to ${plan.toUpperCase()} plan?`)) {
+            try {
+                await updateDoc(doc(db, "partners", currentUser.uid), { plan: plan });
+                alert("Plan upgraded successfully!");
+                location.reload();
+            } catch(e) { alert("Error updating plan: " + e.message); }
+        }
+    };
 
-// GOOGLE LOGIN
-document.getElementById("btn-partner-google").addEventListener("click", async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
+    function startDashboard() {
+        onSnapshot(query(collection(db, "bookings"), where("partnerId", "==", currentUser.uid)), (snap) => {
+            const bookings = []; let earnings = 0;
+            snap.forEach(d => { const b=d.data(); b.id=d.id; bookings.push(b); if(b.totalPrice) earnings+=parseFloat(b.totalPrice); });
+            document.getElementById('val-earnings').textContent = earnings.toLocaleString();
+            document.getElementById('val-orders').textContent = bookings.length;
+            
+            const tbody = document.getElementById('orders-table-body'); tbody.innerHTML = "";
+            bookings.forEach(b => tbody.innerHTML += `<tr><td class="font-mono text-xs text-gray-500">#${b.id.substr(0,6)}</td><td>${b.productName}</td><td class="font-bold">₹${b.totalPrice}</td><td><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">${b.status||'Pending'}</span></td></tr>`);
+            
+            // Chart logic here (same as before)
+        });
 
-  const result = await auth.signInWithPopup(provider);
+        onSnapshot(query(collection(db, "products"), where("partnerId", "==", currentUser.uid)), (snap) => {
+            const grid = document.getElementById('products-grid'); grid.innerHTML = "";
+            snap.forEach(d => {
+                const p = d.data();
+                grid.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl shadow-sm border relative group">
+                        <button onclick="window.deleteProduct('${d.id}')" class="absolute top-2 left-2 w-8 h-8 bg-red-500 text-white rounded-full shadow hover:scale-110 transition flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
+                        <img src="${p.imageUrl}" class="w-full h-32 object-cover rounded-lg mb-3">
+                        <h4 class="font-bold text-sm truncate">${p.name}</h4>
+                        <div class="flex justify-between mt-2 text-xs text-gray-500"><span>${p.category}</span><span class="font-bold text-black">₹${p.rentPerDay}</span></div>
+                    </div>`;
+            });
+        });
+    }
 
-  // CREATE PARTNER PROFILE IF NEW
-  const doc = await db.collection("partners").doc(result.user.uid).get();
-  if (!doc.exists) {
-    await db.collection("partners").doc(result.user.uid).set({
-      email: result.user.email,
-      name: result.user.displayName,
-      createdAt: Date.now(),
-      plan: "free"
+    const compressImage = (file) => new Promise((resolve) => {
+        const reader = new FileReader(); reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image(); img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const scale = 500/img.width; canvas.width=500; canvas.height=img.height*scale;
+                canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
+            }
+        }
     });
-  }
 
-  window.location.href = "partner-dashboard.html";
-});
-
-// REGISTER NEW PARTNER
-document.getElementById("btn-partner-register").addEventListener("click", async () => {
-  const email = reg_email.value;
-  const password = reg_password.value;
-
-  try {
-    const user = await auth.createUserWithEmailAndPassword(email, password);
-
-    await user.user.sendEmailVerification();
-
-    await db.collection("partners").doc(user.user.uid).set({
-      email: email,
-      name: reg_name.value,
-      phone: reg_phone.value,
-      city: reg_city.value,
-      state: reg_state.value,
-      createdAt: Date.now(),
-      plan: "free"
+    document.getElementById('form-add').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            const file = document.getElementById('inp-file').files[0];
+            const base64 = await compressImage(file);
+            await addDoc(collection(db, "products"), {
+                partnerId: currentUser.uid, name: document.getElementById('inp-name').value, rentPerDay: Number(document.getElementById('inp-price').value),
+                category: document.getElementById('inp-category').value, description: document.getElementById('inp-desc').value, imageUrl: base64, status: "published", createdAt: serverTimestamp()
+            });
+            alert("Published!"); window.closeAddModal();
+        } catch(e) { alert(e.message); }
     });
 
-    alert("Verification email sent. Please verify before logging in!");
+    document.getElementById('form-store-settings').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-store'); btn.innerHTML='Saving...'; btn.disabled=true;
+        try {
+            const updates = {};
+            const logo = document.getElementById('inp-logo').files[0];
+            const cover = document.getElementById('inp-cover').files[0];
+            if(logo) updates.storeLogo = await compressImage(logo);
+            if(cover) updates.storeCover = await compressImage(cover);
+            if(Object.keys(updates).length > 0) await updateDoc(doc(db, "partners", currentUser.uid), updates);
+            alert("Settings Saved!");
+        } catch(e) { alert(e.message); } finally { btn.innerHTML='Save Changes'; btn.disabled=false; }
+    });
 
-  } catch (err) {
-    alert(err.message);
-  }
-});
+    window.deleteProduct = async (id) => { if(confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); };
+    
+    window.resetData = async () => {
+        if(!confirm("Reset ALL Products & Orders? Profile will NOT be deleted.")) return;
+        const qP = query(collection(db,"products"), where("partnerId","==",currentUser.uid));
+        const qB = query(collection(db,"bookings"), where("partnerId","==",currentUser.uid));
+        const snapP = await getDocs(qP); snapP.forEach(d => deleteDoc(d.ref));
+        const snapB = await getDocs(qB); snapB.forEach(d => deleteDoc(d.ref));
+        alert("Reset Complete."); location.reload();
+    };
 
- </script>
-  
+    document.getElementById('form-verify').addEventListener('submit', async (e) => {
+        e.preventDefault(); const btn = document.getElementById('btn-submit-app'); btn.innerHTML='...'; btn.disabled=true;
+        try {
+            const file = document.getElementById('v-file-doc').files[0]; const base64 = await compressImage(file);
+            await setDoc(doc(db, "partners", currentUser.uid), {
+                businessName: document.getElementById('v-biz-name').value, businessAddress: document.getElementById('v-biz-addr').value, verificationDoc: base64,
+                verificationStatus: 'submitted', email: currentUser.email, submittedAt: serverTimestamp()
+            }, { merge: true });
+            location.reload();
+        } catch(e) { alert(e.message); btn.disabled=false; }
+    });
 
+    window.switchTab = (t) => {
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active');
+        ['overview','products','messages','orders','customers','store','subscriptions'].forEach(id => document.getElementById(`tab-${id}`).classList.add('hidden'));
+        document.getElementById(`tab-${t}`).classList.remove('hidden');
+    };
+    window.openAddModal = () => document.getElementById('modal-add').classList.remove('hidden');
+    window.closeAddModal = () => document.getElementById('modal-add').classList.add('hidden');
+    window.logout = () => signOut(auth).then(() => window.location.href = "loginpage.html");
+</script>
 </body>
 </html>

@@ -2,25 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Rentify Partner</title>
+  <title>Rentify Partner Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-    /* VERIFICATION MODE (Video BG) */
+    .hidden-force { display: none !important; }
+    
+    /* THEME STYLES */
     .bg-video-mode { background-color: #020617; color: white; }
     .video-bg { position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%; width: auto; height: auto; z-index: -10; transform: translate(-50%, -50%); object-fit: cover; }
     .video-overlay { position: fixed; inset: 0; z-index: -5; background: radial-gradient(circle at 50% 50%, rgba(2, 6, 23, 0.6) 0%, rgba(2, 6, 23, 0.95) 90%); }
     .glass-modal { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); }
+
+    .dashboard-container { display: flex; height: 100vh; background-color: #F3F4F6; color: #111827; }
     
-    /* DASHBOARD MODE (Green/Clean) */
-    .bg-dashboard-mode { background-color: #F8FAFC; color: #1F2937; }
-    .nav-item.active { background-color: #064E3B; color: white; box-shadow: 0 4px 12px rgba(6, 78, 59, 0.3); }
-    .hidden-force { display: none !important; }
+    /* SIDEBAR */
+    .sidebar { width: 260px; background-color: #111827; color: #9CA3AF; display: flex; flex-direction: column; flex-shrink: 0; transition: all 0.3s; }
+    .sidebar-logo { color: white; font-weight: 700; font-size: 1.25rem; padding: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+    
+    .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+    .nav-link:hover { color: white; background-color: rgba(255,255,255,0.05); }
+    .nav-link.active { color: white; background-color: rgba(255,255,255,0.05); border-left-color: #3b82f6; }
+    .nav-section { text-transform: uppercase; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; padding: 1.5rem 1.5rem 0.5rem; opacity: 0.5; }
+    .badge { background-color: #374151; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; margin-left: auto; }
+
+    /* CONTENT */
+    .main-content { flex: 1; overflow-y: auto; padding: 2rem; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card-dark { background: #111827; color: white; }
+
+    /* SUBSCRIPTION CARDS (Dark Theme) */
+    .sub-card {
+        background: #0F172A; /* Dark Blue/Black */
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        color: white;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .sub-card:hover { transform: translateY(-5px); border-color: #3b82f6; box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2); }
+    .sub-card.active-plan { border: 2px solid #3b82f6; background: #1e293b; }
+    .plan-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #60A5FA; border: 1px solid rgba(96, 165, 250, 0.2); padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 1rem; }
+    
+    /* TABLES */
+    .table-container { overflow-x: auto; background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    table { width: 100%; text-align: left; border-collapse: collapse; }
+    th { padding: 1rem; font-size: 0.8rem; text-transform: uppercase; color: #6B7280; font-weight: 600; border-bottom: 1px solid #E5E7EB; }
+    td { padding: 1rem; font-size: 0.9rem; border-bottom: 1px solid #F3F4F6; color: #374151; }
   </style>
 </head>
 <body id="main-body" class="bg-video-mode h-screen overflow-hidden">
@@ -34,247 +72,529 @@
           <h2 class="text-xl font-medium tracking-wide">Connecting...</h2>
       </div>
 
-      <div id="state-form" class="hidden-force w-full max-w-xl glass-modal rounded-3xl p-8 animate-fade-in">
+      <div id="state-form" class="hidden-force w-full max-w-xl glass-modal rounded-3xl p-8">
           <div class="mb-6"><h1 class="text-2xl font-bold">Partner Application</h1><p class="text-slate-400 text-sm">Submit details to activate your seller account.</p></div>
           <form id="form-verify" class="space-y-4">
               <input type="text" id="v-biz-name" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none" placeholder="Business Name">
               <input type="text" id="v-biz-addr" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 outline-none" placeholder="Location">
               <div class="p-4 bg-slate-800/50 rounded-xl border border-dashed border-slate-600">
-                  <label class="block text-xs font-bold text-slate-400 uppercase mb-2">ID Proof (Auto-Compressed &lt; 50KB)</label>
-                  <input type="file" id="v-file-doc" required accept="image/*" class="text-sm text-slate-400 w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-emerald-600 file:text-white cursor-pointer">
+                  <label class="block text-xs font-bold text-slate-400 uppercase mb-2">ID Proof (Image &lt; 50KB)</label>
+                  <input type="file" id="v-file-doc" required accept="image/*" class="text-sm text-slate-400 w-full cursor-pointer">
               </div>
               <button type="submit" id="btn-submit-app" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition">Submit Application</button>
           </form>
-          <button onclick="logout()" class="w-full mt-4 text-xs text-slate-500 hover:text-white">Cancel & Logout</button>
+          <button onclick="logout()" class="w-full mt-4 text-xs text-slate-500 hover:text-white">Logout</button>
       </div>
 
       <div id="state-pending" class="hidden-force text-center max-w-md glass-modal p-10 rounded-3xl">
           <i class="fa-solid fa-clock text-4xl text-yellow-400 mb-4"></i>
           <h2 class="text-2xl font-bold mb-2">Verification Pending</h2>
-          <p class="text-slate-400 mb-6 text-sm">Your application has been sent to the admin. Please wait for approval.</p>
+          <p class="text-slate-400 mb-6 text-sm">Your application is being reviewed.</p>
           <button onclick="location.reload()" class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition">Refresh Status</button>
           <div class="mt-4"><button onclick="logout()" class="text-xs text-slate-500 hover:text-white">Logout</button></div>
       </div>
   </div>
 
-  <div id="view-dashboard" class="hidden-force flex h-screen overflow-hidden">
-      <aside class="w-64 bg-white border-r border-slate-100 flex flex-col p-6 hidden md:flex">
-        <div class="flex items-center gap-3 mb-10"><div class="w-8 h-8 bg-green-100 text-green-700 rounded-lg flex items-center justify-center font-bold">R</div><span class="font-bold text-xl text-slate-900">Rentify</span></div>
-        <nav class="space-y-1 flex-1">
-            <button onclick="switchTab('overview')" id="nav-overview" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 transition"><i class="fa-solid fa-grid-2"></i> Dashboard</button>
-            <button onclick="switchTab('products')" id="nav-products" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 transition"><i class="fa-solid fa-box"></i> Inventory</button>
-        </nav>
-        <button onclick="logout()" class="mt-auto w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 font-medium"><i class="fa-solid fa-power-off"></i> Logout</button>
+  <div id="view-dashboard" class="hidden-force dashboard-container">
+      
+      <aside class="sidebar">
+          <div class="sidebar-logo"><i class="fa-brands fa-react text-2xl text-blue-500"></i> Rentify.</div>
+          
+          <div class="flex flex-col gap-1 mt-4">
+              <div class="nav-section">Dashboard</div>
+              <div onclick="switchTab('overview')" id="nav-overview" class="nav-link active">
+                  <i class="fa-solid fa-chart-pie w-5 text-center"></i> Summary
+              </div>
+              <div onclick="switchTab('products')" id="nav-products" class="nav-link">
+                  <i class="fa-solid fa-box w-5 text-center"></i> Products
+              </div>
+              <div onclick="switchTab('store')" id="nav-store" class="nav-link">
+                  <i class="fa-solid fa-shop w-5 text-center"></i> Store Customization
+              </div>
+              <div onclick="switchTab('subscriptions')" id="nav-subscriptions" class="nav-link">
+                  <i class="fa-solid fa-crown w-5 text-center"></i> Subscription Plan
+              </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+              <div class="nav-section">Management</div>
+              <div onclick="switchTab('messages')" id="nav-messages" class="nav-link">
+                  <i class="fa-solid fa-envelope w-5 text-center"></i> Messages 
+                  <span id="badge-msg" class="badge">0</span>
+              </div>
+              <div onclick="switchTab('orders')" id="nav-orders" class="nav-link">
+                  <i class="fa-solid fa-receipt w-5 text-center"></i> Orders
+                  <span id="badge-orders" class="badge">0</span>
+              </div>
+              <div onclick="switchTab('customers')" id="nav-customers" class="nav-link">
+                  <i class="fa-solid fa-users w-5 text-center"></i> Customers
+              </div>
+          </div>
+
+          <div class="mt-auto p-4 border-t border-gray-800 space-y-2">
+             <div onclick="window.resetData()" class="nav-link text-yellow-500 hover:bg-yellow-900/20 rounded-lg cursor-pointer">
+                <i class="fa-solid fa-eraser w-5 text-center"></i> Reset Data
+             </div>
+             <div onclick="logout()" class="nav-link text-red-400 hover:bg-red-900/20 rounded-lg cursor-pointer">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Logout
+             </div>
+          </div>
       </aside>
 
-      <main class="flex-1 flex flex-col h-screen relative bg-[#F8FAFC]">
-        <header class="h-20 px-8 flex items-center justify-between sticky top-0 z-10 bg-[#F8FAFC]/90 backdrop-blur-sm">
-            <h1 class="text-xl font-bold text-slate-900">Dashboard</h1>
-            <div class="flex items-center gap-4">
-                <span id="plan-badge" class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">FREE</span>
-                <button onclick="openAddModal()" class="bg-[#1F2937] text-white px-5 py-2.5 rounded-full font-medium shadow-lg hover:scale-105 transition"><i class="fa-solid fa-plus"></i> Add Item</button>
-            </div>
-        </header>
+      <div class="main-content">
+          
+          <div class="header">
+              <div>
+                  <h1 class="text-2xl font-bold">Partner Dashboard</h1>
+                  <p class="text-sm text-gray-500">Manage your business & inventory.</p>
+              </div>
+              <div class="flex items-center bg-white p-1 rounded-xl shadow-sm border border-gray-200">
+                  <button onclick="visitMyStore()" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                      <i class="fa-solid fa-external-link-alt"></i> Visit My Store
+                  </button>
+                  <div class="w-px h-6 bg-gray-200 mx-1"></div>
+                  <button onclick="openAddModal()" class="flex items-center gap-2 px-5 py-2 bg-black text-white rounded-lg text-sm font-bold shadow-md hover:bg-gray-800 transition">
+                      <i class="fa-solid fa-plus"></i> Add Item
+                  </button>
+              </div>
+          </div>
 
-        <div class="flex-1 overflow-y-auto p-8 pb-24 space-y-8" id="main-container">
-            <div id="tab-overview" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-[#064E3B] text-white p-6 rounded-[24px] shadow-xl relative overflow-hidden">
-                        <span class="opacity-80 text-sm">Total Products</span>
-                        <h2 class="text-4xl font-bold mt-2" id="stat-products">0</h2>
-                    </div>
-                    <div class="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100">
-                        <span class="text-slate-500 text-sm font-bold">Active Rentals</span>
-                        <h2 class="text-4xl font-bold mt-2 text-slate-800" id="stat-active">0</h2>
-                    </div>
-                    <div class="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100">
-                        <span class="text-slate-500 text-sm font-bold">Earnings</span>
-                        <h2 class="text-3xl font-bold mt-2 text-slate-800">₹<span id="stat-earnings">0</span></h2>
-                    </div>
-                </div>
-                <div class="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100">
-                    <h3 class="font-bold mb-4">Recent Bookings</h3>
-                    <div id="tracking-list" class="space-y-2 text-sm text-slate-500">Loading...</div>
-                </div>
-            </div>
-            <div id="tab-products" class="hidden"><div id="products-grid" class="grid grid-cols-1 md:grid-cols-4 gap-6"></div></div>
-        </div>
-      </main>
+          <div id="tab-overview" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="card card-dark">
+                      <div class="p-2 bg-white/10 rounded-lg w-fit mb-4"><i class="fa-solid fa-wallet"></i></div>
+                      <p class="text-gray-400 text-sm">Total Sales</p>
+                      <h2 class="text-3xl font-bold mt-1">₹<span id="val-earnings">0</span></h2>
+                  </div>
+                  <div class="card">
+                      <div class="p-2 bg-gray-100 rounded-lg w-fit mb-4"><i class="fa-solid fa-users"></i></div>
+                      <p class="text-gray-500 text-sm">Customers Rented</p>
+                      <h2 class="text-3xl font-bold mt-1" id="val-customers">0</h2>
+                  </div>
+                  <div class="card">
+                      <div class="p-2 bg-gray-100 rounded-lg w-fit mb-4"><i class="fa-solid fa-box-open"></i></div>
+                      <p class="text-gray-500 text-sm">Total Orders</p>
+                      <h2 class="text-3xl font-bold mt-1" id="val-orders">0</h2>
+                  </div>
+              </div>
+              <div class="card"><h3 class="font-bold mb-4">Sales Chart</h3><div class="h-64"><canvas id="salesChart"></canvas></div></div>
+          </div>
+
+          <div id="tab-products" class="hidden">
+              <h2 class="text-xl font-bold mb-6">Inventory</h2>
+              <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+          </div>
+
+          <div id="tab-store" class="hidden">
+              <h2 class="text-xl font-bold mb-6">Store Customization</h2>
+              <div class="card">
+                  <form id="form-store-settings">
+                      <div class="relative w-full h-48 md:h-64 bg-slate-100 rounded-xl overflow-hidden border-2 border-dashed border-slate-300 group cursor-pointer" onclick="document.getElementById('inp-cover').click()">
+                          <img id="preview-cover" src="" class="w-full h-full object-cover hidden">
+                          <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 group-hover:bg-black/5 transition">
+                              <i class="fa-regular fa-image text-3xl mb-2"></i>
+                              <span class="text-sm font-medium">Click to upload Cover Photo</span>
+                          </div>
+                          <input type="file" id="inp-cover" accept="image/*" class="hidden" onchange="previewImage(this, 'preview-cover')">
+                      </div>
+
+                      <div class="relative -mt-12 ml-6 w-28 h-28 md:w-32 md:h-32">
+                          <div class="w-full h-full rounded-full border-4 border-white bg-slate-200 overflow-hidden relative group cursor-pointer shadow-lg" onclick="document.getElementById('inp-logo').click()">
+                              <img id="preview-logo" src="" class="w-full h-full object-cover hidden">
+                              <div class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition">
+                                  <i class="fa-solid fa-camera text-white opacity-0 group-hover:opacity-100"></i>
+                              </div>
+                          </div>
+                          <input type="file" id="inp-logo" accept="image/*" class="hidden" onchange="previewImage(this, 'preview-logo')">
+                      </div>
+
+                      <div class="mt-6 flex justify-end">
+                          <button type="submit" id="btn-save-store" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 shadow-md transition">
+                              Save Changes
+                          </button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+
+          <div id="tab-subscriptions" class="hidden">
+              <div class="text-center mb-10">
+                  <h2 class="text-3xl font-bold text-slate-900">Choose Your Plan</h2>
+                  <p class="text-slate-500 mt-2">Scale your rental business with the right tools.</p>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" id="plans-container">
+                  <div class="sub-card" id="plan-card-starter">
+                      <div class="plan-badge">PLAN LEVEL 01</div>
+                      <h3 class="text-3xl font-black mb-1">Starter</h3>
+                      <p class="text-slate-400 text-sm min-h-[40px] mb-6">Entry-level plan.</p>
+                      <button onclick="upgradePlan('starter')" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-slate-200 transition">Select Starter</button>
+                  </div>
+                  <div class="sub-card" id="plan-card-growth">
+                      <div class="plan-badge">PLAN LEVEL 02</div>
+                      <h3 class="text-3xl font-black mb-1">Growth</h3>
+                      <p class="text-slate-400 text-sm min-h-[40px] mb-6">For growing businesses.</p>
+                      <button onclick="upgradePlan('growth')" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-slate-200 transition">Select Growth</button>
+                  </div>
+                  <div class="sub-card" id="plan-card-business">
+                      <div class="plan-badge">PLAN LEVEL 03</div>
+                      <h3 class="text-3xl font-black mb-1">Business Pro</h3>
+                      <p class="text-slate-400 text-sm min-h-[40px] mb-6">Robust tools.</p>
+                      <button onclick="upgradePlan('business')" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-slate-200 transition">Select Business</button>
+                  </div>
+                  <div class="sub-card" id="plan-card-enterprise">
+                      <div class="plan-badge">PLAN LEVEL 04</div>
+                      <h3 class="text-3xl font-black mb-1">Enterprise</h3>
+                      <p class="text-slate-400 text-sm min-h-[40px] mb-6">Full customization.</p>
+                      <button onclick="upgradePlan('enterprise')" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-slate-200 transition">Select Enterprise</button>
+                  </div>
+              </div>
+          </div>
+
+          <div id="tab-messages" class="hidden"><h2 class="text-xl font-bold mb-6">Messages</h2><div class="card p-0 overflow-hidden"><div id="messages-list" class="divide-y divide-gray-100"></div></div></div>
+
+          <div id="tab-orders" class="hidden"><h2 class="text-xl font-bold mb-6">Orders</h2><div class="table-container"><table><thead><tr><th>Order ID</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead><tbody id="orders-table-body"></tbody></table></div></div>
+
+          <div id="tab-customers" class="hidden"><h2 class="text-xl font-bold mb-6">Customers</h2><div class="table-container"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Spent</th></tr></thead><tbody id="customers-table-body"></tbody></table></div></div>
+
+      </div>
   </div>
 
   <div id="modal-add" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-[24px] shadow-2xl p-6">
-        <h3 class="font-bold text-xl mb-6">New Product</h3>
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6">
+        <h3 class="font-bold text-xl mb-6">Add New Item</h3>
         <form id="form-add" class="space-y-4">
-            <input type="text" id="inp-name" required placeholder="Name" class="w-full p-3 border rounded-xl bg-slate-50">
-            <input type="number" id="inp-price" required placeholder="Rent (₹)" class="w-full p-3 border rounded-xl bg-slate-50">
-            <select id="inp-category" class="w-full p-3 border rounded-xl bg-slate-50"><option>Electronics</option><option>Cameras</option><option>Tools</option></select>
-            <textarea id="inp-desc" placeholder="Details..." class="w-full p-3 border rounded-xl bg-slate-50"></textarea>
-            <input type="file" id="inp-file" accept="image/*" class="text-xs">
-            <button type="submit" id="btn-publish" class="w-full py-3 bg-[#064E3B] text-white font-bold rounded-xl shadow-lg">Publish</button>
+            <input type="text" id="inp-name" required placeholder="Product Name" class="w-full p-3 border rounded-xl bg-gray-50">
+            <input type="number" id="inp-price" required placeholder="Rent (₹)" class="w-full p-3 border rounded-xl bg-gray-50">
+            <select id="inp-category" class="w-full p-3 border rounded-xl bg-gray-50"><option>Electronics</option><option>Cameras</option><option>Tools</option><option>Vehicles</option></select>
+            <textarea id="inp-desc" placeholder="Description..." class="w-full p-3 border rounded-xl bg-gray-50"></textarea>
+            <input type="file" id="inp-file" accept="image/*" class="w-full text-xs">
+            <button type="submit" id="btn-publish" class="w-full py-3 bg-black text-white font-bold rounded-xl shadow-lg hover:bg-gray-800">Publish</button>
         </form>
-        <button onclick="closeAddModal()" class="mt-4 w-full text-sm text-slate-400">Cancel</button>
+        <button onclick="closeAddModal()" class="mt-4 w-full text-sm text-gray-400">Cancel</button>
     </div>
   </div>
 
 <script type="module">
-    // 1. EMBEDDED CONFIG & IMPORTS (Guaranteed Loading)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, doc, setDoc, getDoc, updateDoc, query, where, orderBy, getDocs, serverTimestamp, Timestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, setDoc, getDoc, getDocs, updateDoc, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY",
-      authDomain: "rentify-93c05.firebaseapp.com",
-      projectId: "rentify-93c05",
-      storageBucket: "rentify-93c05.firebasestorage.app",
-      messagingSenderId: "652243130812",
-      appId: "1:652243130812:web:628fd64b4a69628eae73b9"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY", authDomain: "rentify-93c05.firebaseapp.com", projectId: "rentify-93c05", storageBucket: "rentify-93c05.firebasestorage.app", messagingSenderId: "652243130812", appId: "1:652243130812:web:628fd64b4a69628eae73b9" };
+    const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
+    let currentUser = null; let salesChartInstance = null;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    let currentUser = null;
-
-    // 2. AUTH & GATEKEEPER
     onAuthStateChanged(auth, async (user) => {
         if (!user) return window.location.href = "loginpage.html";
         currentUser = user;
+        window.currentUser = user; // Global access for debug
         
         try {
             const snap = await getDoc(doc(db, "partners", currentUser.uid));
             document.getElementById('state-loading').style.display = 'none';
-
+            
             let status = 'new';
-            if (snap.exists()) status = snap.data().verificationStatus || 'new';
+            let currentPlan = 'starter';
+
+            if (snap.exists()) {
+                const data = snap.data();
+                status = data.verificationStatus || 'new';
+                currentPlan = data.plan || 'starter';
+
+                // Preload Store Images
+                if(data.storeCover) {
+                    const img = document.getElementById('preview-cover');
+                    img.src = data.storeCover;
+                    img.classList.remove('hidden');
+                }
+                if(data.storeLogo) {
+                    const img = document.getElementById('preview-logo');
+                    img.src = data.storeLogo;
+                    img.classList.remove('hidden');
+                }
+            }
 
             if (status === 'approved') {
-                document.getElementById('main-body').className = "bg-dashboard-mode h-screen overflow-hidden";
+                document.getElementById('main-body').className = "h-screen overflow-hidden bg-gray-50"; 
                 document.getElementById('view-verification').classList.add('hidden-force');
                 document.getElementById('view-dashboard').classList.remove('hidden-force');
+                
+                highlightCurrentPlan(currentPlan); 
                 startDashboard();
             } else if (status === 'submitted') {
                 document.getElementById('state-pending').classList.remove('hidden-force');
             } else {
                 document.getElementById('state-form').classList.remove('hidden-force');
             }
-        } catch (e) {
-            console.error(e);
-            document.getElementById('state-loading').style.display = 'none';
-            document.getElementById('state-form').classList.remove('hidden-force');
+        } catch (e) { 
+            console.error("Auth Error:", e);
+            alert("Error loading profile. Check console."); 
         }
     });
 
-    // 3. IMAGE COMPRESSOR (Smart Resize: <50KB Guaranteed)
-    const compressImage = (file) => {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    // Force small width (500px is safe for ID cards on screen)
-                    const MAX_WIDTH = 500; 
-                    const scale = MAX_WIDTH / img.width; 
-                    canvas.width = MAX_WIDTH; 
-                    canvas.height = img.height * scale;
-                    
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // 0.6 Quality keeps it legible but very small file size
-                    resolve(canvas.toDataURL('image/jpeg', 0.6)); 
-                }
-            }
-        });
+    // --- VISIT STORE LOGIC ---
+    window.visitMyStore = () => {
+        if(currentUser) {
+            window.open(`store.html?id=${currentUser.uid}`, '_blank');
+        }
     };
 
-    // 4. SUBMIT APPLICATION (Uses Compressor)
-    document.getElementById('form-verify').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btn-submit-app');
-        btn.innerHTML = 'Compressing & Sending...'; btn.disabled = true;
-
-        try {
-            const file = document.getElementById('v-file-doc').files[0];
-            if(!file) throw new Error("Select ID/License image");
-
-            // Compress to Base64 String (Bypasses Storage 1MB Limit)
-            const base64 = await compressImage(file); 
-
-            await setDoc(doc(db, "partners", currentUser.uid), {
-                businessName: document.getElementById('v-biz-name').value,
-                businessAddress: document.getElementById('v-biz-addr').value,
-                verificationDoc: base64, // Saves image as text string
-                verificationStatus: 'submitted',
-                email: currentUser.email,
-                submittedAt: serverTimestamp()
-            }, { merge: true });
-
-            alert("Application Submitted Successfully!");
-            location.reload();
-        } catch(e) { 
-            alert("Error: " + e.message); 
-            btn.disabled=false; 
-            btn.innerHTML='Submit Application'; 
+    function highlightCurrentPlan(plan) {
+        document.querySelectorAll('.sub-card').forEach(el => el.classList.remove('active-plan'));
+        const activeCard = document.getElementById(`plan-card-${plan}`);
+        if(activeCard) {
+            activeCard.classList.add('active-plan');
+            const btn = activeCard.querySelector('button');
+            if(btn) { 
+                btn.innerText = "Current Plan"; 
+                btn.disabled = true; 
+                btn.className = "w-full py-3 bg-blue-600/20 text-blue-400 border border-blue-600/50 rounded-lg font-bold cursor-default"; 
+            }
         }
-    });
+    }
 
-    // 5. DASHBOARD LOGIC (Runs after approval)
+    window.upgradePlan = async (plan) => {
+        if(confirm(`Switch subscription to ${plan.toUpperCase()}?`)) {
+            try {
+                await updateDoc(doc(db, "partners", currentUser.uid), { plan: plan });
+                alert("Subscription updated!");
+                location.reload();
+            } catch(e) { alert("Error: " + e.message); }
+        }
+    };
+
     function startDashboard() {
-        onSnapshot(query(collection(db, "bookings"), where("partnerId", "==", currentUser.uid)), snap => {
-            let active=0, earnings=0;
-            const list = document.getElementById('tracking-list');
-            if(list) list.innerHTML = "";
-            snap.forEach(d => {
-                const b = d.data();
-                if(b.status==='active') active++;
-                if(b.totalPrice) earnings+=b.totalPrice;
-                if(list && b.status==='active') {
-                    list.innerHTML += `<div class="p-3 bg-slate-50 border rounded mb-2 flex justify-between"><span>${b.productName}</span><span class="text-green-600 font-bold">ACTIVE</span></div>`;
+        // 1. LISTEN FOR ORDERS/BOOKINGS
+        onSnapshot(query(collection(db, "bookings"), where("partnerId", "==", currentUser.uid)), (snap) => {
+            const bookings = []; 
+            let earnings = 0;
+            const uniqueCustomers = new Set(); // To count unique customers
+            const customersData = []; // To populate customer table
+
+            const tbodyOrders = document.getElementById('orders-table-body'); 
+            tbodyOrders.innerHTML = "";
+
+            snap.forEach(d => { 
+                const b = d.data(); 
+                b.id = d.id; 
+                bookings.push(b); 
+                
+                // --- FIX FOR NaN ISSUE ---
+                // We ensure totalPrice is treated as a number. If it's missing, use 0.
+                const price = parseFloat(b.totalPrice) || 0; 
+                earnings += price;
+
+                // Track unique customers
+                if (b.customerEmail && !uniqueCustomers.has(b.customerEmail)) {
+                    uniqueCustomers.add(b.customerEmail);
+                    customersData.push({
+                        name: b.customerName || "Unknown",
+                        email: b.customerEmail,
+                        phone: b.customerPhone || "N/A"
+                    });
                 }
+
+                // Populate Orders Table
+                tbodyOrders.innerHTML += `
+                    <tr>
+                        <td class="font-mono text-xs text-gray-500">#${b.id.substr(0,6)}</td>
+                        <td>${b.productName || 'Item'}</td>
+                        <td class="font-bold">₹${price}</td>
+                        <td><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">${b.status || 'Pending'}</span></td>
+                    </tr>`;
             });
-            document.getElementById('stat-active').textContent = active;
-            document.getElementById('stat-earnings').textContent = earnings.toLocaleString();
+
+            // Update Stats Cards
+            document.getElementById('val-earnings').textContent = earnings.toLocaleString();
+            document.getElementById('val-orders').textContent = bookings.length;
+            document.getElementById('val-customers').textContent = uniqueCustomers.size;
+
+            // Update Customers Table (FIX FOR EMPTY CUSTOMERS TAB)
+            const tbodyCust = document.getElementById('customers-table-body');
+            tbodyCust.innerHTML = "";
+            if(customersData.length === 0) {
+                tbodyCust.innerHTML = `<tr><td colspan="4" class="text-center text-gray-400 p-4">No customers yet</td></tr>`;
+            } else {
+                customersData.forEach(c => {
+                    tbodyCust.innerHTML += `
+                        <tr>
+                            <td class="font-bold">${c.name}</td>
+                            <td>${c.email}</td>
+                            <td>${c.phone}</td>
+                            <td><span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">View History</span></td>
+                        </tr>`;
+                });
+            }
+
+            // Update Chart
+            const ctx = document.getElementById('salesChart');
+            if(salesChartInstance) salesChartInstance.destroy();
+            salesChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { 
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Today'], 
+                    datasets: [{
+                        label: 'Sales', 
+                        data: [0, earnings * 0.3, earnings * 0.6, earnings], 
+                        borderColor: '#111827', 
+                        backgroundColor: 'rgba(17, 24, 39, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }] 
+                },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
+            });
         });
-        
-        onSnapshot(query(collection(db, "products"), where("partnerId", "==", currentUser.uid)), snap => {
-            document.getElementById('stat-products').textContent = snap.size;
-            const grid = document.getElementById('products-grid'); if(grid) grid.innerHTML="";
+
+        // 2. LISTEN FOR PRODUCTS
+        onSnapshot(query(collection(db, "products"), where("partnerId", "==", currentUser.uid)), (snap) => {
+            // Optional: Update a product count if you have an element id="val-products-count"
+            // document.getElementById('val-products-count').textContent = snap.size;
+            
+            const grid = document.getElementById('products-grid'); 
+            grid.innerHTML = "";
+            
+            if (snap.empty) {
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">No products added yet. Click "Add Item" to start.</div>`;
+            }
+
             snap.forEach(d => {
                 const p = d.data();
-                grid.innerHTML += `<div class="bg-white p-4 rounded-xl shadow border"><img src="${p.imageUrl}" class="h-32 w-full object-cover rounded mb-2"><h4 class="font-bold">${p.name}</h4><div class="text-xs">₹${p.rentPerDay}</div></div>`;
+                grid.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl shadow-sm border relative group hover:shadow-md transition">
+                        <button onclick="window.deleteProduct('${d.id}')" class="absolute top-2 left-2 w-8 h-8 bg-white/90 text-red-500 rounded-full shadow hover:scale-110 transition flex items-center justify-center z-10">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                        <div class="h-32 w-full overflow-hidden rounded-lg mb-3 bg-gray-100">
+                            <img src="${p.imageUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <h4 class="font-bold text-sm truncate">${p.name}</h4>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span class="bg-gray-100 px-2 py-0.5 rounded">${p.category}</span>
+                            <span class="font-bold text-black">₹${p.rentPerDay}/day</span>
+                        </div>
+                    </div>`;
             });
         });
     }
 
-    // 6. ADD PRODUCT (Uses Compressor)
-    document.getElementById('form-add').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        try {
-            const file = document.getElementById('inp-file').files[0];
-            const base64 = await compressImage(file);
-            await addDoc(collection(db, "products"), {
-                partnerId: currentUser.uid,
-                name: document.getElementById('inp-name').value,
-                rentPerDay: Number(document.getElementById('inp-price').value),
-                category: document.getElementById('inp-category').value,
-                description: document.getElementById('inp-desc').value,
-                imageUrl: base64,
-                status: "published",
-                createdAt: serverTimestamp()
-            });
-            alert("Published!"); window.closeAddModal();
-        } catch(e) { alert(e.message); }
+    const compressImage = (file) => new Promise((resolve) => {
+        const reader = new FileReader(); reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image(); img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const scale = 500/img.width; canvas.width=500; canvas.height=img.height*scale;
+                canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
+            }
+        }
     });
 
-    // HELPERS
+    window.previewImage = (input, imgId) => {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById(imgId);
+                img.src = e.target.result;
+                img.classList.remove('hidden');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
+
+    // --- ADD PRODUCT LOGIC (Redirects to Store) ---
+    document.getElementById('form-add').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-publish');
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Publishing...'; 
+        btn.disabled = true;
+        
+        try {
+            const file = document.getElementById('inp-file').files[0];
+            let base64 = "https://placehold.co/400"; 
+            if(file) base64 = await compressImage(file);
+
+            await addDoc(collection(db, "products"), {
+                partnerId: currentUser.uid, 
+                name: document.getElementById('inp-name').value, 
+                rentPerDay: Number(document.getElementById('inp-price').value),
+                category: document.getElementById('inp-category').value, 
+                description: document.getElementById('inp-desc').value, 
+                imageUrl: base64, 
+                status: "published", 
+                createdAt: serverTimestamp()
+            });
+            
+            document.getElementById('form-add').reset();
+            window.closeAddModal();
+            
+            // Redirect to store
+            window.open(`store.html?id=${currentUser.uid}`, '_blank');
+
+        } catch(e) { 
+            console.error(e);
+            alert("Error: " + e.message); 
+        } finally { 
+            btn.innerHTML = "Publish"; 
+            btn.disabled = false; 
+        }
+    });
+
+    // --- STORE CUSTOMIZATION LOGIC ---
+    document.getElementById('form-store-settings').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-store'); 
+        btn.innerHTML='Saving...'; 
+        btn.disabled=true;
+        
+        try {
+            const updates = {};
+            const logo = document.getElementById('inp-logo').files[0];
+            const cover = document.getElementById('inp-cover').files[0];
+            
+            if(logo) updates.storeLogo = await compressImage(logo);
+            if(cover) updates.storeCover = await compressImage(cover);
+            
+            if(Object.keys(updates).length > 0) {
+                await updateDoc(doc(db, "partners", currentUser.uid), updates);
+                alert("Store Customization Saved!");
+            } else {
+                alert("No new images selected.");
+            }
+        } catch(e) { alert(e.message); } 
+        finally { btn.innerHTML='Save Changes'; btn.disabled=false; }
+    });
+
+    window.deleteProduct = async (id) => { if(confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); };
+    
+    window.resetData = async () => {
+        if(!confirm("Reset ALL Products & Orders? This cannot be undone.")) return;
+        
+        const qP = query(collection(db,"products"), where("partnerId","==",currentUser.uid));
+        const qB = query(collection(db,"bookings"), where("partnerId","==",currentUser.uid));
+        
+        const snapP = await getDocs(qP); snapP.forEach(d => deleteDoc(d.ref));
+        const snapB = await getDocs(qB); snapB.forEach(d => deleteDoc(d.ref));
+        
+        alert("Reset Complete."); location.reload();
+    };
+
+    document.getElementById('form-verify').addEventListener('submit', async (e) => {
+        e.preventDefault(); const btn = document.getElementById('btn-submit-app'); btn.innerHTML='...'; btn.disabled=true;
+        try {
+            const file = document.getElementById('v-file-doc').files[0]; const base64 = await compressImage(file);
+            await setDoc(doc(db, "partners", currentUser.uid), {
+                businessName: document.getElementById('v-biz-name').value, businessAddress: document.getElementById('v-biz-addr').value, verificationDoc: base64,
+                verificationStatus: 'submitted', email: currentUser.email, submittedAt: serverTimestamp()
+            }, { merge: true });
+            location.reload();
+        } catch(e) { alert(e.message); btn.disabled=false; }
+    });
+
     window.switchTab = (t) => {
-        ['overview','products'].forEach(id => { document.getElementById(`tab-${id}`).classList.add('hidden'); document.getElementById(`nav-${id}`).classList.remove('active','bg-[#064E3B]','text-white'); });
-        document.getElementById(`tab-${t}`).classList.remove('hidden'); document.getElementById(`nav-${t}`).classList.add('active','bg-[#064E3B]','text-white');
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active');
+        ['overview','products','messages','orders','customers','store','subscriptions'].forEach(id => document.getElementById(`tab-${id}`).classList.add('hidden'));
+        document.getElementById(`tab-${t}`).classList.remove('hidden');
     };
     window.openAddModal = () => document.getElementById('modal-add').classList.remove('hidden');
     window.closeAddModal = () => document.getElementById('modal-add').classList.add('hidden');
