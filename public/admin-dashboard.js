@@ -1,77 +1,92 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const auth = window.firebaseAuth;
-    const db = window.firebaseDb;
-    const helpers = window.firebaseHelpers;
-    let selectedPartnerId = null;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import {
+  getFirestore, collection, query, where,
+  onSnapshot, doc, getDoc, updateDoc
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import {
+  getAuth, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-    // Simple Admin Check (Replace with custom claims in production)
-    helpers.onAuthStateChanged(auth, user => {
-        if(!user || user.email !== "philenkuriakose027@gmail.com") {
-             // alert("Access Denied. Admins only.");
-             // window.location.href = "loginpage.html";
-             // FOR TESTING: Comment out the redirection above to test without setting up a specific admin user yet.
-             loadRequests();
-        } else {
-            loadRequests();
-        }
-    });
+const firebaseConfig = {
+  apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY",
+  authDomain: "rentify-93c05.firebaseapp.com",
+  projectId: "rentify-93c05",
+  storageBucket: "rentify-93c05.firebasestorage.app",
+  messagingSenderId: "652243130812",
+  appId: "1:652243130812:web:628fd64b4a69628eae73b9"
+};
 
-    function loadRequests() {
-        const q = helpers.query(helpers.collection(db, "partners"), helpers.where("verificationStatus", "==", "submitted"));
-        
-        helpers.onSnapshot(q, snap => {
-            const list = document.getElementById('requests-list');
-            list.innerHTML = "";
-            if(snap.empty) {
-                list.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-400">No pending requests.</td></tr>';
-                return;
-            }
-            snap.forEach(doc => {
-                const p = doc.data();
-                list.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 font-bold">${p.businessName || 'N/A'}</td>
-                        <td class="p-4 text-sm">${p.email}</td>
-                        <td class="p-4 text-sm text-slate-500">${p.submittedAt ? p.submittedAt.toDate().toLocaleDateString() : '-'}</td>
-                        <td class="p-4">
-                            <button onclick="openReviewModal('${doc.id}')" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-bold text-xs hover:bg-blue-200">Review</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        });
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const ADMIN_EMAIL = "philenkuriakose027@gmail.com";
+let selectedPartnerId = null;
+
+// 🔐 Admin auth check
+onAuthStateChanged(auth, user => {
+  if (!user || user.email !== ADMIN_EMAIL) {
+    location.href = "admin-login.html";
+    return;
+  }
+  loadRequests();
+});
+
+// 📥 Load partner requests
+function loadRequests() {
+  const q = query(
+    collection(db, "partners"),
+    where("verificationStatus", "==", "submitted")
+  );
+
+  onSnapshot(q, snapshot => {
+    const list = document.getElementById("requests-list");
+    list.innerHTML = "";
+
+    if (snapshot.empty) {
+      list.innerHTML = `<tr><td colspan="4">No pending requests</td></tr>`;
+      return;
     }
 
-    window.openReviewModal = async (uid) => {
-        selectedPartnerId = uid;
-        const snap = await helpers.getDoc(helpers.doc(db, "partners", uid));
-        const p = snap.data();
-        
-        document.getElementById('view-title').textContent = "Review: " + p.businessName;
-        document.getElementById('view-uid').textContent = uid;
-        document.getElementById('view-name').textContent = p.businessName;
-        document.getElementById('view-address').textContent = p.businessAddress;
-        document.getElementById('btn-view-id').href = p.aadharUrl;
-        document.getElementById('btn-view-biz').href = p.licenseUrl;
-        
-        document.getElementById('modal-view').classList.remove('hidden');
-    };
+    snapshot.forEach(d => {
+      const p = d.data();
+      list.innerHTML += `
+        <tr>
+          <td>${p.businessName}</td>
+          <td>${p.email}</td>
+          <td>${p.submittedAt?.toDate().toLocaleDateString() || "-"}</td>
+          <td>
+            <button onclick="review('${d.id}')">Review</button>
+          </td>
+        </tr>
+      `;
+    });
+  });
+}
 
-    const updateStatus = async (status) => {
-        if(!selectedPartnerId) return;
-        const btn = status === 'approved' ? document.getElementById('btn-approve') : document.getElementById('btn-reject');
-        const originalText = btn.innerText;
-        btn.innerText = 'Processing...'; btn.disabled = true;
-        
-        try {
-            await helpers.updateDoc(helpers.doc(db, "partners", selectedPartnerId), { verificationStatus: status });
-            alert(`Partner ${status}!`);
-            document.getElementById('modal-view').classList.add('hidden');
-        } catch(e) { alert("Error: " + e.message); }
-        finally { btn.innerText = originalText; btn.disabled = false; }
-    };
+// 👀 Review partner
+window.review = async (id) => {
+  selectedPartnerId = id;
+  const snap = await getDoc(doc(db, "partners", id));
+  if (!snap.exists()) return alert("Partner not found");
 
-    document.getElementById('btn-approve').addEventListener('click', () => updateStatus('approved'));
-    document.getElementById('btn-reject').addEventListener('click', () => updateStatus('rejected'));
-    document.getElementById('btn-admin-logout').addEventListener('click', () => helpers.signOut(auth).then(() => window.location.href = "loginpage.html"));
-});
+  const p = snap.data();
+  document.getElementById("view-name").innerText = p.businessName;
+  document.getElementById("modal-view").classList.remove("hidden");
+};
+
+// ✅ Approve / Reject
+window.updateStatus = async (status) => {
+  if (!selectedPartnerId) return;
+  await updateDoc(doc(db, "partners", selectedPartnerId), {
+    verificationStatus: status
+  });
+  alert("Partner " + status);
+  document.getElementById("modal-view").classList.add("hidden");
+};
+
+// 🚪 Logout
+document.getElementById("btn-logout")
+  .addEventListener("click", () =>
+    signOut(auth).then(() => location.href = "admin-login.html")
+  );

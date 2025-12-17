@@ -1,13 +1,41 @@
+// firebase-config.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+
 import {
-  getFirestore, collection, addDoc, doc, setDoc, getDoc, updateDoc, 
-  query, where, orderBy, getDocs, serverTimestamp, Timestamp, onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  serverTimestamp,
+  Timestamp,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY",
@@ -18,23 +46,52 @@ const firebaseConfig = {
   appId: "1:652243130812:web:628fd64b4a69628eae73b9"
 };
 
-// Initialize Firebase
+// Init
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Attach globally for access in other scripts
+// Global exposure (IMPORTANT)
 window.firebaseAuth = auth;
 window.firebaseDb = db;
 window.firebaseStorage = storage;
+
 window.firebaseHelpers = {
-  googleProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  sendEmailVerification, signOut, onAuthStateChanged,
-  serverTimestamp, Timestamp, onSnapshot,
-  collection, addDoc, doc, setDoc, getDoc, updateDoc, query, where, orderBy, getDocs,
-  ref, uploadBytes, getDownloadURL
+  // AUTH
+  googleProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signOut,
+  onAuthStateChanged,
+
+  // FIRESTORE
+  collection,
+  addDoc,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  serverTimestamp,
+  Timestamp,
+  onSnapshot,
+
+  // STORAGE
+  ref,
+  uploadBytes,
+  getDownloadURL
 };
 
-console.log("🔥 Firebase Initialized Successfully");
+console.log("🔥 Firebase fully initialised");
+console.log(
+  "🔥 ACTIVE firebase-config.js LOADED",
+  Object.keys(window.firebaseHelpers)
+);

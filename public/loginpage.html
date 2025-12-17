@@ -126,14 +126,13 @@
              <i class="fa-solid fa-basket-shopping text-emerald-600 text-2xl"></i>
              <span class="font-bold text-xl tracking-tight text-slate-900">Rentify.</span>
         </div>
-        <h1 class="font-display text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">
-           Welcome Back
+        <h1 id="welcome-heading" class="font-display text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">
+           Welcome to Rentify
         </h1>
       </div>
 
       <p class="text-slate-500 mb-8 font-medium">
-        How would you like to proceed
-        with <span id="display-email" class="text-slate-900 font-bold underline decoration-emerald-500 decoration-2"></span>?
+        How would you like to proceed with <span id="display-email" class="text-slate-900 font-bold underline decoration-emerald-500 decoration-2">your account</span>?
       </p>
 
       <div class="grid md:grid-cols-2 gap-6">
@@ -246,6 +245,9 @@
               class="w-full h-12 rounded-xl px-4 input-premium font-medium"
               placeholder="••••••••"
             />
+            <div class="text-right mt-1">
+                <a href="#" onclick="forgotPassword('partner-login-email')" class="text-xs text-slate-500 hover:text-slate-900 underline">Forgot Password?</a>
+            </div>
           </div>
         </div>
 
@@ -272,97 +274,55 @@
 
       <div id="partner-register-view" class="hidden">
         <div class="space-y-4 mb-6">
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Email
-            </label>
+          <input
+            id="partner-reg-email"
+            type="email"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="Email"
+          />
+          <input
+            id="partner-reg-password"
+            type="password"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="Password (>5 chars, @, Num, Capital)"
+          />
+          <input
+            id="partner-reg-name"
+            type="text"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="Full Name"
+          />
+          <input
+            id="partner-reg-phone"
+            type="tel"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="Phone"
+          />
+          <input
+            id="partner-reg-address1"
+            type="text"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="Address"
+          />
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
             <input
-              id="partner-reg-email"
-              type="email"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Password
-            </label>
-            <input
-              id="partner-reg-password"
-              type="password"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="Create a strong password"
-            />
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                Full Name
-              </label>
-              <input
-                id="partner-reg-name"
-                type="text"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-                placeholder="Your name"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                Phone
-              </label>
-              <input
-                id="partner-reg-phone"
-                type="tel"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-                placeholder="+91 9876543210"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Address Line 1
-            </label>
-            <input
-              id="partner-reg-address1"
+              id="partner-reg-city"
               type="text"
               class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="Street, Building"
+              placeholder="City"
             />
-          </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                City
-              </label>
-              <input
-                id="partner-reg-city"
-                type="text"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                State
-              </label>
-              <input
-                id="partner-reg-state"
-                type="text"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                PIN
-              </label>
-              <input
-                id="partner-reg-pin"
-                type="text"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-              />
-            </div>
+            <input
+              id="partner-reg-state"
+              type="text"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="State"
+            />
+            <input
+              id="partner-reg-pin"
+              type="text"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="PIN"
+            />
           </div>
         </div>
 
@@ -437,6 +397,9 @@
               class="w-full h-12 rounded-xl px-4 input-premium font-medium"
               placeholder="••••••••"
             />
+            <div class="text-right mt-1">
+                <a href="#" onclick="forgotPassword('customer-login-email')" class="text-xs text-slate-500 hover:text-emerald-700 underline">Forgot Password?</a>
+            </div>
           </div>
         </div>
 
@@ -463,98 +426,58 @@
 
       <div id="customer-register-view" class="hidden">
         <div class="space-y-4 mb-6">
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Email
-            </label>
-            <input
-              id="customer-reg-email"
-              type="email"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-              Password
-            </label>
-            <input
-              id="customer-reg-password"
-              type="password"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="Create a strong password"
-            />
-          </div>
-
+          <input
+            id="customer-reg-email"
+            type="email"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="Email"
+          />
+          <input
+            id="customer-reg-password"
+            type="password"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="Password (>5 chars, @, Num, Capital)"
+          />
+          <input
+            id="customer-reg-name"
+            type="text"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="Full Name"
+          />
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                Full Name
-              </label>
-              <input
-                id="customer-reg-name"
-                type="text"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-                placeholder="Your name"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                Phone
-              </label>
-              <input
-                id="customer-reg-phone"
-                type="tel"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-                placeholder="+91 9876543210"
-              />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                Country
-              </label>
-              <input
-                id="customer-reg-country"
-                type="text"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-                placeholder="India"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                State
-              </label>
-              <input
-                id="customer-reg-state"
-                type="text"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-                City
-              </label>
-              <input
-                id="customer-reg-city"
-                type="text"
-                class="w-full h-11 rounded-lg px-4 input-premium"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">
-              PIN / ZIP
-            </label>
             <input
-              id="customer-reg-pin"
+              id="customer-reg-phone"
+              type="tel"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="Phone"
+            />
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <input
+              id="customer-reg-country"
               type="text"
               class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="Country"
+            />
+            <input
+              id="customer-reg-state"
+              type="text"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="State"
+            />
+            <input
+              id="customer-reg-city"
+              type="text"
+              class="w-full h-11 rounded-lg px-4 input-premium"
+              placeholder="City"
             />
           </div>
+          <input
+            id="customer-reg-pin"
+            type="text"
+            class="w-full h-11 rounded-lg px-4 input-premium"
+            placeholder="PIN / ZIP"
+          />
         </div>
 
         <button
@@ -575,32 +498,47 @@
   <script type="module" src="firebase-config.js"></script>
 
   <script>
-    // CHANGE THESE TO YOUR REAL PAGES
     const CUSTOMER_PRODUCTS_URL = 'products.html';
     const PARTNER_DASHBOARD_URL = 'partner-dashboard.html';
+
+    // --- HELPER: SET WELCOME NAME ---
+    function setWelcomeName(emailString) {
+        const header = document.getElementById('welcome-heading');
+        const displayEmail = document.getElementById('display-email');
+        
+        if (!emailString || !emailString.includes('@')) {
+            header.textContent = "Welcome to Rentify";
+            displayEmail.textContent = "your account";
+            return;
+        }
+        const namePart = emailString.split('@')[0];
+        const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+        header.textContent = `Welcome, ${formattedName}`;
+        displayEmail.textContent = emailString;
+    }
+
+    // --- HELPER: VALIDATE PASSWORD ---
+    // >5 chars, contains @, contains Number, contains Capital Letter
+    function validatePassword(password) {
+        if(password.length <= 5) return false;
+        if(!/[A-Z]/.test(password)) return false;
+        if(!/\d/.test(password)) return false;
+        if(!/@/.test(password)) return false;
+        return true;
+    }
 
     function showToast(message, type = 'info') {
       const toast = document.getElementById('toast');
       const msg = document.getElementById('toast-message');
       const icon = document.getElementById('toast-icon');
-
       msg.textContent = message;
-
       icon.className = 'fa-solid';
-      if (type === 'success') {
-        icon.classList.add('fa-circle-check', 'text-emerald-400');
-      } else if (type === 'error') {
-        icon.classList.add('fa-circle-xmark', 'text-rose-400');
-      } else {
-        icon.classList.add('fa-circle-info', 'text-blue-400');
-      }
-
+      if (type === 'success') icon.classList.add('fa-circle-check', 'text-emerald-400');
+      else if (type === 'error') icon.classList.add('fa-circle-xmark', 'text-rose-400');
+      else icon.classList.add('fa-circle-info', 'text-blue-400');
       toast.classList.add('show');
-
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 4000);
+      window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -608,184 +546,136 @@
       const helpers = window.firebaseHelpers || {};
       const db = window.firebaseDb;
 
-      if (!auth || !helpers || !db) {
-        console.error('Firebase not initialised – check firebase-config.js');
-        showToast('Firebase not initialised. Check console.', 'error');
-        return;
-      }
+      if (!auth || !helpers) { console.error('Firebase not initialised'); return; }
 
-      const {
-        signInWithEmailAndPassword,
-        createUserWithEmailAndPassword,
-        signInWithPopup,
-        sendEmailVerification,
-        signOut,
-        googleProvider,
-        doc,
-        setDoc,
-        serverTimestamp,
-      } = helpers;
+      const { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, sendEmailVerification, sendPasswordResetEmail, signOut, googleProvider, doc, setDoc, serverTimestamp } = helpers;
 
-      // --- DOM references ---
       const roleView = document.getElementById('role-view');
       const partnerAuth = document.getElementById('partner-auth');
       const customerAuth = document.getElementById('customer-auth');
 
-      // email from URL (landing page)
+      // 1. Check URL for email & set Welcome text
       const urlParams = new URLSearchParams(window.location.search);
-      const emailFromLanding = urlParams.get('email') || '';
+      const emailFromLanding = urlParams.get('email');
+      
       if (emailFromLanding) {
-        document.getElementById('display-email').textContent = emailFromLanding;
-      } else {
-        document.getElementById('display-email').textContent = 'your email';
+          setWelcomeName(emailFromLanding);
+          document.getElementById('partner-login-email').value = emailFromLanding;
+          document.getElementById('customer-login-email').value = emailFromLanding;
       }
 
-      // Helper show/hide panels
-      function openPartner() {
-        roleView.classList.add('hidden');
-        partnerAuth.classList.remove('hidden');
-      }
-      function openCustomer() {
-        roleView.classList.add('hidden');
-        customerAuth.classList.remove('hidden');
-      }
-      function backToRoleView() {
-        partnerAuth.classList.add('hidden');
-        customerAuth.classList.add('hidden');
-        roleView.classList.remove('hidden');
-      }
+      // 2. FORGOT PASSWORD FUNCTION
+      window.forgotPassword = async (inputId) => {
+          const email = document.getElementById(inputId).value;
+          if(!email) { showToast("Please enter your email first to reset.", "error"); return; }
+          try {
+              await sendPasswordResetEmail(auth, email);
+              showToast("Reset link sent! Check your email.", "success");
+          } catch(e) {
+              showToast("Error: " + e.message, "error");
+          }
+      };
+
+      // 3. Auth State
+      auth.onAuthStateChanged(user => {
+        if (user) {
+            let displayName = user.displayName;
+            if (!displayName && user.email) displayName = user.email.split('@')[0];
+            if (displayName) {
+                displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+                document.getElementById('welcome-heading').textContent = `Welcome, ${displayName}`;
+            }
+        }
+      });
+
+      // UI Toggles
+      function openPartner() { roleView.classList.add('hidden'); partnerAuth.classList.remove('hidden'); }
+      function openCustomer() { roleView.classList.add('hidden'); customerAuth.classList.remove('hidden'); }
+      function backToRoleView() { partnerAuth.classList.add('hidden'); customerAuth.classList.add('hidden'); roleView.classList.remove('hidden'); }
 
       // Tabs
       function setPartnerTab(tab) {
-        const loginTab = document.getElementById('tab-partner-login');
-        const regTab = document.getElementById('tab-partner-register');
         const loginView = document.getElementById('partner-login-view');
         const regView = document.getElementById('partner-register-view');
-
-        if (tab === 'login') {
-          loginTab.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-          loginTab.classList.remove('text-slate-500', 'hover:text-slate-700');
-          
-          regTab.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-          regTab.classList.add('text-slate-500', 'hover:text-slate-700');
-          
-          loginView.classList.remove('hidden');
-          regView.classList.add('hidden');
-        } else {
-          regTab.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-          regTab.classList.remove('text-slate-500', 'hover:text-slate-700');
-          
-          loginTab.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-          loginTab.classList.add('text-slate-500', 'hover:text-slate-700');
-          
-          regView.classList.remove('hidden');
-          loginView.classList.add('hidden');
-        }
+        if (tab === 'login') { loginView.classList.remove('hidden'); regView.classList.add('hidden'); }
+        else { regView.classList.remove('hidden'); loginView.classList.add('hidden'); }
       }
-
       function setCustomerTab(tab) {
-        const loginTab = document.getElementById('tab-customer-login');
-        const regTab = document.getElementById('tab-customer-register');
         const loginView = document.getElementById('customer-login-view');
         const regView = document.getElementById('customer-register-view');
-
-        if (tab === 'login') {
-          loginTab.classList.add('bg-white', 'text-emerald-700', 'shadow-sm');
-          loginTab.classList.remove('text-slate-500', 'hover:text-slate-700');
-
-          regTab.classList.remove('bg-white', 'text-emerald-700', 'shadow-sm');
-          regTab.classList.add('text-slate-500', 'hover:text-slate-700');
-
-          loginView.classList.remove('hidden');
-          regView.classList.add('hidden');
-        } else {
-          regTab.classList.add('bg-white', 'text-emerald-700', 'shadow-sm');
-          regTab.classList.remove('text-slate-500', 'hover:text-slate-700');
-
-          loginTab.classList.remove('bg-white', 'text-emerald-700', 'shadow-sm');
-          loginTab.classList.add('text-slate-500', 'hover:text-slate-700');
-
-          regView.classList.remove('hidden');
-          loginView.classList.add('hidden');
-        }
+        if (tab === 'login') { loginView.classList.remove('hidden'); regView.classList.add('hidden'); }
+        else { regView.classList.remove('hidden'); loginView.classList.add('hidden'); }
       }
 
-      // Role buttons
-      document.getElementById('btn-role-partner').addEventListener('click', () => {
-        // prefill email in partner forms
-        if (emailFromLanding) {
-          document.getElementById('partner-login-email').value = emailFromLanding;
-          document.getElementById('partner-reg-email').value = emailFromLanding;
-        }
-        openPartner();
-      });
-
-      document.getElementById('btn-role-customer').addEventListener('click', () => {
-        if (emailFromLanding) {
-          document.getElementById('customer-login-email').value = emailFromLanding;
-          document.getElementById('customer-reg-email').value = emailFromLanding;
-        }
-        openCustomer();
-      });
-
-      document.getElementById('btn-back-email').addEventListener('click', () => {
-        // go back to landing page (same as before)
-        window.location.href = 'index.html';
-      });
-
+      document.getElementById('btn-role-partner').addEventListener('click', openPartner);
+      document.getElementById('btn-role-customer').addEventListener('click', openCustomer);
       document.getElementById('btn-close-partner').addEventListener('click', backToRoleView);
       document.getElementById('btn-close-customer').addEventListener('click', backToRoleView);
+      document.getElementById('btn-back-email').addEventListener('click', () => window.location.href = 'index.html');
 
-      // Partner tabs
       document.getElementById('tab-partner-login').addEventListener('click', () => setPartnerTab('login'));
       document.getElementById('tab-partner-register').addEventListener('click', () => setPartnerTab('register'));
-
-      // Customer tabs
       document.getElementById('tab-customer-login').addEventListener('click', () => setCustomerTab('login'));
       document.getElementById('tab-customer-register').addEventListener('click', () => setCustomerTab('register'));
 
-      // ---------- PARTNER AUTH ----------
-      async function partnerEmailLogin() {
-        const email = document.getElementById('partner-login-email').value.trim();
-        const password = document.getElementById('partner-login-password').value.trim();
+      // --- AUTH ACTIONS ---
 
-        if (!email || !password) {
-          showToast('Enter email & password', 'error');
-          return;
-        }
+      // LOGIN
+      async function handleLogin(emailId, passId, redirectUrl) {
+        const email = document.getElementById(emailId).value.trim();
+        const password = document.getElementById(passId).value.trim();
+        if (!email || !password) return showToast('Enter email & password', 'error');
 
         try {
           const cred = await signInWithEmailAndPassword(auth, email, password);
+          setWelcomeName(email);
+          backToRoleView(); 
 
-          if (!cred.user.emailVerified) {
-            await sendEmailVerification(cred.user);
-            await signOut(auth);
-            showToast('Email not verified. Verification link sent again.', 'error');
-            return;
-          }
-
-          // ensure partner profile exists
-          const ref = doc(db, 'partners', cred.user.uid);
-          await setDoc(ref, {
-            email,
-            lastLoginAt: serverTimestamp(),
-          }, { merge: true });
-
-          showToast('Logged in as partner', 'success');
-          window.location.href = PARTNER_DASHBOARD_URL;
-        } catch (err) {
-          console.error(err);
-          showToast('Partner login failed: ' + err.message, 'error');
-        }
+          if (!cred.user.emailVerified) { await signOut(auth); return showToast('Email not verified.', 'error'); }
+          
+          showToast(`Welcome back, ${email.split('@')[0]}!`, 'success');
+          setTimeout(() => window.location.href = redirectUrl, 1500);
+        } catch (err) { console.error(err); showToast(err.message, 'error'); }
       }
 
-      async function partnerGoogleLogin() {
+      // REGISTER
+      async function handleRegister(emailId, passId, nameId, collectionName) {
+        const email = document.getElementById(emailId).value.trim();
+        const password = document.getElementById(passId).value.trim();
+        const name = document.getElementById(nameId).value.trim();
+
+        if (!email || !password || !name) return showToast('All fields required', 'error');
+        
+        // VALIDATE PASSWORD COMPLEXITY
+        if (!validatePassword(password)) {
+            return showToast('Password must be >5 chars, include @, Num, Capital letter', 'error');
+        }
+
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          await helpers.sendEmailVerification(cred.user);
+          
+          await setDoc(doc(db, collectionName, cred.user.uid), { email, fullname: name, createdAt: serverTimestamp() }, { merge: true });
+
+          await signOut(auth);
+          showToast('Account created! Verify email sent.', 'success');
+          
+          if(collectionName === 'partners') setPartnerTab('login');
+          else setCustomerTab('login');
+
+        } catch (err) { console.error(err); showToast(err.message, 'error'); }
+      }
+
+      // GOOGLE LOGIN
+      async function handleGoogleLogin(collectionName, redirectUrl) {
         try {
           const result = await signInWithPopup(auth, googleProvider);
           const user = result.user;
+          // Set welcome name immediately
+          setWelcomeName(user.email);
+          backToRoleView();
 
-          const ref = doc(db, 'partners', user.uid);
-          await setDoc(ref, {
+          await setDoc(doc(db, collectionName, user.uid), {
             email: user.email,
             displayName: user.displayName || '',
             phone: user.phoneNumber || '',
@@ -794,157 +684,196 @@
           }, { merge: true });
 
           showToast('Google login successful', 'success');
-          window.location.href = PARTNER_DASHBOARD_URL;
+          setTimeout(() => window.location.href = redirectUrl, 1500);
         } catch (err) {
           console.error(err);
           showToast('Google login failed: ' + err.message, 'error');
         }
       }
 
-      async function partnerRegister() {
-        const email = document.getElementById('partner-reg-email').value.trim();
-        const password = document.getElementById('partner-reg-password').value.trim();
-        const fullname = document.getElementById('partner-reg-name').value.trim();
-        const phone = document.getElementById('partner-reg-phone').value.trim();
-        const address1 = document.getElementById('partner-reg-address1').value.trim();
-        const city = document.getElementById('partner-reg-city').value.trim();
-        const state = document.getElementById('partner-reg-state').value.trim();
-        const pin = document.getElementById('partner-reg-pin').value.trim();
+      // Buttons
+      document.getElementById('btn-partner-login').onclick = () => handleLogin('partner-login-email', 'partner-login-password', PARTNER_DASHBOARD_URL);
+      document.getElementById('btn-customer-login').onclick = () => handleLogin('customer-login-email', 'customer-login-password', CUSTOMER_PRODUCTS_URL);
+      
+      document.getElementById('btn-partner-register').onclick = () => handleRegister('partner-reg-email', 'partner-reg-password', 'partner-reg-name', 'partners');
+      document.getElementById('btn-customer-register').onclick = () => handleRegister('customer-reg-email', 'customer-reg-password', 'customer-reg-name', 'customers');
 
-        if (!email || !password || !fullname) {
-          showToast('Email, password & name are required', 'error');
-          return;
-        }
+      // GOOGLE BUTTONS FIXED
+      document.getElementById('btn-partner-google').onclick = () => handleGoogleLogin('partners', PARTNER_DASHBOARD_URL);
+      document.getElementById('btn-customer-google').onclick = () => handleGoogleLogin('customers', CUSTOMER_PRODUCTS_URL);
 
-        try {
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          await sendEmailVerification(cred.user);
-
-          const ref = doc(db, 'partners', cred.user.uid);
-          await setDoc(ref, {
-            email,
-            fullname,
-            phone,
-            address: { line1: address1, city, state, pin },
-            createdAt: serverTimestamp(),
-          }, { merge: true });
-
-          await signOut(auth);
-
-          showToast('Partner account created. Please verify your email and then login.', 'success');
-          setPartnerTab('login');
-        } catch (err) {
-          console.error(err);
-          showToast('Partner registration failed: ' + err.message, 'error');
-        }
-      }
-
-      document.getElementById('btn-partner-login').addEventListener('click', partnerEmailLogin);
-      document.getElementById('btn-partner-google').addEventListener('click', partnerGoogleLogin);
-      document.getElementById('btn-partner-register').addEventListener('click', partnerRegister);
-
-      // ---------- CUSTOMER AUTH ----------
-      async function customerEmailLogin() {
-        const email = document.getElementById('customer-login-email').value.trim();
-        const password = document.getElementById('customer-login-password').value.trim();
-
-        if (!email || !password) {
-          showToast('Enter email & password', 'error');
-          return;
-        }
-
-        try {
-          const cred = await signInWithEmailAndPassword(auth, email, password);
-
-          if (!cred.user.emailVerified) {
-            await sendEmailVerification(cred.user);
-            await signOut(auth);
-            showToast('Email not verified. Verification link sent again.', 'error');
-            return;
-          }
-
-          const ref = doc(db, 'customers', cred.user.uid);
-          await setDoc(ref, {
-            email,
-            lastLoginAt: serverTimestamp(),
-          }, { merge: true });
-
-          showToast('Logged in as customer', 'success');
-          window.location.href = CUSTOMER_PRODUCTS_URL;
-        } catch (err) {
-          console.error(err);
-          showToast('Customer login failed: ' + err.message, 'error');
-        }
-      }
-
-      async function customerGoogleLogin() {
-        try {
-          const result = await signInWithPopup(auth, googleProvider);
-          const user = result.user;
-
-          const ref = doc(db, 'customers', user.uid);
-          await setDoc(ref, {
-            email: user.email,
-            displayName: user.displayName || '',
-            phone: user.phoneNumber || '',
-            provider: 'google',
-            lastLoginAt: serverTimestamp(),
-          }, { merge: true });
-
-          showToast('Google login successful', 'success');
-          window.location.href = CUSTOMER_PRODUCTS_URL;
-        } catch (err) {
-          console.error(err);
-          showToast('Google login failed: ' + err.message, 'error');
-        }
-      }
-
-      async function customerRegister() {
-        const email = document.getElementById('customer-reg-email').value.trim();
-        const password = document.getElementById('customer-reg-password').value.trim();
-        const fullname = document.getElementById('customer-reg-name').value.trim();
-        const phone = document.getElementById('customer-reg-phone').value.trim();
-        const country = document.getElementById('customer-reg-country').value.trim();
-        const state = document.getElementById('customer-reg-state').value.trim();
-        const city = document.getElementById('customer-reg-city').value.trim();
-        const pin = document.getElementById('customer-reg-pin').value.trim();
-
-        if (!email || !password || !fullname) {
-          showToast('Email, password & name are required', 'error');
-          return;
-        }
-
-        try {
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          await sendEmailVerification(cred.user);
-
-          const ref = doc(db, 'customers', cred.user.uid);
-          await setDoc(ref, {
-            email,
-            fullname,
-            phone,
-            address: { country, state, city, pin },
-            createdAt: serverTimestamp(),
-          }, { merge: true });
-
-          await signOut(auth);
-
-          showToast('Customer account created. Please verify your email and then login.', 'success');
-          setCustomerTab('login');
-        } catch (err) {
-          console.error(err);
-          showToast('Customer registration failed: ' + err.message, 'error');
-        }
-      }
-
-      document.getElementById('btn-customer-login').addEventListener('click', customerEmailLogin);
-      document.getElementById('btn-customer-google').addEventListener('click', customerGoogleLogin);
-      document.getElementById('btn-customer-register').addEventListener('click', customerRegister);
-
-      // default tabs
+      // Init Tabs
       setPartnerTab('login');
       setCustomerTab('login');
     });
   </script>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const auth = window.firebaseAuth;
+  const helpers = window.firebaseHelpers;
+
+  if (!auth || !helpers) {
+    console.error("Firebase not ready");
+    return;
+  }
+
+  // ------------------ TOAST ------------------
+  function showToast(msg, type="info") {
+    alert(msg); // replace with your toast if needed
+  }
+
+  // ------------------ FORGOT PASSWORD ------------------
+  window.forgotPassword = async (inputId) => {
+    const email = document.getElementById(inputId).value.trim();
+
+    if (!email) {
+      showToast("Enter your email first", "error");
+      return;
+    }
+
+    try {
+      await helpers.sendPasswordResetEmail(auth, email);
+      showToast("Password reset link sent", "success");
+    } catch (e) {
+      showToast(e.message, "error");
+    }
+  };
+
+  // ------------------ LOGIN ------------------
+  async function handleLogin(emailId, passId, redirect) {
+    const email = document.getElementById(emailId).value.trim();
+    const pass = document.getElementById(passId).value.trim();
+
+    if (!email || !pass) {
+      showToast("Email & password required", "error");
+      return;
+    }
+
+    try {
+      const cred = await helpers.signInWithEmailAndPassword(auth, email, pass);
+
+      if (!cred.user.emailVerified) {
+        await helpers.signOut(auth);
+        showToast("Verify your email first", "error");
+        return;
+      }
+
+      showToast("Login successful", "success");
+      setTimeout(() => location.href = redirect, 1200);
+    } catch (e) {
+      showToast(e.message, "error");
+    }
+  }
+
+  // ------------------ REGISTER ------------------
+  async function handleRegister(emailId, passId, nameId, collection) {
+    const email = document.getElementById(emailId).value.trim();
+    const pass = document.getElementById(passId).value.trim();
+    const name = document.getElementById(nameId).value.trim();
+
+    if (!email || !pass || !name) {
+      showToast("All fields required", "error");
+      return;
+    }
+
+    try {
+      const cred = await helpers.createUserWithEmailAndPassword(auth, email, pass);
+      await helpers.sendEmailVerification(cred.user);
+
+      await helpers.setDoc(
+        helpers.doc(window.firebaseDb, collection, cred.user.uid),
+        { email, name, createdAt: helpers.serverTimestamp() },
+        { merge: true }
+      );
+
+      await helpers.signOut(auth);
+      showToast("Account created. Verify email.", "success");
+    } catch (e) {
+      showToast(e.message, "error");
+    }
+  }
+
+  // ------------------ GOOGLE LOGIN ------------------
+  async function googleLogin(collection, redirect) {
+    try {
+      const res = await helpers.signInWithPopup(auth, helpers.googleProvider);
+
+      await helpers.setDoc(
+        helpers.doc(window.firebaseDb, collection, res.user.uid),
+        {
+          email: res.user.email,
+          provider: "google",
+          lastLogin: helpers.serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      showToast("Google login successful", "success");
+      setTimeout(() => location.href = redirect, 1200);
+    } catch (e) {
+      showToast(e.message, "error");
+    }
+  }
+
+  // Expose for buttons
+  window.loginCustomer = () =>
+    handleLogin("customer-login-email", "customer-login-password", "products.html");
+
+  window.loginPartner = () =>
+    handleLogin("partner-login-email", "partner-login-password", "partner-dashboard.html");
+
+  window.registerCustomer = () =>
+    handleRegister("customer-reg-email", "customer-reg-password", "customer-reg-name", "customers");
+
+  window.registerPartner = () =>
+    handleRegister("partner-reg-email", "partner-reg-password", "partner-reg-name", "partners");
+
+  window.googleCustomer = () =>
+    googleLogin("customers", "products.html");
+
+  window.googlePartner = () =>
+    googleLogin("partners", "partner-dashboard.html");
+
+});
+</script>
+<script type="module">
+import { auth } from "./firebase-config.js";
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+// ---------------- FORGOT PASSWORD ----------------
+window.forgotPassword = async (inputId) => {
+  const email = document.getElementById(inputId).value.trim();
+
+  if (!email) {
+    alert("Enter email first");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset link sent");
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+// ---------------- LOGIN (EXAMPLE) ----------------
+window.loginUser = async (emailId, passId, redirect) => {
+  const email = document.getElementById(emailId).value.trim();
+  const pass = document.getElementById(passId).value.trim();
+
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    location.href = redirect;
+  } catch (e) {
+    alert(e.message);
+  }
+};
+</script>
+
 </body>
 </html>
