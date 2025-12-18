@@ -10,19 +10,16 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        /* Custom Theme Colors based on Shopcart Image */
-        .text-brand-green { color: #047857; } /* Emerald 700 */
+        .text-brand-green { color: #047857; }
         .bg-brand-green { background-color: #047857; }
         .border-brand-green { border-color: #047857; }
         
-        .text-brand-black { color: #0f172a; } /* Slate 900 */
+        .text-brand-black { color: #0f172a; }
         .bg-brand-black { background-color: #0f172a; }
 
-        /* Hide scrollbar for horizontal scrolling */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* File Upload Box */
         .upload-box {
             border: 2px dashed #cbd5e1;
             transition: all 0.3s ease;
@@ -31,20 +28,49 @@
             border-color: #047857;
             background-color: #ecfdf5;
         }
+
+        /* FIX: Dropdown Z-Index to show ABOVE product cards */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+            z-index: 1000 !important; 
+            border-radius: 12px;
+            margin-top: 8px;
+            border: 1px solid #f1f5f9;
+        }
+        .dropdown-content.show { display: block; }
+        .dropdown-item {
+            padding: 12px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .dropdown-item:hover { background-color: #f8fafc; color: #047857; }
     </style>
 </head>
-<body class="bg-white text-slate-900">
+<body class="bg-white text-slate-900" onclick="closeAllDropdowns(event)">
 
-    <nav class="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-50">
+    <nav class="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-[1001]">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="location.reload()">
                 <i class="fa-solid fa-basket-shopping text-brand-green text-2xl"></i>
                 <span class="font-bold text-2xl text-brand-black tracking-tight">Rentify.</span>
             </div>
 
             <div class="hidden md:flex gap-6 text-sm font-semibold text-slate-600">
-                <a href="#" class="hover:text-brand-green flex items-center gap-1">Categories <i class="fa-solid fa-chevron-down text-[10px]"></i></a>
+                <div class="relative">
+                    <button onclick="toggleDropdown(event, 'drop-nav-categories')" class="hover:text-brand-green flex items-center gap-1">Categories <i class="fa-solid fa-chevron-down text-[10px]"></i></button>
+                    <div id="drop-nav-categories" class="dropdown-content">
+                        <div class="dropdown-item" onclick="filterByCategory('Electronics')">Electronics</div>
+                        <div class="dropdown-item" onclick="filterByCategory('Cameras')">Cameras</div>
+                        <div class="dropdown-item" onclick="filterByCategory('Electric Scooter')">Electric Scooter</div>
+                        <div class="dropdown-item" onclick="filterByCategory('Power Tools')">Power Tools</div>
+                    </div>
+                </div>
                 <a href="#" class="hover:text-brand-green">Deals</a>
                 <a href="#" class="hover:text-brand-green">What's New</a>
                 <a href="#" class="hover:text-brand-green">Delivery</a>
@@ -52,7 +78,7 @@
 
             <div class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
                 <div class="relative hidden md:block w-64">
-                    <input type="text" placeholder="Search Product" class="w-full bg-gray-100 rounded-full py-2 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-green-500">
+                    <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Search Product" class="w-full bg-gray-100 rounded-full py-2 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-green-500">
                     <i class="fa-solid fa-magnifying-glass absolute right-4 top-2.5 text-slate-400 text-xs"></i>
                 </div>
 
@@ -64,6 +90,7 @@
                     <div class="flex items-center gap-2 cursor-pointer hover:text-brand-green relative" onclick="window.openAccountModal()">
                         <i class="fa-solid fa-cart-shopping text-lg"></i>
                         <span class="text-sm font-bold hidden md:block">Cart</span>
+                        <div id="cart-badge" class="absolute -top-2 -left-2 bg-brand-green text-white text-[10px] w-5 h-5 rounded-full hidden items-center justify-center font-bold">0</div>
                     </div>
                     <button onclick="logout()" class="text-xs text-red-500 hover:text-red-700 hidden font-bold border border-red-200 px-3 py-1 rounded-full" id="logout-btn">Logout</button>
                 </div>
@@ -71,23 +98,32 @@
         </div>
     </nav>
 
-    <div class="border-b border-gray-100 bg-white">
+    <div class="border-b border-gray-100 bg-white relative z-40">
         <div class="max-w-7xl mx-auto px-6 py-4 overflow-x-auto no-scrollbar">
             <div class="flex gap-3 text-sm whitespace-nowrap">
-                <button class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">Curated Collections <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
-                <button class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">Price <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
+                <div class="relative">
+                    <button onclick="toggleDropdown(event, 'drop-curated')" class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">Curated Collections <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
+                    <div id="drop-curated" class="dropdown-content">
+                        <div class="dropdown-item" onclick="filterBy('all')">All Products</div>
+                        <div class="dropdown-item" onclick="filterBy('deals')">Deals</div>
+                        <div class="dropdown-item" onclick="filterBy('new')">New</div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <button onclick="toggleDropdown(event, 'drop-price')" class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">Price <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
+                    <div id="drop-price" class="dropdown-content">
+                        <div class="dropdown-item" onclick="sortByPrice('asc')">Low to High</div>
+                        <div class="dropdown-item" onclick="sortByPrice('desc')">High to Low</div>
+                    </div>
+                </div>
                 <button class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">Review <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
-                <button class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">Color <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
-                <button class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">Material <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
-                <button class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">Offer <i class="fa-solid fa-chevron-down ml-1 text-xs"></i></button>
-                <button class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">All Filters <i class="fa-solid fa-sliders ml-1 text-xs"></i></button>
+                <button onclick="location.reload()" class="bg-gray-100 hover:bg-green-50 text-slate-700 px-4 py-1.5 rounded-full font-semibold transition">All Filters <i class="fa-solid fa-sliders ml-1 text-xs"></i></button>
             </div>
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-6 py-10">
-        <h2 class="text-2xl font-bold mb-8 text-brand-black">Curated Collections For You!</h2>
-        
+    <main class="max-w-7xl mx-auto px-6 py-10 relative z-10">
+        <h2 id="grid-title" class="text-2xl font-bold mb-8 text-brand-black">Curated Collections For You!</h2>
         <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div class="col-span-full text-center py-20 text-slate-400">
                 <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-2 text-brand-green"></i><br>Loading products...
@@ -95,158 +131,70 @@
         </div>
     </main>
 
-    <div id="modal-rent" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+    <div id="modal-rent" class="fixed inset-0 bg-slate-900/60 hidden z-[2000] flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-100 my-10">
-            
             <div class="bg-white px-6 py-4 border-b flex justify-between items-center sticky top-0 z-10">
                 <h3 class="font-bold text-xl text-brand-black" id="rent-title">Rent Product</h3>
-                <button onclick="closeRentModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-100 text-slate-500 hover:text-red-500 flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeRentModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div class="p-6 space-y-6" id="rental-steps-container">
-                
                 <div id="step-request" class="space-y-5">
-                    <div class="bg-slate-50 p-3 rounded-lg flex items-center gap-3">
-                        <i class="fa-solid fa-info-circle text-blue-500"></i>
-                        <p class="text-xs text-slate-600">Admin approval required. Your request will be reviewed.</p>
-                    </div>
-
                     <div class="flex gap-4">
                         <div class="flex-1">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Start Date</label>
-                            <input type="date" id="date-start" class="w-full border-2 border-slate-100 bg-slate-50 p-3 rounded-xl focus:outline-none focus:border-green-500 font-medium" onchange="calcTotal()">
+                            <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">Start Date</label>
+                            <input type="date" id="date-start" class="w-full border-2 border-slate-100 p-3 rounded-xl outline-none" oninput="calcTotal()">
                         </div>
                         <div class="flex-1">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">End Date</label>
-                            <input type="date" id="date-end" class="w-full border-2 border-slate-100 bg-slate-50 p-3 rounded-xl focus:outline-none focus:border-green-500 font-medium" onchange="calcTotal()">
+                            <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">End Date</label>
+                            <input type="date" id="date-end" class="w-full border-2 border-slate-100 p-3 rounded-xl outline-none" oninput="calcTotal()">
                         </div>
                     </div>
-
                     <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Why are you renting this?</label>
-                        <textarea id="rent-reason" class="w-full border-2 border-slate-100 bg-slate-50 p-3 rounded-xl focus:outline-none focus:border-green-500 text-sm" rows="3" placeholder="E.g., For a wedding shoot..."></textarea>
-                    </div>
-
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">ID Proof (Aadhar Card)</label>
-                        <label class="upload-box w-full p-6 rounded-xl flex flex-col items-center justify-center cursor-pointer text-slate-500 hover:text-brand-green bg-slate-50">
+                        <label class="text-xs font-bold text-slate-500 uppercase mb-1 block">ID Proof (Aadhar)</label>
+                        <label class="upload-box w-full p-6 rounded-xl flex flex-col items-center justify-center cursor-pointer text-slate-500">
                             <i class="fa-solid fa-cloud-arrow-up text-3xl mb-2"></i>
-                            <span class="text-sm font-semibold">Click to upload Aadhar Card</span>
-                            <span class="text-xs text-slate-400 mt-1">(Image or PDF)</span>
-                            <input type="file" id="aadhar-file" class="hidden" onchange="this.previousElementSibling.previousElementSibling.innerText = this.files[0].name; this.previousElementSibling.previousElementSibling.previousElementSibling.classList.replace('fa-cloud-arrow-up', 'fa-file-circle-check')">
+                            <span class="text-sm font-semibold">Upload Aadhar</span>
+                            <input type="file" id="aadhar-file" class="hidden" onchange="this.previousElementSibling.innerText = this.files[0].name">
                         </label>
                     </div>
-
                     <div class="bg-gray-50 p-4 rounded-xl flex justify-between items-center border border-gray-200">
-                        <span class="text-sm font-semibold text-slate-600">Estimated Rent:</span>
+                        <span class="text-sm font-semibold text-slate-600">Total:</span>
                         <span class="text-xl font-bold text-brand-black" id="est-total">₹0</span>
                     </div>
-
-                    <button onclick="submitRequest()" class="w-full bg-brand-black text-white py-3.5 rounded-full font-bold hover:bg-slate-800 transition shadow-lg">Send Request to Admin</button>
+                    <button id="send-request-btn" onclick="submitRequest()" class="w-full bg-brand-black text-white py-3.5 rounded-full font-bold transition hover:bg-slate-800">Send Request</button>
                 </div>
-
                 <div id="step-pending" class="hidden text-center py-10">
-                    <div class="w-20 h-20 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                        <i class="fa-solid fa-clock"></i>
-                    </div>
+                    <div class="w-20 h-20 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"><i class="fa-solid fa-clock"></i></div>
                     <h3 class="text-xl font-bold text-slate-800 mb-2">Request Pending</h3>
-                    <p class="text-sm text-slate-500 px-4">Your request has been sent to the admin. Please wait for approval before paying the security deposit.</p>
-                    
-                    <button onclick="simulateAdminApproval()" class="mt-8 text-xs text-blue-500 underline">Simulate Admin Approval (Demo Only)</button>
+                    <p class="text-sm text-slate-500">Waiting for Partner to approve this booking.</p>
                 </div>
-
-                <div id="step-payment" class="hidden space-y-5">
-                    <div class="bg-green-50 text-green-800 p-4 rounded-xl flex items-center gap-3 border border-green-200">
-                        <i class="fa-solid fa-circle-check text-xl"></i>
-                        <div>
-                            <p class="font-bold text-sm">Request Approved!</p>
-                            <p class="text-xs">Please pay the security deposit to confirm.</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-500">Rental Fee</span>
-                            <span class="font-semibold" id="final-rent-fee">₹0</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-500">Security Deposit (Refundable)</span>
-                            <span class="font-semibold text-brand-green">₹5,000</span>
-                        </div>
-                        <div class="border-t border-slate-100 pt-3 flex justify-between items-center">
-                            <span class="font-bold text-slate-700">Total Payable</span>
-                            <span class="font-bold text-2xl text-brand-black" id="final-payable">₹0</span>
-                        </div>
-                    </div>
-
-                    <button onclick="processPayment()" id="btn-pay" class="w-full bg-brand-green text-white py-3.5 rounded-full font-bold hover:bg-green-800 transition shadow-lg flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-lock"></i> Pay Security Deposit
-                    </button>
-                </div>
-
-                <div id="step-success" class="hidden text-center py-10">
-                    <div class="w-20 h-20 bg-green-100 text-brand-green rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                        <i class="fa-solid fa-check"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2">Booking Confirmed!</h3>
-                    <p class="text-sm text-slate-500 px-4 mb-6">Your order has been placed. View details in your account dashboard.</p>
-                    <button onclick="closeRentModal()" class="bg-slate-100 text-slate-700 px-6 py-2 rounded-full font-bold text-sm hover:bg-slate-200">Close</button>
-                </div>
-
             </div>
         </div>
     </div>
 
-    <div id="modal-account" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div id="modal-account" class="fixed inset-0 bg-slate-900/60 hidden z-[2001] flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden h-[80vh] flex flex-col">
             <div class="bg-white px-6 py-4 border-b flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600"><i class="fa-solid fa-user"></i></div>
-                    <div>
-                        <h3 class="font-bold text-lg text-brand-black">My Account</h3>
-                        <p class="text-xs text-slate-500" id="account-email">user@example.com</p>
-                    </div>
+                    <div><h3 class="font-bold text-lg text-brand-black" id="account-name">Guest</h3><p class="text-xs text-slate-500" id="account-email">user@example.com</p></div>
                 </div>
-                <button onclick="closeAccountModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-100 text-slate-500 hover:text-red-500 flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeAccountModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div class="flex border-b border-gray-100">
-                <button class="flex-1 py-3 text-sm font-bold text-brand-green border-b-2 border-brand-green bg-green-50" onclick="switchTab('active-rentals')">Active Rentals</button>
-                <button class="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800" onclick="switchTab('orders')">Orders</button>
-                <button class="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800" onclick="switchTab('deadlines')">Deadlines</button>
+                <button class="flex-1 py-3 text-sm font-bold border-b-2 border-brand-green" onclick="switchTab('active-rentals')">Active Rentals</button>
+                <button class="flex-1 py-3 text-sm font-bold text-slate-500" onclick="switchTab('orders')">Orders</button>
             </div>
-
             <div class="p-6 overflow-y-auto flex-1 bg-gray-50" id="account-content">
-                <div id="tab-active-rentals">
-                    <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-3">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-bold text-brand-black">Sony Alpha a7 III</h4>
-                                <p class="text-xs text-slate-500">Rented until: <span class="font-semibold text-red-500">Oct 25, 2023</span></p>
-                            </div>
-                            <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded">ACTIVE</span>
-                        </div>
-                    </div>
-                </div>
-                <div id="tab-orders" class="hidden">
-                    <div class="text-center text-slate-400 py-10">No past orders found.</div>
-                </div>
-                <div id="tab-deadlines" class="hidden">
-                    <div class="bg-red-50 border border-red-100 p-4 rounded-xl mb-3 flex items-start gap-3">
-                        <i class="fa-solid fa-clock text-red-500 mt-1"></i>
-                        <div>
-                            <h4 class="font-bold text-red-700 text-sm">Return Due Soon</h4>
-                            <p class="text-xs text-red-600">Sony Alpha a7 III must be returned by tomorrow to avoid penalties.</p>
-                        </div>
-                    </div>
-                </div>
+                <div id="tab-active-rentals">No items.</div>
+                <div id="tab-orders" class="hidden py-10 text-center text-slate-400">No past orders.</div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, query, where, serverTimestamp, Timestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY", authDomain: "rentify-93c05.firebaseapp.com", projectId: "rentify-93c05", storageBucket: "rentify-93c05.firebasestorage.app", messagingSenderId: "652243130812", appId: "1:652243130812:web:628fd64b4a69628eae73b9" };
@@ -254,68 +202,119 @@
         
         let products = [], selectedProduct = null, currentUser = null;
 
-        // AUTH STATE LISTENER
         onAuthStateChanged(auth, user => {
             currentUser = user;
             const ui = document.getElementById('user-info');
             if(user) { 
-                ui.textContent = user.email.split('@')[0]; 
+                ui.textContent = user.email.split('@')[0];
+                document.getElementById('account-name').textContent = user.email.split('@')[0];
                 document.getElementById('logout-btn').classList.remove('hidden'); 
                 document.getElementById('account-email').innerText = user.email;
+                listenToCart(user.uid);
             } else { 
                 ui.textContent = "Guest"; 
                 document.getElementById('logout-btn').classList.add('hidden'); 
+                document.getElementById('cart-badge').classList.add('hidden');
             }
         });
 
-        // LOAD PRODUCTS
+        function listenToCart(uid) {
+            const q = query(collection(db, "cart"), where("customerId", "==", uid));
+            onSnapshot(q, (snap) => {
+                const badge = document.getElementById('cart-badge');
+                if (snap.size > 0) {
+                    badge.textContent = snap.size;
+                    badge.classList.remove('hidden'); badge.classList.add('flex');
+                } else { badge.classList.add('hidden'); }
+            });
+        }
+
+        window.addToCart = async (pid) => {
+            if (!currentUser) return alert("Login first.");
+            try {
+                await addDoc(collection(db, "cart"), { productId: pid, customerId: currentUser.uid, addedAt: serverTimestamp() });
+                alert("Added to cart!");
+            } catch (e) { alert("Submission failed: " + e.message); }
+        };
+
+        window.toggleDropdown = (event, id) => {
+            event.stopPropagation();
+            const current = document.getElementById(id);
+            const wasShown = current.classList.contains('show');
+            window.closeAllDropdowns();
+            if (!wasShown) current.classList.add('show');
+        };
+
+        window.closeAllDropdowns = () => {
+            document.querySelectorAll(".dropdown-content").forEach(d => d.classList.remove('show'));
+        };
+
+        window.handleSearch = () => {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            renderGrid(products.filter(p => p.name.toLowerCase().includes(term)));
+        };
+
+        window.filterByCategory = (cat) => {
+            document.getElementById('grid-title').innerText = cat + " Collections";
+            renderGrid(products.filter(p => p.category === cat || cat === 'all'));
+            closeAllDropdowns();
+        };
+
+        window.sortByPrice = (order) => {
+            const sorted = [...products].sort((a, b) => order === 'asc' ? a.rentPerDay - b.rentPerDay : b.rentPerDay - a.rentPerDay);
+            renderGrid(sorted);
+            closeAllDropdowns();
+        };
+
+        window.filterBy = (type) => {
+            if(type === 'deals') renderGrid(products.filter(p => p.rentPerDay < 1000));
+            else if(type === 'new') renderGrid([...products].reverse());
+            else renderGrid(products);
+            closeAllDropdowns();
+        };
+
         async function loadProducts() {
             const snap = await getDocs(collection(db, "products"));
-            const grid = document.getElementById('grid');
-            if (snap.empty) { grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No products found.</div>'; return; }
-            
-            grid.innerHTML = "";
-            snap.forEach(doc => {
-                const p = { id: doc.id, ...doc.data() };
-                products.push(p);
-                const randomReviewCount = Math.floor(Math.random() * 200) + 20;
+            products = []; snap.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+            renderGrid(products);
+        }
 
+        window.renderGrid = (data) => {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = data.length ? "" : '<div class="col-span-full text-center py-10">No products found.</div>';
+            data.forEach(p => {
                 grid.innerHTML += `
-                    <div class="group relative flex flex-col">
+                    <div class="group relative flex flex-col bg-white p-4 rounded-3xl border border-gray-100 hover:shadow-xl transition-all">
                         <div class="bg-gray-100 rounded-2xl h-64 w-full flex items-center justify-center relative overflow-hidden mb-4">
-                            <button class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:text-red-500 transition z-10 text-slate-400"><i class="fa-regular fa-heart"></i></button>
-                            <a href="store.html?id=${p.partnerId}" class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-sm text-brand-black hover:bg-black hover:text-white transition z-10"><i class="fa-solid fa-store mr-1"></i> Store</a>
+                            <button class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm text-slate-400 hover:text-red-500 z-10"><i class="fa-regular fa-heart"></i></button>
+                            <a href="store.html?id=${p.partnerId}" class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-sm text-brand-black hover:bg-black hover:text-white z-10"><i class="fa-solid fa-store mr-1"></i> Store</a>
                             <img src="${p.imageUrl}" class="h-4/5 w-4/5 object-contain mix-blend-multiply transition duration-500 group-hover:scale-110">
                         </div>
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="font-bold text-lg text-brand-black truncate flex-1 pr-2">${p.name}</h3>
                             <div class="font-bold text-lg text-brand-black">₹${p.rentPerDay}</div>
                         </div>
-                        <p class="text-xs text-slate-500 line-clamp-1 mb-2">${p.description || 'Premium rental item available now.'}</p>
-                        <div class="flex items-center gap-1 mb-4">
-                            <div class="flex text-green-600 text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                            <span class="text-xs text-slate-400">(${randomReviewCount})</span>
+                        <div class="flex gap-2">
+                            <button onclick="window.openRentModal('${p.id}')" class="flex-1 border-2 border-slate-900 rounded-full py-2 font-bold text-xs hover:bg-slate-900 hover:text-white transition duration-300">Rent Now</button>
+                            <button onclick="window.addToCart('${p.id}')" class="flex-1 bg-brand-green text-white rounded-full py-2 font-bold text-xs hover:bg-green-800 transition duration-300">Add to Cart</button>
                         </div>
-                        <button onclick="window.openRentModal('${p.id}')" class="w-full border-2 border-slate-900 text-slate-900 rounded-full py-2.5 font-bold text-sm hover:bg-slate-900 hover:text-white transition duration-300">Rent Now</button>
                     </div>`;
             });
-        }
-        loadProducts();
+        };
 
-        // --- RENTAL MODAL LOGIC ---
         window.openRentModal = (pid) => {
-            if (!currentUser) return alert("Please log in to rent items.");
+            if (!currentUser) return alert("Login first.");
             selectedProduct = products.find(p => p.id === pid);
-            
-            // Reset Modal State
             document.getElementById('modal-rent').classList.remove('hidden');
             document.getElementById('step-request').classList.remove('hidden');
             document.getElementById('step-pending').classList.add('hidden');
-            document.getElementById('step-payment').classList.add('hidden');
-            document.getElementById('step-success').classList.add('hidden');
             
-            // Set Dates to Empty
-            document.getElementById('date-start').value = "";
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date-start').setAttribute('min', today);
+            document.getElementById('date-end').setAttribute('min', today);
+            
+            document.getElementById('date-start').value = ""; 
             document.getElementById('date-end').value = "";
             document.getElementById('est-total').innerText = "₹0";
         };
@@ -323,102 +322,80 @@
         window.closeRentModal = () => document.getElementById('modal-rent').classList.add('hidden');
 
         window.calcTotal = () => {
-            const d1 = new Date(document.getElementById('date-start').value);
-            const d2 = new Date(document.getElementById('date-end').value);
-            if(d2 > d1 && selectedProduct) {
-                const days = Math.ceil((d2-d1)/(1000*60*60*24));
-                const total = days * selectedProduct.rentPerDay;
+            const d1Val = document.getElementById('date-start').value;
+            const d2Val = document.getElementById('date-end').value;
+            if(!d1Val || !d2Val || !selectedProduct) return 0;
+
+            const d1 = new Date(d1Val);
+            const d2 = new Date(d2Val);
+
+            if(d2 > d1) {
+                const diffTime = Math.abs(d2 - d1);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                const total = diffDays * selectedProduct.rentPerDay;
                 document.getElementById('est-total').innerText = `₹${total}`;
                 return total;
+            } else {
+                document.getElementById('est-total').innerText = `₹0`;
+                return 0;
             }
-            return 0;
         };
 
-        // STAGE 1: SUBMIT REQUEST
         window.submitRequest = async () => {
-            const d1 = document.getElementById('date-start').value;
-            const d2 = document.getElementById('date-end').value;
-            const reason = document.getElementById('rent-reason').value;
+            const start = document.getElementById('date-start').value;
+            const end = document.getElementById('date-end').value;
             const file = document.getElementById('aadhar-file').files[0];
-
-            if(!d1 || !d2 || !reason) return alert("Please fill all details.");
-            if(!file) return alert("Please upload Aadhar card for ID proof.");
-
-            // In a real app, upload file to Firebase Storage here.
-            // For now, we simulate success and move to pending state.
             
-            document.getElementById('step-request').classList.add('hidden');
-            document.getElementById('step-pending').classList.remove('hidden');
-        };
-
-        // STAGE 2: SIMULATE ADMIN APPROVAL (For Demo)
-        window.simulateAdminApproval = () => {
-            document.getElementById('step-pending').classList.add('hidden');
-            document.getElementById('step-payment').classList.remove('hidden');
-            
-            const rent = window.calcTotal();
-            const deposit = 5000;
-            document.getElementById('final-rent-fee').innerText = `₹${rent}`;
-            document.getElementById('final-payable').innerText = `₹${rent + deposit}`;
-        };
-
-        // STAGE 3: PROCESS PAYMENT
-        window.processPayment = async () => {
-            const btn = document.getElementById('btn-pay'); 
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+            if(!start || !end || !file) return alert("Fill all details and upload Aadhar.");
             
             try {
-                // Simulate Payment Delay
-                await new Promise(r => setTimeout(r, 1500));
-
-                // Save to Firestore
-                const d1 = new Date(document.getElementById('date-start').value);
-                const d2 = new Date(document.getElementById('date-end').value);
-                
-                await addDoc(collection(db, "bookings"), {
-                    productId: selectedProduct.id, 
-                    productName: selectedProduct.name, 
-                    partnerId: selectedProduct.partnerId,
-                    customerId: currentUser.uid, 
+                const reqData = {
+                    productId: selectedProduct.id,
+                    productName: selectedProduct.name,
+                    partnerId: selectedProduct.partnerId, // MAP TO PARTNER
+                    customerId: currentUser.uid,
                     customerEmail: currentUser.email,
-                    startDate: Timestamp.fromDate(d1), 
-                    endDate: Timestamp.fromDate(d2),
-                    reason: document.getElementById('rent-reason').value,
-                    status: 'confirmed',
-                    paymentStatus: 'paid',
-                    securityDeposit: 5000,
-                    totalPrice: window.calcTotal() + 5000,
+                    status: "submitted",
+                    totalPrice: window.calcTotal(),
+                    startDate: start,
+                    endDate: end,
                     createdAt: serverTimestamp()
+                };
+
+                const docRef = await addDoc(collection(db, "booking_requests"), reqData);
+
+                // REAL-TIME LISTENER FOR APPROVAL
+                onSnapshot(doc(db, "booking_requests", docRef.id), (snap) => {
+                    const data = snap.data();
+                    if (data && data.status === "approved") {
+                        document.getElementById('rental-steps-container').innerHTML = `
+                            <div class="text-center py-10">
+                                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-800 mb-2">Approved!</h3>
+                                <p class="text-sm text-slate-500 mb-6">Partner approved your request. Please pay to confirm booking.</p>
+                                <button onclick="alert('Payment Integration Coming Soon')" class="w-full bg-brand-green text-white py-3.5 rounded-full font-bold shadow-lg shadow-emerald-200">
+                                    Pay Deposit: ₹${data.totalPrice}
+                                </button>
+                            </div>`;
+                    }
                 });
 
-                document.getElementById('step-payment').classList.add('hidden');
-                document.getElementById('step-success').classList.remove('hidden');
-
-            } catch(e) {
-                alert("Payment Failed: " + e.message);
-                btn.innerHTML = 'Pay Security Deposit';
+                document.getElementById('step-request').classList.add('hidden');
+                document.getElementById('step-pending').classList.remove('hidden');
+            } catch (e) {
+                alert("Submission failed: " + e.message);
             }
         };
 
-        // --- ACCOUNT DASHBOARD LOGIC ---
-        window.openAccountModal = () => {
-            if (!currentUser) return alert("Please log in.");
-            document.getElementById('modal-account').classList.remove('hidden');
+        window.switchTab = (t) => {
+            document.getElementById('tab-active-rentals').classList.toggle('hidden', t !== 'active-rentals');
+            document.getElementById('tab-orders').classList.toggle('hidden', t !== 'orders');
         };
-        window.closeAccountModal = () => document.getElementById('modal-account').classList.add('hidden');
-
-        window.switchTab = (tabName) => {
-            // Hide all tabs
-            ['active-rentals', 'orders', 'deadlines'].forEach(t => document.getElementById(`tab-${t}`).classList.add('hidden'));
-            // Show selected
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            
-            // Update Tab Styles (Simple toggle)
-            // Note: In a full app, you'd toggle classes on the buttons too.
-        };
-
         window.logout = () => signOut(auth).then(() => location.reload());
 
+        loadProducts();
     </script>
 </body>
 </html>

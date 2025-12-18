@@ -31,7 +31,7 @@
     .nav-link:hover { color: white; background-color: rgba(255,255,255,0.05); }
     .nav-link.active { color: white; background-color: rgba(255,255,255,0.05); border-left-color: #3b82f6; }
     .nav-section { text-transform: uppercase; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; padding: 1.5rem 1.5rem 0.5rem; opacity: 0.5; }
-    .badge { background-color: #374151; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; margin-left: auto; }
+    .badge { background-color: #ef4444; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; margin-left: auto; }
 
     /* CONTENT */
     .main-content { flex: 1; overflow-y: auto; padding: 2rem; }
@@ -104,6 +104,10 @@
               <div class="nav-section">Dashboard</div>
               <div onclick="switchTab('overview')" id="nav-overview" class="nav-link active">
                   <i class="fa-solid fa-chart-pie w-5 text-center"></i> Summary
+              </div>
+              <div onclick="switchTab('rent-requests')" id="nav-rent-requests" class="nav-link">
+                  <i class="fa-solid fa-bell w-5 text-center text-orange-500"></i> Rent Requests
+                  <span id="badge-requests" class="badge hidden">0</span>
               </div>
               <div onclick="switchTab('products')" id="nav-products" class="nav-link">
                   <i class="fa-solid fa-box w-5 text-center"></i> Products
@@ -178,6 +182,26 @@
                   </div>
               </div>
               <div class="card"><h3 class="font-bold mb-4">Sales Chart</h3><div class="h-64"><canvas id="salesChart"></canvas></div></div>
+          </div>
+
+          <div id="tab-rent-requests" class="hidden">
+              <h2 class="text-xl font-bold mb-6">Pending Rental Requests</h2>
+              <div class="table-container">
+                  <table>
+                      <thead>
+                          <tr>
+                              <th>Customer</th>
+                              <th>Product</th>
+                              <th>Duration</th>
+                              <th>Total Price</th>
+                              <th>Action</th>
+                          </tr>
+                      </thead>
+                      <tbody id="requests-list-body">
+                          <tr><td colspan="5" class="p-10 text-center text-slate-400">No pending requests found.</td></tr>
+                      </tbody>
+                  </table>
+              </div>
           </div>
 
           <div id="tab-products" class="hidden">
@@ -331,7 +355,16 @@
         }
     });
 
-    // --- VISIT STORE LOGIC ---
+    window.switchTab = (t) => {
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active')); 
+        document.getElementById(`nav-${t}`).classList.add('active');
+        ['overview','products','messages','orders','customers','store','subscriptions','rent-requests'].forEach(id => {
+            const el = document.getElementById(`tab-${id}`);
+            if(el) el.classList.add('hidden');
+        });
+        document.getElementById(`tab-${t}`).classList.remove('hidden');
+    };
+
     window.visitMyStore = () => {
         if(currentUser) {
             window.open(`store.html?id=${currentUser.uid}`, '_blank');
@@ -363,12 +396,46 @@
     };
 
     function startDashboard() {
-        // 1. LISTEN FOR ORDERS/BOOKINGS
+        // 1. LISTEN FOR RENT REQUESTS (NEW)
+        onSnapshot(query(collection(db, "booking_requests"), 
+                   where("partnerId", "==", currentUser.uid), 
+                   where("status", "==", "submitted")), (snap) => {
+            
+            const listBody = document.getElementById('requests-list-body');
+            const badge = document.getElementById('badge-requests');
+            listBody.innerHTML = "";
+            
+            if (snap.empty) {
+                listBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400">No requests found.</td></tr>`;
+                badge.classList.add('hidden');
+                return;
+            }
+
+            badge.innerText = snap.size;
+            badge.classList.remove('hidden');
+
+            snap.forEach(d => {
+                const r = d.data();
+                listBody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="font-bold">${r.customerEmail.split('@')[0]}</td>
+                        <td>${r.productName}</td>
+                        <td class="text-xs text-slate-500">${r.startDate} to ${r.endDate}</td>
+                        <td class="font-bold">₹${r.totalPrice}</td>
+                        <td>
+                            <button onclick="handleRequest('${d.id}', 'approved')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold mr-1">Accept</button>
+                            <button onclick="handleRequest('${d.id}', 'rejected')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Reject</button>
+                        </td>
+                    </tr>`;
+            });
+        });
+
+        // 2. LISTEN FOR ORDERS/BOOKINGS
         onSnapshot(query(collection(db, "bookings"), where("partnerId", "==", currentUser.uid)), (snap) => {
             const bookings = []; 
             let earnings = 0;
-            const uniqueCustomers = new Set(); // To count unique customers
-            const customersData = []; // To populate customer table
+            const uniqueCustomers = new Set(); 
+            const customersData = []; 
 
             const tbodyOrders = document.getElementById('orders-table-body'); 
             tbodyOrders.innerHTML = "";
@@ -377,13 +444,8 @@
                 const b = d.data(); 
                 b.id = d.id; 
                 bookings.push(b); 
-                
-                // --- FIX FOR NaN ISSUE ---
-                // We ensure totalPrice is treated as a number. If it's missing, use 0.
                 const price = parseFloat(b.totalPrice) || 0; 
                 earnings += price;
-
-                // Track unique customers
                 if (b.customerEmail && !uniqueCustomers.has(b.customerEmail)) {
                     uniqueCustomers.add(b.customerEmail);
                     customersData.push({
@@ -392,8 +454,6 @@
                         phone: b.customerPhone || "N/A"
                     });
                 }
-
-                // Populate Orders Table
                 tbodyOrders.innerHTML += `
                     <tr>
                         <td class="font-mono text-xs text-gray-500">#${b.id.substr(0,6)}</td>
@@ -403,12 +463,10 @@
                     </tr>`;
             });
 
-            // Update Stats Cards
             document.getElementById('val-earnings').textContent = earnings.toLocaleString();
             document.getElementById('val-orders').textContent = bookings.length;
             document.getElementById('val-customers').textContent = uniqueCustomers.size;
 
-            // Update Customers Table (FIX FOR EMPTY CUSTOMERS TAB)
             const tbodyCust = document.getElementById('customers-table-body');
             tbodyCust.innerHTML = "";
             if(customersData.length === 0) {
@@ -425,7 +483,6 @@
                 });
             }
 
-            // Update Chart
             const ctx = document.getElementById('salesChart');
             if(salesChartInstance) salesChartInstance.destroy();
             salesChartInstance = new Chart(ctx, {
@@ -445,18 +502,13 @@
             });
         });
 
-        // 2. LISTEN FOR PRODUCTS
+        // 3. LISTEN FOR PRODUCTS
         onSnapshot(query(collection(db, "products"), where("partnerId", "==", currentUser.uid)), (snap) => {
-            // Optional: Update a product count if you have an element id="val-products-count"
-            // document.getElementById('val-products-count').textContent = snap.size;
-            
             const grid = document.getElementById('products-grid'); 
             grid.innerHTML = "";
-            
             if (snap.empty) {
-                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">No products added yet. Click "Add Item" to start.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">No products added yet.</div>`;
             }
-
             snap.forEach(d => {
                 const p = d.data();
                 grid.innerHTML += `
@@ -476,6 +528,14 @@
             });
         });
     }
+
+    window.handleRequest = async (id, status) => {
+        if(!confirm(`Are you sure you want to mark this as ${status}?`)) return;
+        try {
+            await updateDoc(doc(db, "booking_requests", id), { status: status });
+            alert("Request status updated!");
+        } catch (e) { alert(e.message); }
+    };
 
     const compressImage = (file) => new Promise((resolve) => {
         const reader = new FileReader(); reader.readAsDataURL(file);
@@ -502,18 +562,15 @@
         }
     };
 
-    // --- ADD PRODUCT LOGIC (Redirects to Store) ---
     document.getElementById('form-add').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-publish');
         btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Publishing...'; 
         btn.disabled = true;
-        
         try {
             const file = document.getElementById('inp-file').files[0];
             let base64 = "https://placehold.co/400"; 
             if(file) base64 = await compressImage(file);
-
             await addDoc(collection(db, "products"), {
                 partnerId: currentUser.uid, 
                 name: document.getElementById('inp-name').value, 
@@ -524,43 +581,28 @@
                 status: "published", 
                 createdAt: serverTimestamp()
             });
-            
             document.getElementById('form-add').reset();
             window.closeAddModal();
-            
-            // Redirect to store
             window.open(`store.html?id=${currentUser.uid}`, '_blank');
-
-        } catch(e) { 
-            console.error(e);
-            alert("Error: " + e.message); 
-        } finally { 
-            btn.innerHTML = "Publish"; 
-            btn.disabled = false; 
-        }
+        } catch(e) { alert("Error: " + e.message); } 
+        finally { btn.innerHTML = "Publish"; btn.disabled = false; }
     });
 
-    // --- STORE CUSTOMIZATION LOGIC ---
     document.getElementById('form-store-settings').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-save-store'); 
         btn.innerHTML='Saving...'; 
         btn.disabled=true;
-        
         try {
             const updates = {};
             const logo = document.getElementById('inp-logo').files[0];
             const cover = document.getElementById('inp-cover').files[0];
-            
             if(logo) updates.storeLogo = await compressImage(logo);
             if(cover) updates.storeCover = await compressImage(cover);
-            
             if(Object.keys(updates).length > 0) {
                 await updateDoc(doc(db, "partners", currentUser.uid), updates);
                 alert("Store Customization Saved!");
-            } else {
-                alert("No new images selected.");
-            }
+            } else { alert("No new images selected."); }
         } catch(e) { alert(e.message); } 
         finally { btn.innerHTML='Save Changes'; btn.disabled=false; }
     });
@@ -569,13 +611,10 @@
     
     window.resetData = async () => {
         if(!confirm("Reset ALL Products & Orders? This cannot be undone.")) return;
-        
         const qP = query(collection(db,"products"), where("partnerId","==",currentUser.uid));
         const qB = query(collection(db,"bookings"), where("partnerId","==",currentUser.uid));
-        
         const snapP = await getDocs(qP); snapP.forEach(d => deleteDoc(d.ref));
         const snapB = await getDocs(qB); snapB.forEach(d => deleteDoc(d.ref));
-        
         alert("Reset Complete."); location.reload();
     };
 
@@ -591,11 +630,6 @@
         } catch(e) { alert(e.message); btn.disabled=false; }
     });
 
-    window.switchTab = (t) => {
-        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active');
-        ['overview','products','messages','orders','customers','store','subscriptions'].forEach(id => document.getElementById(`tab-${id}`).classList.add('hidden'));
-        document.getElementById(`tab-${t}`).classList.remove('hidden');
-    };
     window.openAddModal = () => document.getElementById('modal-add').classList.remove('hidden');
     window.closeAddModal = () => document.getElementById('modal-add').classList.add('hidden');
     window.logout = () => signOut(auth).then(() => window.location.href = "loginpage.html");

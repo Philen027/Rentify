@@ -18,7 +18,6 @@
             theme: {
                 extend: {
                     colors: {
-                        // Monochrome Palette
                         'brand-black': '#000000',
                         'brand-white': '#ffffff',
                         'brand-gray': '#111111',
@@ -45,44 +44,21 @@
     <style>
         body { 
             background-color: #e4dbdb; 
-            color: rgb(0, 0, 0); 
+            color: rgb(255, 255, 255); 
             overflow-x: hidden; 
             cursor: default;
         }
 
-        /* --- Lenis Smooth Scroll Setup --- */
         html.lenis, html.lenis body { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
         .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
         .lenis.lenis-stopped { overflow: hidden; }
         .lenis.lenis-scrolling iframe { pointer-events: none; }
 
-        /* --- Custom Scrollbar --- */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000000; }
-        ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #ffffff; }
+        ::-webkit-scrollbar-track { background: #fcfcfc; }
+        ::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 10px; }
 
-        /* --- Typography Effects --- */
-        .stroke-text {
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.868);
-            color: transparent;
-            transition: all 0.5s ease;
-        }
-        .stroke-text:hover {
-            -webkit-text-stroke: 1px #ffffff;
-            color: rgb(255, 255, 255);
-        }
-
-        /* --- Reveal Animations --- */
-        .reveal-text {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
-        }
-        .char {
-            transform: translateY(115%);
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
         .fade-up {
             opacity: 0;
             transform: translateY(40px);
@@ -93,16 +69,13 @@
             transform: translateY(0);
         }
 
-        /* --- Preloader --- */
         #preloader { transition: transform 1.2s cubic-bezier(0.87, 0, 0.13, 1); }
         #preloader.loaded { transform: translateY(-100%); }
 
-        /* --- Backgrounds --- */
         .bg-slide { transition: opacity 1.5s ease-in-out; }
         .bg-image { transition: transform 10s ease-linear; will-change: transform; }
         .active .bg-image { transform: scale(1.15); }
         
-        /* --- Magnetic Button Base --- */
         .magnetic-btn {
             will-change: transform;
             transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -194,16 +167,27 @@
             </div>
         </section>
 
-        <section id="info" class="py-40 border-t border-white/10 relative z-20">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
-                <div class="fade-up">
-                    <h2 class="text-5xl font-bold mb-10 text-white tracking-tight">The Rentify Manifesto.</h2>
-                    <p class="text-white/70 text-xl leading-relaxed max-w-xl font-light">
-                        We are shifting the paradigm from ownership to access. Rentify connects verified owners with trusted renters in a secure, seamless ecosystem powered by modern technology.
-                    </p>
-                    <button class="magnetic-btn mt-12 border border-white/20 px-8 py-4 rounded-full hover:bg-white hover:text-black transition-all text-sm font-bold uppercase tracking-widest" onclick="window.location.href='loginpage.html'">
-                        Join Rentify Today
-                    </button>
+        <section id="info" class="py-40 border-t border-white/10 relative z-20 flex justify-center items-center px-4">
+            <div class="fade-up w-full max-w-5xl group">
+                <div class="relative p-12 md:p-24 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-2xl transition-all duration-700 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01] overflow-hidden shadow-2xl">
+                    
+                    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white opacity-0 group-hover:opacity-5 blur-[120px] transition-opacity duration-1000"></div>
+                    
+                    <div class="relative z-10 text-center flex flex-col items-center">
+                        <h2 class="text-5xl md:text-7xl font-black mb-10 text-white tracking-tighter uppercase">
+                            The Rentify Manifesto.
+                        </h2>
+                        
+                        <p class="text-white/70 text-xl md:text-3xl leading-relaxed max-w-3xl font-light mb-14">
+                            We are shifting the paradigm from <span class="text-white font-medium">ownership to access</span>. 
+                            Rentify connects verified owners with trusted renters in a secure, 
+                            seamless ecosystem powered by modern technology.
+                        </p>
+
+                        <button class="magnetic-btn bg-white text-black px-14 py-6 rounded-full text-sm font-bold uppercase tracking-widest transition-all hover:bg-gray-200 shadow-xl" onclick="window.location.href='loginpage.html'">
+                            Join Rentify Today
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -218,7 +202,6 @@
     </footer>
 
     <script>
-        // --- DATA ---
         const backgrounds = [
             { src: "https://images.unsplash.com/photo-1533577116850-9cc66cad8a9b?q=80&w=2670&auto=format&fit=crop" },
             { src: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2671&auto=format&fit=crop" },
@@ -229,8 +212,8 @@
         const listings = [
             { title: "Cinema Cameras", category: "Production", price: "From 500/day", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2000&auto=format&fit=crop" },
             { title: "Pro Laptops", category: "Tech", price: "From 1500/day", img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2000&auto=format&fit=crop" },
-            { title: "Power Tools", category: "Equipment", price: "From 300/day", img: "https://images.unsplash.com/photo-1581147036324-c17ac41d1687?q=80&w=2000&auto=format&fit=crop" },
-            { title: "Electric Scooters", category: "Mobility", price: "From 1500/day", img: "https://images.unsplash.com/photo-1558981806-ec527fa84c3d?q=80&w=2000&auto=format&fit=crop" }
+            { title: "Power Tools", category: "Equipment", price: "From 300/day", img: "https://gibadi.com/cdn/shop/articles/power_tools_1024x1024.png?v=1683296477" },
+            { title: "Electric Scooters", category: "Mobility", price: "From 1500/day", img: "https://c.ndtvimg.com/2025-04/hn6vh284_river-indie_625x300_25_April_25.jpg?im=FaceCrop,algorithm=dnn,width=545,height=307" }
         ];
 
         const plans = [
@@ -240,17 +223,11 @@
             { name: "Enterprise", desc: "Full customization for large scale operations.", features: ["Unlimited Products", "Custom Branding", "API Access"] }
         ];
 
-        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             const lenis = new Lenis({
                 duration: 1.2,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                direction: 'vertical',
-                gestureDirection: 'vertical',
                 smooth: true,
-                mouseMultiplier: 1,
-                smoothTouch: false,
-                touchMultiplier: 2,
             });
 
             function raf(time) {
@@ -282,7 +259,6 @@
             });
         });
 
-        // --- BACKGROUND LOGIC ---
         function initBackgrounds() {
             const container = document.getElementById('background-container');
             backgrounds.forEach((bg, i) => {
@@ -304,7 +280,6 @@
                 const scrollY = window.scrollY;
                 const vh = window.innerHeight;
                 let activeIndex = 0;
-
                 if (scrollY < vh * 0.8) activeIndex = 0;
                 else if (scrollY < vh * 1.8) activeIndex = 1;
                 else if (scrollY < vh * 3.5) activeIndex = 2;
@@ -313,19 +288,18 @@
                 backgrounds.forEach((_, i) => {
                     const el = document.getElementById(`bg-${i}`);
                     if (i === activeIndex) {
-                        el.classList.remove('opacity-0');
-                        el.classList.add('opacity-100', 'active');
+                        el.classList.replace('opacity-0', 'opacity-100');
+                        el.classList.add('active');
                         el.style.zIndex = '10';
                     } else {
-                        el.classList.add('opacity-0');
-                        el.classList.remove('opacity-100', 'active');
+                        el.classList.replace('opacity-100', 'opacity-0');
+                        el.classList.remove('active');
                         el.style.zIndex = '0';
                     }
                 });
             });
         }
 
-        // --- RENDERERS ---
         function renderListings() {
             const container = document.getElementById('listings-container');
             listings.forEach((item, i) => {
@@ -350,7 +324,6 @@
         function renderPlans() {
             const container = document.getElementById('plans-container');
             plans.forEach((plan, i) => {
-                // Changed icon to white
                 const featuresHtml = plan.features.map(f => `<li class="flex items-start gap-4 text-white/90 text-sm font-light"><i data-lucide="check" class="w-4 h-4 text-white"></i> ${f}</li>`).join('');
                 const div = document.createElement('div');
                 div.className = `fade-up sticky w-full max-w-5xl mx-auto mb-24`;
@@ -367,9 +340,8 @@
                                     <p class="text-white/60 text-lg font-light leading-relaxed">${plan.desc}</p>
                                 </div>
                                 <div class="mt-8 md:mt-0">
-                                    <button onclick="window.location.href='loginpage.html?role=partner'" class="magnetic-btn px-10 py-5 bg-white text-black rounded-full font-bold hover:bg-gray-200 transition-all w-full md:w-auto shadow-lg shadow-white/5 flex items-center justify-center gap-2">
-                                        Select ${plan.name}
-                                        <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                                    <button onclick="window.location.href='loginpage.html?role=partner'" class="magnetic-btn px-10 py-5 bg-white text-black rounded-full font-bold hover:bg-gray-200 transition-all w-full md:w-auto flex items-center justify-center gap-2">
+                                        Select ${plan.name} <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
                                     </button>
                                 </div>
                             </div>
@@ -385,7 +357,6 @@
             lucide.createIcons();
         }
 
-        // --- MAGNETIC BUTTONS ---
         function setupMagneticButtons() {
             document.querySelectorAll('.magnetic-btn').forEach(btn => {
                 btn.addEventListener('mousemove', (e) => {
@@ -400,37 +371,14 @@
             });
         }
 
-        // --- SCROLL ANIMATIONS ---
         function initScrollAnimations() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: "0px 0px -50px 0px"
-            };
-
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
                 });
-            }, observerOptions);
-
+            }, { threshold: 0.1 });
             document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
         }
-    </script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        
-        const firebaseConfig = {
-          apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY",
-          authDomain: "rentify-93c05.firebaseapp.com",
-          projectId: "rentify-93c05",
-          storageBucket: "rentify-93c05.firebasestorage.app",
-          messagingSenderId: "652243130812",
-          appId: "1:652243130812:web:628fd64b4a69628eae73b9"
-        };
-        
-        const app = initializeApp(firebaseConfig);
     </script>
 </body>
 </html>
