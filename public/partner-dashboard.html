@@ -39,9 +39,9 @@
     .card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .card-dark { background: #111827; color: white; }
 
-    /* SUBSCRIPTION CARDS (Dark Theme) */
+    /* SUBSCRIPTION CARDS */
     .sub-card {
-        background: #0F172A; /* Dark Blue/Black */
+        background: #0F172A; 
         border: 1px solid rgba(255,255,255,0.1);
         border-radius: 1.5rem;
         padding: 2rem;
@@ -59,6 +59,10 @@
     table { width: 100%; text-align: left; border-collapse: collapse; }
     th { padding: 1rem; font-size: 0.8rem; text-transform: uppercase; color: #6B7280; font-weight: 600; border-bottom: 1px solid #E5E7EB; }
     td { padding: 1rem; font-size: 0.9rem; border-bottom: 1px solid #F3F4F6; color: #374151; }
+
+    /* MODERN FILE UPLOAD */
+    .upload-area { border: 2px dashed #e2e8f0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+    .upload-area:hover { border-color: #3b82f6; background: #f8fafc; transform: scale(1.01); }
   </style>
 </head>
 <body id="main-body" class="bg-video-mode h-screen overflow-hidden">
@@ -88,9 +92,9 @@
 
       <div id="state-pending" class="hidden-force text-center max-w-md glass-modal p-10 rounded-3xl">
           <i class="fa-solid fa-clock text-4xl text-yellow-400 mb-4"></i>
-          <h2 class="text-2xl font-bold mb-2">Verification Pending</h2>
+          <h2 class="text-2xl font-bold mb-2 text-white">Verification Pending</h2>
           <p class="text-slate-400 mb-6 text-sm">Your application is being reviewed.</p>
-          <button onclick="location.reload()" class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition">Refresh Status</button>
+          <button onclick="location.reload()" class="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition text-white">Refresh Status</button>
           <div class="mt-4"><button onclick="logout()" class="text-xs text-slate-500 hover:text-white">Logout</button></div>
       </div>
   </div>
@@ -102,104 +106,51 @@
           
           <div class="flex flex-col gap-1 mt-4">
               <div class="nav-section">Dashboard</div>
-              <div onclick="switchTab('overview')" id="nav-overview" class="nav-link active">
-                  <i class="fa-solid fa-chart-pie w-5 text-center"></i> Summary
-              </div>
-              <div onclick="switchTab('rent-requests')" id="nav-rent-requests" class="nav-link">
-                  <i class="fa-solid fa-bell w-5 text-center text-orange-500"></i> Rent Requests
-                  <span id="badge-requests" class="badge hidden">0</span>
-              </div>
-              <div onclick="switchTab('products')" id="nav-products" class="nav-link">
-                  <i class="fa-solid fa-box w-5 text-center"></i> Products
-              </div>
-              <div onclick="switchTab('store')" id="nav-store" class="nav-link">
-                  <i class="fa-solid fa-shop w-5 text-center"></i> Store Customization
-              </div>
-              <div onclick="switchTab('subscriptions')" id="nav-subscriptions" class="nav-link">
-                  <i class="fa-solid fa-crown w-5 text-center"></i> Subscription Plan
-              </div>
+              <div onclick="switchTab('overview')" id="nav-overview" class="nav-link active"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Summary</div>
+              <div onclick="switchTab('rent-requests')" id="nav-rent-requests" class="nav-link"><i class="fa-solid fa-bell w-5 text-center text-orange-500"></i> Rent Requests <span id="badge-requests" class="badge hidden">0</span></div>
+              <div onclick="switchTab('products')" id="nav-products" class="nav-link"><i class="fa-solid fa-box w-5 text-center"></i> Products</div>
+              <div onclick="switchTab('store')" id="nav-store" class="nav-link"><i class="fa-solid fa-shop w-5 text-center"></i> Store Customization</div>
+              <div onclick="switchTab('subscriptions')" id="nav-subscriptions" class="nav-link"><i class="fa-solid fa-crown w-5 text-center"></i> Subscription Plan</div>
           </div>
 
           <div class="flex flex-col gap-1">
               <div class="nav-section">Management</div>
-              <div onclick="switchTab('messages')" id="nav-messages" class="nav-link">
-                  <i class="fa-solid fa-envelope w-5 text-center"></i> Messages 
-                  <span id="badge-msg" class="badge">0</span>
-              </div>
-              <div onclick="switchTab('orders')" id="nav-orders" class="nav-link">
-                  <i class="fa-solid fa-receipt w-5 text-center"></i> Orders
-                  <span id="badge-orders" class="badge">0</span>
-              </div>
-              <div onclick="switchTab('customers')" id="nav-customers" class="nav-link">
-                  <i class="fa-solid fa-users w-5 text-center"></i> Customers
-              </div>
+              <div onclick="switchTab('messages')" id="nav-messages" class="nav-link"><i class="fa-solid fa-envelope w-5 text-center"></i> Messages <span id="badge-msg" class="badge">0</span></div>
+              <div onclick="switchTab('orders')" id="nav-orders" class="nav-link"><i class="fa-solid fa-receipt w-5 text-center"></i> Orders <span id="badge-orders" class="badge">0</span></div>
+              <div onclick="switchTab('customers')" id="nav-customers" class="nav-link"><i class="fa-solid fa-users w-5 text-center"></i> Customers</div>
           </div>
 
           <div class="mt-auto p-4 border-t border-gray-800 space-y-2">
-             <div onclick="window.resetData()" class="nav-link text-yellow-500 hover:bg-yellow-900/20 rounded-lg cursor-pointer">
-                <i class="fa-solid fa-eraser w-5 text-center"></i> Reset Data
-             </div>
-             <div onclick="logout()" class="nav-link text-red-400 hover:bg-red-900/20 rounded-lg cursor-pointer">
-                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Logout
-             </div>
+             <div onclick="window.resetData()" class="nav-link text-yellow-500 hover:bg-yellow-900/20 rounded-lg cursor-pointer"><i class="fa-solid fa-eraser w-5 text-center"></i> Reset Data</div>
+             <div onclick="logout()" class="nav-link text-red-400 hover:bg-red-900/20 rounded-lg cursor-pointer"><i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Logout</div>
           </div>
       </aside>
 
       <div class="main-content">
-          
           <div class="header">
-              <div>
-                  <h1 class="text-2xl font-bold">Partner Dashboard</h1>
-                  <p class="text-sm text-gray-500">Manage your business & inventory.</p>
-              </div>
+              <div><h1 class="text-2xl font-bold">Partner Dashboard</h1><p class="text-sm text-gray-500">Manage your business & inventory.</p></div>
               <div class="flex items-center bg-white p-1 rounded-xl shadow-sm border border-gray-200">
-                  <button onclick="visitMyStore()" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-                      <i class="fa-solid fa-external-link-alt"></i> Visit My Store
-                  </button>
+                  <button onclick="visitMyStore()" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"><i class="fa-solid fa-external-link-alt"></i> Visit My Store</button>
                   <div class="w-px h-6 bg-gray-200 mx-1"></div>
-                  <button onclick="openAddModal()" class="flex items-center gap-2 px-5 py-2 bg-black text-white rounded-lg text-sm font-bold shadow-md hover:bg-gray-800 transition">
-                      <i class="fa-solid fa-plus"></i> Add Item
-                  </button>
+                  <button onclick="openAddModal()" class="flex items-center gap-2 px-5 py-2 bg-black text-white rounded-lg text-sm font-bold shadow-md hover:bg-gray-800 transition">+ Add Item</button>
               </div>
           </div>
 
           <div id="tab-overview" class="space-y-6">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div class="card card-dark">
-                      <div class="p-2 bg-white/10 rounded-lg w-fit mb-4"><i class="fa-solid fa-wallet"></i></div>
-                      <p class="text-gray-400 text-sm">Total Sales</p>
-                      <h2 class="text-3xl font-bold mt-1">₹<span id="val-earnings">0</span></h2>
-                  </div>
-                  <div class="card">
-                      <div class="p-2 bg-gray-100 rounded-lg w-fit mb-4"><i class="fa-solid fa-users"></i></div>
-                      <p class="text-gray-500 text-sm">Customers Rented</p>
-                      <h2 class="text-3xl font-bold mt-1" id="val-customers">0</h2>
-                  </div>
-                  <div class="card">
-                      <div class="p-2 bg-gray-100 rounded-lg w-fit mb-4"><i class="fa-solid fa-box-open"></i></div>
-                      <p class="text-gray-500 text-sm">Total Orders</p>
-                      <h2 class="text-3xl font-bold mt-1" id="val-orders">0</h2>
-                  </div>
+                  <div class="card card-dark"><p class="text-gray-400 text-sm">Total Sales</p><h2 class="text-3xl font-bold mt-1">₹<span id="val-earnings">0</span></h2></div>
+                  <div class="card"><p class="text-gray-500 text-sm">Customers Rented</p><h2 class="text-3xl font-bold mt-1" id="val-customers">0</h2></div>
+                  <div class="card"><p class="text-gray-500 text-sm">Total Orders</p><h2 class="text-3xl font-bold mt-1" id="val-orders">0</h2></div>
               </div>
-              <div class="card"><h3 class="font-bold mb-4">Sales Chart</h3><div class="h-64"><canvas id="salesChart"></canvas></div></div>
+              <div class="card h-64"><canvas id="salesChart"></canvas></div>
           </div>
 
           <div id="tab-rent-requests" class="hidden">
               <h2 class="text-xl font-bold mb-6">Pending Rental Requests</h2>
               <div class="table-container">
                   <table>
-                      <thead>
-                          <tr>
-                              <th>Customer</th>
-                              <th>Product</th>
-                              <th>Duration</th>
-                              <th>Total Price</th>
-                              <th>Action</th>
-                          </tr>
-                      </thead>
-                      <tbody id="requests-list-body">
-                          <tr><td colspan="5" class="p-10 text-center text-slate-400">No pending requests found.</td></tr>
-                      </tbody>
+                      <thead><tr><th>Customer Details</th><th>Product</th><th>ID Proof</th><th>Duration</th><th>Total Price</th><th>Action</th></tr></thead>
+                      <tbody id="requests-list-body"></tbody>
                   </table>
               </div>
           </div>
@@ -213,88 +164,50 @@
               <h2 class="text-xl font-bold mb-6">Store Customization</h2>
               <div class="card">
                   <form id="form-store-settings">
-                      <div class="relative w-full h-48 md:h-64 bg-slate-100 rounded-xl overflow-hidden border-2 border-dashed border-slate-300 group cursor-pointer" onclick="document.getElementById('inp-cover').click()">
+                      <div class="relative w-full h-48 bg-slate-100 rounded-xl overflow-hidden border-2 border-dashed border-slate-300 group cursor-pointer" onclick="document.getElementById('inp-cover').click()">
                           <img id="preview-cover" src="" class="w-full h-full object-cover hidden">
-                          <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 group-hover:bg-black/5 transition">
-                              <i class="fa-regular fa-image text-3xl mb-2"></i>
-                              <span class="text-sm font-medium">Click to upload Cover Photo</span>
-                          </div>
+                          <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400"><i class="fa-regular fa-image text-3xl mb-2"></i><span class="text-sm font-medium">Upload Cover Photo</span></div>
                           <input type="file" id="inp-cover" accept="image/*" class="hidden" onchange="previewImage(this, 'preview-cover')">
                       </div>
-
-                      <div class="relative -mt-12 ml-6 w-28 h-28 md:w-32 md:h-32">
-                          <div class="w-full h-full rounded-full border-4 border-white bg-slate-200 overflow-hidden relative group cursor-pointer shadow-lg" onclick="document.getElementById('inp-logo').click()">
-                              <img id="preview-logo" src="" class="w-full h-full object-cover hidden">
-                              <div class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition">
-                                  <i class="fa-solid fa-camera text-white opacity-0 group-hover:opacity-100"></i>
-                              </div>
-                          </div>
-                          <input type="file" id="inp-logo" accept="image/*" class="hidden" onchange="previewImage(this, 'preview-logo')">
-                      </div>
-
-                      <div class="mt-6 flex justify-end">
-                          <button type="submit" id="btn-save-store" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 shadow-md transition">
-                              Save Changes
-                          </button>
-                      </div>
+                      <div class="mt-6 flex justify-end"><button type="submit" id="btn-save-store" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold">Save Changes</button></div>
                   </form>
               </div>
           </div>
 
           <div id="tab-subscriptions" class="hidden">
-              <div class="text-center mb-10">
-                  <h2 class="text-3xl font-bold text-slate-900">Choose Your Plan</h2>
-                  <p class="text-slate-500 mt-2">Scale your rental business with the right tools.</p>
-              </div>
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" id="plans-container">
-                  <div class="sub-card" id="plan-card-starter">
-                      <div class="plan-badge">PLAN LEVEL 01</div>
-                      <h3 class="text-3xl font-black mb-1">Starter</h3>
-                      <p class="text-slate-400 text-sm min-h-[40px] mb-6">Entry-level plan.</p>
-                      <button onclick="upgradePlan('starter')" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-slate-200 transition">Select Starter</button>
-                  </div>
-                  <div class="sub-card" id="plan-card-growth">
-                      <div class="plan-badge">PLAN LEVEL 02</div>
-                      <h3 class="text-3xl font-black mb-1">Growth</h3>
-                      <p class="text-slate-400 text-sm min-h-[40px] mb-6">For growing businesses.</p>
-                      <button onclick="upgradePlan('growth')" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-slate-200 transition">Select Growth</button>
-                  </div>
-                  <div class="sub-card" id="plan-card-business">
-                      <div class="plan-badge">PLAN LEVEL 03</div>
-                      <h3 class="text-3xl font-black mb-1">Business Pro</h3>
-                      <p class="text-slate-400 text-sm min-h-[40px] mb-6">Robust tools.</p>
-                      <button onclick="upgradePlan('business')" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-slate-200 transition">Select Business</button>
-                  </div>
-                  <div class="sub-card" id="plan-card-enterprise">
-                      <div class="plan-badge">PLAN LEVEL 04</div>
-                      <h3 class="text-3xl font-black mb-1">Enterprise</h3>
-                      <p class="text-slate-400 text-sm min-h-[40px] mb-6">Full customization.</p>
-                      <button onclick="upgradePlan('enterprise')" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-slate-200 transition">Select Enterprise</button>
-                  </div>
+                  <div class="sub-card" id="plan-card-starter"><div class="plan-badge">LEVEL 01</div><h3 class="text-3xl font-black mb-1 text-white">Starter</h3><p class="text-slate-400 text-sm min-h-[40px] mb-6">Entry-level plan for new businesses starting their rental journey.</p><button onclick="upgradePlan('starter')" class="w-full py-3 bg-white text-black rounded-lg font-bold mt-4">Select Starter</button></div>
+                  <div class="sub-card" id="plan-card-growth"><div class="plan-badge">LEVEL 02</div><h3 class="text-3xl font-black mb-1 text-white">Growth</h3><p class="text-slate-400 text-sm min-h-[40px] mb-6">For growing businesses needing more flexibility and reach.</p><button onclick="upgradePlan('growth')" class="w-full py-3 bg-white text-black rounded-lg font-bold mt-4">Select Growth</button></div>
+                  <div class="sub-card" id="plan-card-business"><div class="plan-badge">LEVEL 03</div><h3 class="text-3xl font-black mb-1 text-white">Business</h3><p class="text-slate-400 text-sm min-h-[40px] mb-6">Robust tools for established rental enterprises.</p><button onclick="upgradePlan('business')" class="w-full py-3 bg-white text-black rounded-lg font-bold mt-4">Select Business</button></div>
+                  <div class="sub-card" id="plan-card-enterprise"><div class="plan-badge">LEVEL 04</div><h3 class="text-3xl font-black mb-1 text-white">Enterprise</h3><p class="text-slate-400 text-sm min-h-[40px] mb-6">Full customization for large scale operations.</p><button onclick="upgradePlan('enterprise')" class="w-full py-3 bg-white text-black rounded-lg font-bold mt-4">Select Enterprise</button></div>
               </div>
           </div>
 
-          <div id="tab-messages" class="hidden"><h2 class="text-xl font-bold mb-6">Messages</h2><div class="card p-0 overflow-hidden"><div id="messages-list" class="divide-y divide-gray-100"></div></div></div>
-
+          <div id="tab-messages" class="hidden"><h2 class="text-xl font-bold mb-6 text-black">Booking & Rental Notifications</h2><div class="card p-0 overflow-hidden"><div id="messages-list" class="divide-y divide-gray-100"></div></div></div>
           <div id="tab-orders" class="hidden"><h2 class="text-xl font-bold mb-6">Orders</h2><div class="table-container"><table><thead><tr><th>Order ID</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead><tbody id="orders-table-body"></tbody></table></div></div>
-
           <div id="tab-customers" class="hidden"><h2 class="text-xl font-bold mb-6">Customers</h2><div class="table-container"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Spent</th></tr></thead><tbody id="customers-table-body"></tbody></table></div></div>
-
       </div>
   </div>
 
   <div id="modal-add" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6">
-        <h3 class="font-bold text-xl mb-6">Add New Item</h3>
-        <form id="form-add" class="space-y-4">
-            <input type="text" id="inp-name" required placeholder="Product Name" class="w-full p-3 border rounded-xl bg-gray-50">
-            <input type="number" id="inp-price" required placeholder="Rent (₹)" class="w-full p-3 border rounded-xl bg-gray-50">
-            <select id="inp-category" class="w-full p-3 border rounded-xl bg-gray-50"><option>Electronics</option><option>Cameras</option><option>Tools</option><option>Vehicles</option></select>
-            <textarea id="inp-desc" placeholder="Description..." class="w-full p-3 border rounded-xl bg-gray-50"></textarea>
-            <input type="file" id="inp-file" accept="image/*" class="w-full text-xs">
-            <button type="submit" id="btn-publish" class="w-full py-3 bg-black text-white font-bold rounded-xl shadow-lg hover:bg-gray-800">Publish</button>
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div class="p-6 border-b flex justify-between items-center"><h3 class="font-bold text-xl">New Listing</h3><button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark text-xl"></i></button></div>
+        <form id="form-add" class="p-6 space-y-5 overflow-y-auto max-h-[80vh]">
+            <div id="drop-zone" class="upload-area rounded-2xl p-8 text-center" onclick="document.getElementById('inp-file').click()">
+                <div id="upload-placeholder"><i class="fa-solid fa-cloud-arrow-up text-4xl text-blue-500 mb-3"></i><p class="text-sm font-bold text-slate-700">Drop Product Image here</p></div>
+                <img id="upload-preview" class="hidden w-full h-40 object-contain rounded-lg">
+                <input type="file" id="inp-file" accept="image/*" class="hidden">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2"><input type="text" id="inp-name" required placeholder="Product Name" class="w-full p-3 border rounded-xl bg-slate-50 outline-none"></div>
+                <div><input type="number" id="inp-price" required placeholder="Daily Rent (₹)" class="w-full p-3 border rounded-xl bg-slate-50 outline-none"></div>
+                <div><input type="number" id="inp-security" required placeholder="Security Deposit (₹)" class="w-full p-3 border rounded-xl bg-slate-50 outline-none"></div>
+                <div><input type="number" id="inp-stock" value="1" min="1" required class="w-full p-3 border rounded-xl bg-slate-50 outline-none"></div>
+                <div><select id="inp-category" class="w-full p-3 border rounded-xl bg-slate-50 outline-none"><option>Electronics</option><option>Cameras</option><option>Tools</option><option>Vehicles</option></select></div>
+            </div>
+            <textarea id="inp-desc" placeholder="Description..." rows="3" class="w-full p-3 border rounded-xl bg-slate-50 outline-none"></textarea>
+            <button type="submit" id="btn-publish" class="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-700 transition">Publish Item</button>
         </form>
-        <button onclick="closeAddModal()" class="mt-4 w-full text-sm text-gray-400">Cancel</button>
     </div>
   </div>
 
@@ -310,329 +223,183 @@
     onAuthStateChanged(auth, async (user) => {
         if (!user) return window.location.href = "loginpage.html";
         currentUser = user;
-        window.currentUser = user; // Global access for debug
-        
         try {
             const snap = await getDoc(doc(db, "partners", currentUser.uid));
             document.getElementById('state-loading').style.display = 'none';
-            
-            let status = 'new';
-            let currentPlan = 'starter';
-
-            if (snap.exists()) {
-                const data = snap.data();
-                status = data.verificationStatus || 'new';
-                currentPlan = data.plan || 'starter';
-
-                // Preload Store Images
-                if(data.storeCover) {
-                    const img = document.getElementById('preview-cover');
-                    img.src = data.storeCover;
-                    img.classList.remove('hidden');
-                }
-                if(data.storeLogo) {
-                    const img = document.getElementById('preview-logo');
-                    img.src = data.storeLogo;
-                    img.classList.remove('hidden');
-                }
-            }
-
+            let status = snap.exists() ? (snap.data().verificationStatus || 'new') : 'new';
             if (status === 'approved') {
                 document.getElementById('main-body').className = "h-screen overflow-hidden bg-gray-50"; 
                 document.getElementById('view-verification').classList.add('hidden-force');
                 document.getElementById('view-dashboard').classList.remove('hidden-force');
-                
-                highlightCurrentPlan(currentPlan); 
-                startDashboard();
+                highlightCurrentPlan(snap.exists() ? snap.data().plan : 'starter'); startDashboard();
             } else if (status === 'submitted') {
                 document.getElementById('state-pending').classList.remove('hidden-force');
             } else {
                 document.getElementById('state-form').classList.remove('hidden-force');
             }
-        } catch (e) { 
-            console.error("Auth Error:", e);
-            alert("Error loading profile. Check console."); 
-        }
+        } catch (e) { document.getElementById('state-loading').style.display = 'none'; }
     });
 
-    window.switchTab = (t) => {
-        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active')); 
-        document.getElementById(`nav-${t}`).classList.add('active');
-        ['overview','products','messages','orders','customers','store','subscriptions','rent-requests'].forEach(id => {
-            const el = document.getElementById(`tab-${id}`);
-            if(el) el.classList.add('hidden');
-        });
-        document.getElementById(`tab-${t}`).classList.remove('hidden');
-    };
-
-    window.visitMyStore = () => {
-        if(currentUser) {
-            window.open(`store.html?id=${currentUser.uid}`, '_blank');
-        }
-    };
-
-    function highlightCurrentPlan(plan) {
-        document.querySelectorAll('.sub-card').forEach(el => el.classList.remove('active-plan'));
-        const activeCard = document.getElementById(`plan-card-${plan}`);
-        if(activeCard) {
-            activeCard.classList.add('active-plan');
-            const btn = activeCard.querySelector('button');
-            if(btn) { 
-                btn.innerText = "Current Plan"; 
-                btn.disabled = true; 
-                btn.className = "w-full py-3 bg-blue-600/20 text-blue-400 border border-blue-600/50 rounded-lg font-bold cursor-default"; 
-            }
-        }
-    }
-
-    window.upgradePlan = async (plan) => {
-        if(confirm(`Switch subscription to ${plan.toUpperCase()}?`)) {
-            try {
-                await updateDoc(doc(db, "partners", currentUser.uid), { plan: plan });
-                alert("Subscription updated!");
-                location.reload();
-            } catch(e) { alert("Error: " + e.message); }
-        }
-    };
-
     function startDashboard() {
-        // 1. LISTEN FOR RENT REQUESTS (NEW)
-        onSnapshot(query(collection(db, "booking_requests"), 
-                   where("partnerId", "==", currentUser.uid), 
-                   where("status", "==", "submitted")), (snap) => {
-            
+        // UPDATED: COMBINED LOGIC FOR REQUESTS, ORDERS, AND MESSAGE NOTIFICATIONS
+        onSnapshot(query(collection(db, "booking_requests"), where("partnerId", "==", currentUser.uid)), (snap) => {
             const listBody = document.getElementById('requests-list-body');
-            const badge = document.getElementById('badge-requests');
-            listBody.innerHTML = "";
+            const msgList = document.getElementById('messages-list');
+            const badgeRequests = document.getElementById('badge-requests');
+            const msgBadge = document.getElementById('badge-msg');
+            const tbodyOrders = document.getElementById('orders-table-body');
+            const tbodyCust = document.getElementById('customers-table-body');
+            const badgeOrders = document.getElementById('badge-orders');
             
-            if (snap.empty) {
-                listBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400">No requests found.</td></tr>`;
-                badge.classList.add('hidden');
-                return;
-            }
+            listBody.innerHTML = ""; msgList.innerHTML = ""; tbodyOrders.innerHTML = ""; tbodyCust.innerHTML = "";
+            let pendingCount = 0; let approvedCount = 0; let revenue = 0; const custs = {};
 
-            badge.innerText = snap.size;
-            badge.classList.remove('hidden');
+            if (snap.empty) {
+                listBody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-slate-400">No requests</td></tr>`;
+                msgList.innerHTML = `<div class="p-8 text-center text-gray-400">No new messages.</div>`;
+                badgeRequests.classList.add('hidden'); msgBadge.innerText = "0"; return;
+            }
 
             snap.forEach(d => {
                 const r = d.data();
-                listBody.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="font-bold">${r.customerEmail.split('@')[0]}</td>
-                        <td>${r.productName}</td>
-                        <td class="text-xs text-slate-500">${r.startDate} to ${r.endDate}</td>
-                        <td class="font-bold">₹${r.totalPrice}</td>
-                        <td>
-                            <button onclick="handleRequest('${d.id}', 'approved')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold mr-1">Accept</button>
-                            <button onclick="handleRequest('${d.id}', 'rejected')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Reject</button>
-                        </td>
-                    </tr>`;
-            });
-        });
+                const today = new Date().toISOString().split('T')[0];
 
-        // 2. LISTEN FOR ORDERS/BOOKINGS
-        onSnapshot(query(collection(db, "bookings"), where("partnerId", "==", currentUser.uid)), (snap) => {
-            const bookings = []; 
-            let earnings = 0;
-            const uniqueCustomers = new Set(); 
-            const customersData = []; 
-
-            const tbodyOrders = document.getElementById('orders-table-body'); 
-            tbodyOrders.innerHTML = "";
-
-            snap.forEach(d => { 
-                const b = d.data(); 
-                b.id = d.id; 
-                bookings.push(b); 
-                const price = parseFloat(b.totalPrice) || 0; 
-                earnings += price;
-                if (b.customerEmail && !uniqueCustomers.has(b.customerEmail)) {
-                    uniqueCustomers.add(b.customerEmail);
-                    customersData.push({
-                        name: b.customerName || "Unknown",
-                        email: b.customerEmail,
-                        phone: b.customerPhone || "N/A"
-                    });
-                }
-                tbodyOrders.innerHTML += `
-                    <tr>
-                        <td class="font-mono text-xs text-gray-500">#${b.id.substr(0,6)}</td>
-                        <td>${b.productName || 'Item'}</td>
-                        <td class="font-bold">₹${price}</td>
-                        <td><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">${b.status || 'Pending'}</span></td>
-                    </tr>`;
-            });
-
-            document.getElementById('val-earnings').textContent = earnings.toLocaleString();
-            document.getElementById('val-orders').textContent = bookings.length;
-            document.getElementById('val-customers').textContent = uniqueCustomers.size;
-
-            const tbodyCust = document.getElementById('customers-table-body');
-            tbodyCust.innerHTML = "";
-            if(customersData.length === 0) {
-                tbodyCust.innerHTML = `<tr><td colspan="4" class="text-center text-gray-400 p-4">No customers yet</td></tr>`;
-            } else {
-                customersData.forEach(c => {
-                    tbodyCust.innerHTML += `
-                        <tr>
-                            <td class="font-bold">${c.name}</td>
-                            <td>${c.email}</td>
-                            <td>${c.phone}</td>
-                            <td><span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">View History</span></td>
+                // 1. Logic for "Rent Requests" Tab (Submitted only)
+                if (r.status === 'submitted') {
+                    pendingCount++;
+                    listBody.innerHTML += `
+                        <tr class="hover:bg-slate-50 border-b">
+                            <td class="p-4 font-bold text-sm text-black">${r.customerName || "Customer"}<br><span class="text-[10px] text-emerald-600 font-bold">${r.customerPhone || 'N/A'}</span></td>
+                            <td class="p-4 text-sm font-medium uppercase text-black">${r.productName}</td>
+                            <td class="p-4">${r.customerAadhar ? `<img src="${r.customerAadhar}" class="h-8 w-12 object-cover rounded cursor-pointer" onclick="const w=window.open(); w.document.write('<img src=\\'${r.customerAadhar}\\' style=\\'width:100%\\'>');">` : 'N/A'}</td>
+                            <td class="p-4 text-xs font-bold text-gray-400">${r.startDate} to ${r.endDate}</td>
+                            <td class="p-4 font-black">₹${r.totalPrice}</td>
+                            <td class="p-4 flex gap-2 justify-center">
+                                <button onclick="handleRequest('${d.id}', 'approved')" class="bg-black text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Approve</button>
+                                <button onclick="handleRequest('${d.id}', 'rejected')" class="bg-red-500 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Reject</button>
+                            </td>
                         </tr>`;
-                });
-            }
+                    
+                    // Add Message for New Request
+                    msgList.innerHTML += createMsgUI("New Rental Request", `${r.customerName} wants to rent ${r.productName}`, "blue");
+                }
 
-            const ctx = document.getElementById('salesChart');
-            if(salesChartInstance) salesChartInstance.destroy();
-            salesChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: { 
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Today'], 
-                    datasets: [{
-                        label: 'Sales', 
-                        data: [0, earnings * 0.3, earnings * 0.6, earnings], 
-                        borderColor: '#111827', 
-                        backgroundColor: 'rgba(17, 24, 39, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }] 
-                },
-                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
+                // 2. Logic for "Orders" and "Customers" (Approved only)
+                if (r.status === 'approved') {
+                    approvedCount++;
+                    revenue += parseFloat(r.totalPrice);
+                    tbodyOrders.innerHTML += `<tr class="border-b"><td class="p-4 font-mono text-xs">#${d.id.substring(0,6)}</td><td class="p-4 font-bold text-xs uppercase">${r.productName}</td><td class="p-4 font-black text-black">₹${r.totalPrice}</td><td class="p-4 text-[10px] font-black text-blue-500 uppercase">Active</td></tr>`;
+                    
+                    if(!custs[r.customerId]) custs[r.customerId] = { name: r.customerName, email: r.customerEmail, phone: r.customerPhone, total: 0 };
+                    custs[r.customerId].total += parseFloat(r.totalPrice);
+
+                    // Add Message for Approved Order
+                    msgList.innerHTML += createMsgUI("Order Confirmed", `Rental for ${r.productName} by ${r.customerName} is active.`, "green");
+
+                    // 3. Logic for "Last Date Reminder"
+                    if (r.endDate === today) {
+                        msgList.innerHTML += createMsgUI("Return Reminder", `TODAY is the last day for ${r.productName} (Customer: ${r.customerName}).`, "orange");
+                    }
+                }
             });
+
+            // Update Badges and Stats
+            badgeRequests.innerText = pendingCount;
+            badgeRequests.classList.toggle('hidden', pendingCount === 0);
+            msgBadge.innerText = snap.size;
+            badgeOrders.innerText = approvedCount;
+            document.getElementById('val-earnings').textContent = revenue.toLocaleString();
+            document.getElementById('val-orders').textContent = approvedCount;
+            document.getElementById('val-customers').textContent = Object.keys(custs).length;
+
+            Object.values(custs).forEach(c => {
+                tbodyCust.innerHTML += `<tr class="border-b"><td class="p-4 font-black uppercase text-xs text-black">${c.name}</td><td class="p-4 text-xs text-black">${c.email}</td><td class="p-4 font-bold text-xs text-black">${c.phone}</td><td class="p-4 font-black text-black">₹${c.total}</td></tr>`;
+            });
+
+            updateChart(revenue);
         });
 
-        // 3. LISTEN FOR PRODUCTS
+        // INVENTORY LISTENER
         onSnapshot(query(collection(db, "products"), where("partnerId", "==", currentUser.uid)), (snap) => {
-            const grid = document.getElementById('products-grid'); 
-            grid.innerHTML = "";
-            if (snap.empty) {
-                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">No products added yet.</div>`;
-            }
+            const grid = document.getElementById('products-grid'); grid.innerHTML = "";
             snap.forEach(d => {
-                const p = d.data();
+                const p = d.data(); const stock = p.stock || 0;
                 grid.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border relative group hover:shadow-md transition">
-                        <button onclick="window.deleteProduct('${d.id}')" class="absolute top-2 left-2 w-8 h-8 bg-white/90 text-red-500 rounded-full shadow hover:scale-110 transition flex items-center justify-center z-10">
-                            <i class="fa-solid fa-trash text-xs"></i>
-                        </button>
-                        <div class="h-32 w-full overflow-hidden rounded-lg mb-3 bg-gray-100">
-                            <img src="${p.imageUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        </div>
-                        <h4 class="font-bold text-sm truncate">${p.name}</h4>
-                        <div class="flex justify-between text-xs text-gray-500 mt-1">
-                            <span class="bg-gray-100 px-2 py-0.5 rounded">${p.category}</span>
-                            <span class="font-bold text-black">₹${p.rentPerDay}/day</span>
-                        </div>
+                    <div class="card group relative border-none bg-gray-50 shadow-none ${stock <= 0 ? 'opacity-50 grayscale' : ''}">
+                        <button onclick="window.deleteProduct('${d.id}')" class="absolute top-4 left-4 w-8 h-8 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition z-10 text-red-500"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        <div class="h-40 overflow-hidden rounded-xl bg-gray-200 mb-4"><img src="${p.imageUrl}" class="w-full h-full object-cover"></div>
+                        <div class="flex justify-between items-start mb-1"><h4 class="font-black text-xs uppercase truncate text-black">${p.name}</h4><span class="text-[9px] font-black px-2 py-0.5 rounded-full ${stock > 0 ? 'bg-black text-white' : 'bg-red-500 text-white'}">${stock > 0 ? stock + ' IN STOCK' : 'OUT'}</span></div>
+                        <div class="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-tighter"><span>₹${p.rentPerDay}/Day</span><span>Dep: ₹${p.securityDeposit || 0}</span></div>
                     </div>`;
             });
         });
     }
 
+    // Helper function for creating Message UI
+    function createMsgUI(title, body, color) {
+        const colors = { blue: "bg-blue-100 text-blue-600", green: "bg-green-100 text-green-600", orange: "bg-orange-100 text-orange-600" };
+        return `
+            <div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition border-b border-gray-100">
+                <div class="w-10 h-10 rounded-full ${colors[color] || colors.blue} flex items-center justify-center font-bold">!</div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-sm text-black uppercase">${title}</h4>
+                    <p class="text-xs text-gray-500">${body}</p>
+                </div>
+            </div>`;
+    }
+
     window.handleRequest = async (id, status) => {
-        if(!confirm(`Are you sure you want to mark this as ${status}?`)) return;
-        try {
-            await updateDoc(doc(db, "booking_requests", id), { status: status });
-            alert("Request status updated!");
-        } catch (e) { alert(e.message); }
+        if(!confirm(`Confirm Action?`)) return;
+        const ref = doc(db, "booking_requests", id);
+        if(status === 'approved') {
+            const reqSnap = await getDoc(ref);
+            const pRef = doc(db, "products", reqSnap.data().productId);
+            const pSnap = await getDoc(pRef);
+            if((pSnap.data().stock || 0) <= 0) return alert("ITEM OUT OF STOCK");
+            await updateDoc(pRef, { stock: pSnap.data().stock - 1 });
+        }
+        await updateDoc(ref, { status: status });
     };
 
-    const compressImage = (file) => new Promise((resolve) => {
-        const reader = new FileReader(); reader.readAsDataURL(file);
-        reader.onload = (e) => {
-            const img = new Image(); img.src = e.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const scale = 500/img.width; canvas.width=500; canvas.height=img.height*scale;
-                canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.6));
-            }
-        }
-    });
-
-    window.previewImage = (input, imgId) => {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = document.getElementById(imgId);
-                img.src = e.target.result;
-                img.classList.remove('hidden');
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    };
+    const inpFile = document.getElementById('inp-file');
+    inpFile.onchange = () => { if(inpFile.files[0]) { const r = new FileReader(); r.onload=e=>{const preview = document.getElementById('upload-preview'); preview.src=e.target.result; preview.classList.remove('hidden'); document.getElementById('upload-placeholder').classList.add('hidden');}; r.readAsDataURL(inpFile.files[0]); } };
 
     document.getElementById('form-add').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btn-publish');
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Publishing...'; 
-        btn.disabled = true;
+        e.preventDefault(); const btn = document.getElementById('btn-publish'); btn.disabled = true;
         try {
-            const file = document.getElementById('inp-file').files[0];
-            let base64 = "https://placehold.co/400"; 
-            if(file) base64 = await compressImage(file);
+            const base64 = inpFile.files[0] ? await compressImage(inpFile.files[0]) : "https://placehold.co/400";
             await addDoc(collection(db, "products"), {
-                partnerId: currentUser.uid, 
-                name: document.getElementById('inp-name').value, 
+                partnerId: currentUser.uid, name: document.getElementById('inp-name').value, 
                 rentPerDay: Number(document.getElementById('inp-price').value),
-                category: document.getElementById('inp-category').value, 
-                description: document.getElementById('inp-desc').value, 
-                imageUrl: base64, 
-                status: "published", 
-                createdAt: serverTimestamp()
+                securityDeposit: Number(document.getElementById('inp-security').value),
+                stock: Number(document.getElementById('inp-stock').value),
+                category: document.getElementById('inp-category').value, imageUrl: base64, status: "published", createdAt: serverTimestamp()
             });
-            document.getElementById('form-add').reset();
-            window.closeAddModal();
-            window.open(`store.html?id=${currentUser.uid}`, '_blank');
-        } catch(e) { alert("Error: " + e.message); } 
-        finally { btn.innerHTML = "Publish"; btn.disabled = false; }
+            closeAddModal(); document.getElementById('form-add').reset(); document.getElementById('upload-preview').classList.add('hidden'); document.getElementById('upload-placeholder').classList.remove('hidden');
+        } catch(err) { alert(err.message); } finally { btn.disabled = false; }
     });
 
-    document.getElementById('form-store-settings').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btn-save-store'); 
-        btn.innerHTML='Saving...'; 
-        btn.disabled=true;
-        try {
-            const updates = {};
-            const logo = document.getElementById('inp-logo').files[0];
-            const cover = document.getElementById('inp-cover').files[0];
-            if(logo) updates.storeLogo = await compressImage(logo);
-            if(cover) updates.storeCover = await compressImage(cover);
-            if(Object.keys(updates).length > 0) {
-                await updateDoc(doc(db, "partners", currentUser.uid), updates);
-                alert("Store Customization Saved!");
-            } else { alert("No new images selected."); }
-        } catch(e) { alert(e.message); } 
-        finally { btn.innerHTML='Save Changes'; btn.disabled=false; }
-    });
-
-    window.deleteProduct = async (id) => { if(confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); };
-    
     window.resetData = async () => {
-        if(!confirm("Reset ALL Products & Orders? This cannot be undone.")) return;
-        const qP = query(collection(db,"products"), where("partnerId","==",currentUser.uid));
-        const qB = query(collection(db,"bookings"), where("partnerId","==",currentUser.uid));
-        const snapP = await getDocs(qP); snapP.forEach(d => deleteDoc(d.ref));
-        const snapB = await getDocs(qB); snapB.forEach(d => deleteDoc(d.ref));
-        alert("Reset Complete."); location.reload();
+        if(!confirm("WIPE DASHBOARD?")) return;
+        const cols = ["products", "booking_requests"];
+        for(const c of cols) {
+            const snap = await getDocs(query(collection(db, c), where("partnerId", "==", currentUser.uid)));
+            await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+        }
+        location.reload();
     };
 
-    document.getElementById('form-verify').addEventListener('submit', async (e) => {
-        e.preventDefault(); const btn = document.getElementById('btn-submit-app'); btn.innerHTML='...'; btn.disabled=true;
-        try {
-            const file = document.getElementById('v-file-doc').files[0]; const base64 = await compressImage(file);
-            await setDoc(doc(db, "partners", currentUser.uid), {
-                businessName: document.getElementById('v-biz-name').value, businessAddress: document.getElementById('v-biz-addr').value, verificationDoc: base64,
-                verificationStatus: 'submitted', email: currentUser.email, submittedAt: serverTimestamp()
-            }, { merge: true });
-            location.reload();
-        } catch(e) { alert(e.message); btn.disabled=false; }
-    });
-
+    window.switchTab = (t) => { document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active'); ['overview','products','messages','orders','customers','store','subscriptions','rent-requests'].forEach(id=>document.getElementById(`tab-${id}`)?.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden'); };
+    function highlightCurrentPlan(p) { document.querySelectorAll('.sub-card').forEach(el=>el.classList.remove('active-plan')); const activeCard = document.getElementById(`plan-card-${p}`); if(activeCard) { activeCard.classList.add('active-plan'); const btn = activeCard.querySelector('button'); if(btn) { btn.innerText = "Current Plan"; btn.disabled = true; btn.className = "w-full py-3 bg-blue-600/20 text-blue-400 border border-blue-600/50 rounded-lg font-bold cursor-default"; } } }
+    window.upgradePlan = async (p) => { if(confirm(`Switch to ${p}?`)) { await updateDoc(doc(db, "partners", currentUser.uid), { plan: p }); location.reload(); } };
     window.openAddModal = () => document.getElementById('modal-add').classList.remove('hidden');
     window.closeAddModal = () => document.getElementById('modal-add').classList.add('hidden');
-    window.logout = () => signOut(auth).then(() => window.location.href = "loginpage.html");
+    window.deleteProduct = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "products", id)); };
+    window.logout = () => signOut(auth).then(()=>window.location.href="loginpage.html");
+    window.visitMyStore = () => { if(currentUser) window.open(`store.html?id=${currentUser.uid}`, '_blank'); };
+    function previewImage(input, imgId) { if (input.files && input.files[0]) { const r = new FileReader(); r.onload=e=>{const img=document.getElementById(imgId); img.src=e.target.result; img.classList.remove('hidden');}; r.readAsDataURL(input.files[0]); } }
+    const compressImage = (f) => new Promise((resolve) => { const r = new FileReader(); r.readAsDataURL(f); r.onload = (e) => { const i = new Image(); i.src = e.target.result; i.onload = () => { const c = document.createElement('canvas'); c.width=500; c.height=500; c.getContext('2d').drawImage(i,0,0,500,500); resolve(c.toDataURL('image/jpeg', 0.6)); } } });
+    function updateChart(e){ const ctx = document.getElementById('salesChart'); if(!ctx) return; if(salesChartInstance) salesChartInstance.destroy(); salesChartInstance = new Chart(ctx, { type:'line', data:{ labels:['W1','W2','W3','Today'], datasets:[{label:'Revenue', data:[0,e*0.3,e*0.6,e], borderColor:'#000', backgroundColor:'rgba(0,0,0,0.05)', fill:true, tension:0.4}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} } }); }
 </script>
 </body>
 </html>
