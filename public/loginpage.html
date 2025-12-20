@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rentify – Login</title>
-
+ 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -127,7 +127,7 @@
              <span class="font-bold text-xl tracking-tight text-slate-900">Rentify.</span>
         </div>
         <h1 id="welcome-heading" class="font-display text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">
-           Welcome to Rentify
+            Welcome to Rentify
         </h1>
       </div>
 
@@ -274,12 +274,18 @@
 
       <div id="partner-register-view" class="hidden">
         <div class="space-y-4 mb-6">
-          <input
-            id="partner-reg-email"
-            type="email"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="Email"
-          />
+          <div class="relative">
+            <input
+              id="partner-reg-email"
+              type="email"
+              class="w-full h-11 rounded-lg px-4 input-premium pr-10"
+              placeholder="Email"
+              oninput="validateField('partner-reg-email', 'email')"
+            />
+            <span id="partner-reg-email-icon" class="absolute right-3 top-3 hidden"></span>
+            <p id="partner-reg-email-msg" class="text-[10px] text-rose-500 mt-1 hidden"></p>
+          </div>
+
           <input
             id="partner-reg-password"
             type="password"
@@ -292,12 +298,19 @@
             class="w-full h-11 rounded-lg px-4 input-premium"
             placeholder="Full Name"
           />
-          <input
-            id="partner-reg-phone"
-            type="tel"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="Phone"
-          />
+
+          <div class="relative">
+            <input
+              id="partner-reg-phone"
+              type="tel"
+              class="w-full h-11 rounded-lg px-4 input-premium pr-10"
+              placeholder="Phone (10 digits)"
+              oninput="validateField('partner-reg-phone', 'phone')"
+            />
+            <span id="partner-reg-phone-icon" class="absolute right-3 top-3 hidden"></span>
+            <p id="partner-reg-phone-msg" class="text-[10px] text-rose-500 mt-1 hidden"></p>
+          </div>
+
           <input
             id="partner-reg-address1"
             type="text"
@@ -426,12 +439,18 @@
 
       <div id="customer-register-view" class="hidden">
         <div class="space-y-4 mb-6">
-          <input
-            id="customer-reg-email"
-            type="email"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="Email"
-          />
+          <div class="relative">
+            <input
+              id="customer-reg-email"
+              type="email"
+              class="w-full h-11 rounded-lg px-4 input-premium pr-10"
+              placeholder="Email"
+              oninput="validateField('customer-reg-email', 'email')"
+            />
+            <span id="customer-reg-email-icon" class="absolute right-3 top-3 hidden"></span>
+            <p id="customer-reg-email-msg" class="text-[10px] text-rose-500 mt-1 hidden"></p>
+          </div>
+
           <input
             id="customer-reg-password"
             type="password"
@@ -444,14 +463,19 @@
             class="w-full h-11 rounded-lg px-4 input-premium"
             placeholder="Full Name"
           />
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+          <div class="relative">
             <input
               id="customer-reg-phone"
               type="tel"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="Phone"
+              class="w-full h-11 rounded-lg px-4 input-premium pr-10"
+              placeholder="Phone (10 digits)"
+              oninput="validateField('customer-reg-phone', 'phone')"
             />
+            <span id="customer-reg-phone-icon" class="absolute right-3 top-3 hidden"></span>
+            <p id="customer-reg-phone-msg" class="text-[10px] text-rose-500 mt-1 hidden"></p>
           </div>
+
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
             <input
               id="customer-reg-country"
@@ -492,12 +516,61 @@
           A verification email will be sent to your address.
         </p>
       </div>
+<div class="mt-4 mb-2 text-center">
+  <p class="text-[10px] text-slate-400">
+    By registering, you agree to our 
+    <a href="privacy.html" class="text-slate-900 font-bold underline decoration-emerald-500">Privacy Policy</a>.
+  </p>
+</div>
+</div>
     </section>
   </main>
 
   <script type="module" src="firebase-config.js"></script>
 
   <script>
+    // --- REAL-TIME VALIDATION LOGIC ---
+    window.validateField = (id, type) => {
+        const input = document.getElementById(id);
+        const icon = document.getElementById(id + '-icon');
+        const msg = document.getElementById(id + '-msg');
+        if (!input || !icon || !msg) return false;
+
+        const val = input.value.trim();
+        let isValid = false;
+        let errorMessage = "";
+
+        if (type === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            isValid = emailRegex.test(val);
+            errorMessage = "Please enter a valid email address.";
+        } else if (type === 'phone') {
+            const phoneRegex = /^[6-9]\d{9}$/; 
+            isValid = phoneRegex.test(val);
+            errorMessage = "Enter a valid 10-digit number.";
+        }
+
+        if (val === "") {
+            icon.classList.add('hidden');
+            msg.classList.add('hidden');
+            input.classList.remove('border-emerald-500', 'border-rose-500');
+        } else if (isValid) {
+            icon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
+            icon.classList.remove('hidden');
+            msg.classList.add('hidden');
+            input.classList.add('border-emerald-500');
+            input.classList.remove('border-rose-500', 'border-transparent');
+        } else {
+            icon.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-500"></i>';
+            icon.classList.remove('hidden');
+            msg.innerText = errorMessage;
+            msg.classList.remove('hidden');
+            input.classList.add('border-rose-500');
+            input.classList.remove('border-emerald-500', 'border-transparent');
+        }
+        return isValid;
+    };
+
     const CUSTOMER_PRODUCTS_URL = 'products.html';
     const PARTNER_DASHBOARD_URL = 'partner-dashboard.html';
 
@@ -518,7 +591,6 @@
     }
 
     // --- HELPER: VALIDATE PASSWORD ---
-    // >5 chars, contains @, contains Number, contains Capital Letter
     function validatePassword(password) {
         if(password.length <= 5) return false;
         if(!/[A-Z]/.test(password)) return false;
@@ -566,7 +638,7 @@
 
       // 2. FORGOT PASSWORD FUNCTION
       window.forgotPassword = async (inputId) => {
-          const email = document.getElementById(inputId).value;
+          const email = document.getElementById(inputId).value.trim();
           if(!email) { showToast("Please enter your email first to reset.", "error"); return; }
           try {
               await sendPasswordResetEmail(auth, email);
@@ -628,11 +700,9 @@
 
         try {
           const cred = await signInWithEmailAndPassword(auth, email, password);
-          setWelcomeName(email);
-          backToRoleView(); 
-
           if (!cred.user.emailVerified) { await signOut(auth); return showToast('Email not verified.', 'error'); }
           
+          setWelcomeName(email);
           showToast(`Welcome back, ${email.split('@')[0]}!`, 'success');
           setTimeout(() => window.location.href = redirectUrl, 1500);
         } catch (err) { console.error(err); showToast(err.message, 'error'); }
@@ -643,19 +713,28 @@
         const email = document.getElementById(emailId).value.trim();
         const password = document.getElementById(passId).value.trim();
         const name = document.getElementById(nameId).value.trim();
+        const phoneId = collectionName === 'partners' ? 'partner-reg-phone' : 'customer-reg-phone';
+        const phone = document.getElementById(phoneId).value.trim();
+
+        // BLOCK SUBMISSION IF FIELDS ARE INVALID
+        if (!window.validateField(emailId, 'email') || !window.validateField(phoneId, 'phone')) {
+            showToast("Please enter a valid email and phone number", "error");
+            return;
+        }
 
         if (!email || !password || !name) return showToast('All fields required', 'error');
-        
-        // VALIDATE PASSWORD COMPLEXITY
-        if (!validatePassword(password)) {
-            return showToast('Password must be >5 chars, include @, Num, Capital letter', 'error');
-        }
+        if (!validatePassword(password)) return showToast('Password Complexity Error', 'error');
 
         try {
           const cred = await createUserWithEmailAndPassword(auth, email, password);
           await helpers.sendEmailVerification(cred.user);
           
-          await setDoc(doc(db, collectionName, cred.user.uid), { email, fullname: name, createdAt: serverTimestamp() }, { merge: true });
+          await setDoc(doc(db, collectionName, cred.user.uid), { 
+              email, 
+              fullname: name, 
+              phone: phone, 
+              createdAt: serverTimestamp() 
+          }, { merge: true });
 
           await signOut(auth);
           showToast('Account created! Verify email sent.', 'success');
@@ -671,9 +750,7 @@
         try {
           const result = await signInWithPopup(auth, googleProvider);
           const user = result.user;
-          // Set welcome name immediately
           setWelcomeName(user.email);
-          backToRoleView();
 
           await setDoc(doc(db, collectionName, user.uid), {
             email: user.email,
@@ -698,7 +775,6 @@
       document.getElementById('btn-partner-register').onclick = () => handleRegister('partner-reg-email', 'partner-reg-password', 'partner-reg-name', 'partners');
       document.getElementById('btn-customer-register').onclick = () => handleRegister('customer-reg-email', 'customer-reg-password', 'customer-reg-name', 'customers');
 
-      // GOOGLE BUTTONS FIXED
       document.getElementById('btn-partner-google').onclick = () => handleGoogleLogin('partners', PARTNER_DASHBOARD_URL);
       document.getElementById('btn-customer-google').onclick = () => handleGoogleLogin('customers', CUSTOMER_PRODUCTS_URL);
 
@@ -707,173 +783,5 @@
       setCustomerTab('login');
     });
   </script>
-  <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-  const auth = window.firebaseAuth;
-  const helpers = window.firebaseHelpers;
-
-  if (!auth || !helpers) {
-    console.error("Firebase not ready");
-    return;
-  }
-
-  // ------------------ TOAST ------------------
-  function showToast(msg, type="info") {
-    alert(msg); // replace with your toast if needed
-  }
-
-  // ------------------ FORGOT PASSWORD ------------------
-  window.forgotPassword = async (inputId) => {
-    const email = document.getElementById(inputId).value.trim();
-
-    if (!email) {
-      showToast("Enter your email first", "error");
-      return;
-    }
-
-    try {
-      await helpers.sendPasswordResetEmail(auth, email);
-      showToast("Password reset link sent", "success");
-    } catch (e) {
-      showToast(e.message, "error");
-    }
-  };
-
-  // ------------------ LOGIN ------------------
-  async function handleLogin(emailId, passId, redirect) {
-    const email = document.getElementById(emailId).value.trim();
-    const pass = document.getElementById(passId).value.trim();
-
-    if (!email || !pass) {
-      showToast("Email & password required", "error");
-      return;
-    }
-
-    try {
-      const cred = await helpers.signInWithEmailAndPassword(auth, email, pass);
-
-      if (!cred.user.emailVerified) {
-        await helpers.signOut(auth);
-        showToast("Verify your email first", "error");
-        return;
-      }
-
-      showToast("Login successful", "success");
-      setTimeout(() => location.href = redirect, 1200);
-    } catch (e) {
-      showToast(e.message, "error");
-    }
-  }
-
-  // ------------------ REGISTER ------------------
-  async function handleRegister(emailId, passId, nameId, collection) {
-    const email = document.getElementById(emailId).value.trim();
-    const pass = document.getElementById(passId).value.trim();
-    const name = document.getElementById(nameId).value.trim();
-
-    if (!email || !pass || !name) {
-      showToast("All fields required", "error");
-      return;
-    }
-
-    try {
-      const cred = await helpers.createUserWithEmailAndPassword(auth, email, pass);
-      await helpers.sendEmailVerification(cred.user);
-
-      await helpers.setDoc(
-        helpers.doc(window.firebaseDb, collection, cred.user.uid),
-        { email, name, createdAt: helpers.serverTimestamp() },
-        { merge: true }
-      );
-
-      await helpers.signOut(auth);
-      showToast("Account created. Verify email.", "success");
-    } catch (e) {
-      showToast(e.message, "error");
-    }
-  }
-
-  // ------------------ GOOGLE LOGIN ------------------
-  async function googleLogin(collection, redirect) {
-    try {
-      const res = await helpers.signInWithPopup(auth, helpers.googleProvider);
-
-      await helpers.setDoc(
-        helpers.doc(window.firebaseDb, collection, res.user.uid),
-        {
-          email: res.user.email,
-          provider: "google",
-          lastLogin: helpers.serverTimestamp()
-        },
-        { merge: true }
-      );
-
-      showToast("Google login successful", "success");
-      setTimeout(() => location.href = redirect, 1200);
-    } catch (e) {
-      showToast(e.message, "error");
-    }
-  }
-
-  // Expose for buttons
-  window.loginCustomer = () =>
-    handleLogin("customer-login-email", "customer-login-password", "products.html");
-
-  window.loginPartner = () =>
-    handleLogin("partner-login-email", "partner-login-password", "partner-dashboard.html");
-
-  window.registerCustomer = () =>
-    handleRegister("customer-reg-email", "customer-reg-password", "customer-reg-name", "customers");
-
-  window.registerPartner = () =>
-    handleRegister("partner-reg-email", "partner-reg-password", "partner-reg-name", "partners");
-
-  window.googleCustomer = () =>
-    googleLogin("customers", "products.html");
-
-  window.googlePartner = () =>
-    googleLogin("partners", "partner-dashboard.html");
-
-});
-</script>
-<script type="module">
-import { auth } from "./firebase-config.js";
-import {
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-
-// ---------------- FORGOT PASSWORD ----------------
-window.forgotPassword = async (inputId) => {
-  const email = document.getElementById(inputId).value.trim();
-
-  if (!email) {
-    alert("Enter email first");
-    return;
-  }
-
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("Password reset link sent");
-  } catch (e) {
-    alert(e.message);
-  }
-};
-
-// ---------------- LOGIN (EXAMPLE) ----------------
-window.loginUser = async (emailId, passId, redirect) => {
-  const email = document.getElementById(emailId).value.trim();
-  const pass = document.getElementById(passId).value.trim();
-
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    location.href = redirect;
-  } catch (e) {
-    alert(e.message);
-  }
-};
-</script>
-
 </body>
 </html>
