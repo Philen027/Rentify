@@ -30,6 +30,7 @@
     .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
     .nav-link:hover { color: white; background-color: rgba(255,255,255,0.05); }
     .nav-link.active { color: white; background-color: rgba(255,255,255,0.05); border-left-color: #3b82f6; }
+    .nav-link.locked { opacity: 0.4; cursor: not-allowed; }
     .nav-section { text-transform: uppercase; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; padding: 1.5rem 1.5rem 0.5rem; opacity: 0.5; }
     .badge { background-color: #ef4444; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; margin-left: auto; }
 
@@ -115,6 +116,7 @@
 
           <div class="flex flex-col gap-1">
               <div class="nav-section">Management</div>
+              <div onclick="switchTab('staff')" id="nav-staff" class="nav-link"><i class="fa-solid fa-user-gear w-5 text-center"></i> Staff Members</div>
               <div onclick="switchTab('messages')" id="nav-messages" class="nav-link"><i class="fa-solid fa-envelope w-5 text-center"></i> Messages <span id="badge-msg" class="badge">0</span></div>
               <div onclick="switchTab('orders')" id="nav-orders" class="nav-link"><i class="fa-solid fa-receipt w-5 text-center"></i> Orders <span id="badge-orders" class="badge">0</span></div>
               <div onclick="switchTab('customers')" id="nav-customers" class="nav-link"><i class="fa-solid fa-users w-5 text-center"></i> Customers</div>
@@ -132,7 +134,7 @@
               <div class="flex items-center bg-white p-1 rounded-xl shadow-sm border border-gray-200">
                   <button onclick="visitMyStore()" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"><i class="fa-solid fa-external-link-alt"></i> Visit My Store</button>
                   <div class="w-px h-6 bg-gray-200 mx-1"></div>
-                  <button onclick="openAddModal()" class="flex items-center gap-2 px-5 py-2 bg-black text-white rounded-lg text-sm font-bold shadow-md hover:bg-gray-800 transition">+ Add Item</button>
+                  <button id="btn-open-add" onclick="openAddModal()" class="flex items-center gap-2 px-5 py-2 bg-black text-white rounded-lg text-sm font-bold shadow-md hover:bg-gray-800 transition">+ Add Item</button>
               </div>
           </div>
 
@@ -143,6 +145,19 @@
                   <div class="card"><p class="text-gray-500 text-sm">Total Orders</p><h2 class="text-3xl font-bold mt-1" id="val-orders">0</h2></div>
               </div>
               <div class="card h-64"><canvas id="salesChart"></canvas></div>
+          </div>
+
+          <div id="tab-staff" class="hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold">Staff Members</h2>
+                <button onclick="document.getElementById('modal-add-staff').classList.remove('hidden')" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-blue-700 transition">+ Add Staff Member</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="staff-list-body"></tbody>
+                </table>
+            </div>
           </div>
 
           <div id="tab-rent-requests" class="hidden">
@@ -161,32 +176,120 @@
           </div>
 
           <div id="tab-store" class="hidden">
-              <h2 class="text-xl font-bold mb-6">Store Customization</h2>
-              <div class="card">
-                  <form id="form-store-settings">
-                      <div class="relative w-full h-48 bg-slate-100 rounded-xl overflow-hidden border-2 border-dashed border-slate-300 group cursor-pointer" onclick="document.getElementById('inp-cover').click()">
-                          <img id="preview-cover" src="" class="w-full h-full object-cover hidden">
-                          <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400"><i class="fa-regular fa-image text-3xl mb-2"></i><span class="text-sm font-medium">Upload Cover Photo</span></div>
-                          <input type="file" id="inp-cover" accept="image/*" class="hidden" onchange="previewImage(this, 'preview-cover')">
-                      </div>
-                      <div class="mt-6 flex justify-end"><button type="submit" id="btn-save-store" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold">Save Changes</button></div>
-                  </form>
-              </div>
-          </div>
+    <div class="flex justify-between items-end mb-6">
+        <div>
+            <h2 class="text-xl font-bold">Store Customization</h2>
+            <p class="text-sm text-gray-500">Customize how your store looks to customers.</p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="visitMyStore()" class="px-4 py-1 text-xs font-bold uppercase tracking-wider bg-white border border-gray-300 hover:bg-gray-50 rounded-full transition shadow-sm">
+                <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Visit Page
+            </button>
+            <span id="store-plan-badge" class="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-600 px-3 py-1 rounded-full flex items-center">
+                <i class="fa-solid fa-lock mr-1"></i> Requires Growth Plan
+            </span>
+        </div>
+    </div>
+
+    <div class="card p-0 overflow-hidden relative">
+        <form id="form-store-settings">
+            
+            <div class="relative w-full h-48 bg-slate-800 group cursor-pointer" onclick="document.getElementById('inp-cover-upload').click()">
+                <img id="preview-store-cover" src="" class="w-full h-full object-cover hidden opacity-80 group-hover:opacity-60 transition">
+                
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-white/50 group-hover:text-white transition pointer-events-none">
+                    <i class="fa-regular fa-image text-3xl mb-2"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest">Change Cover</span>
+                </div>
+                <input type="file" id="inp-cover-upload" accept="image/*" class="hidden" onchange="previewLocalImage(this, 'preview-store-cover')">
+            </div>
+
+            <div class="px-8 pb-8">
+                <div class="relative -mt-12 mb-6 inline-block">
+                    <div class="w-24 h-24 rounded-full border-4 border-white bg-slate-200 overflow-hidden cursor-pointer relative group" onclick="document.getElementById('inp-logo-upload').click()">
+                        <img id="preview-store-logo" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-xs">Edit</div>
+                    </div>
+                    <input type="file" id="inp-logo-upload" accept="image/*" class="hidden" onchange="previewLocalImage(this, 'preview-store-logo')">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Store Description / Bio</label>
+                        <textarea id="inp-store-desc" rows="3" placeholder="Tell customers about your business..." class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-blue-500 transition"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Theme Color</label>
+                        <div class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl bg-gray-50">
+                            <input type="color" id="inp-store-color" value="#000000" class="w-10 h-10 rounded cursor-pointer border-none bg-transparent">
+                            <span class="text-sm font-medium text-gray-600">Brand Color</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 md:col-span-2 mt-4">
+                        <div class="p-5 border border-dashed border-slate-300 rounded-xl bg-slate-50">
+                            <label class="flex justify-between items-center text-xs font-bold text-gray-500 uppercase mb-2">
+                                <span><i class="fa-brands fa-html5 text-orange-500 mr-1"></i> Advanced: Import Custom Design</span>
+                                <span class="text-[9px] bg-slate-200 px-2 py-0.5 rounded text-slate-500">Optional</span>
+                            </label>
+                            <textarea id="inp-store-html" rows="4" class="w-full p-3 border border-gray-200 rounded-lg bg-white font-mono text-xs text-slate-600 outline-none focus:border-blue-500 transition" placeholder="Paste your HTML/CSS code here to customize the store layout..."></textarea>
+                            <p class="text-[10px] text-gray-400 mt-2">Enter custom HTML/CSS here. This will be published to your live store page.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-end col-span-1 md:col-span-2 justify-end">
+                        <button type="submit" id="btn-save-store" class="w-full md:w-auto px-8 py-3 bg-black hover:bg-gray-800 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> Publish Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
           <div id="tab-subscriptions" class="hidden">
               <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" id="plans-container">
-                  <div class="sub-card" id="plan-card-starter"><div class="plan-badge">LEVEL 01</div><h3 class="text-3xl font-black mb-1 text-white">Starter</h3><p class="text-slate-400 text-sm min-h-[40px] mb-6">Entry-level plan for new businesses starting their rental journey.</p><button onclick="upgradePlan('starter')" class="w-full py-3 bg-white text-black rounded-lg font-bold mt-4">Select Starter</button></div>
-                  <div class="sub-card" id="plan-card-growth"><div class="plan-badge">LEVEL 02</div><h3 class="text-3xl font-black mb-1 text-white">Growth</h3><p class="text-slate-400 text-sm min-h-[40px] mb-6">For growing businesses needing more flexibility and reach.</p><button onclick="upgradePlan('growth')" class="w-full py-3 bg-white text-black rounded-lg font-bold mt-4">Select Growth</button></div>
-                  <div class="sub-card" id="plan-card-business"><div class="plan-badge">LEVEL 03</div><h3 class="text-3xl font-black mb-1 text-white">Business</h3><p class="text-slate-400 text-sm min-h-[40px] mb-6">Robust tools for established rental enterprises.</p><button onclick="upgradePlan('business')" class="w-full py-3 bg-white text-black rounded-lg font-bold mt-4">Select Business</button></div>
-                  <div class="sub-card" id="plan-card-enterprise"><div class="plan-badge">LEVEL 04</div><h3 class="text-3xl font-black mb-1 text-white">Enterprise</h3><p class="text-slate-400 text-sm min-h-[40px] mb-6">Full customization for large scale operations.</p><button onclick="upgradePlan('enterprise')" class="w-full py-3 bg-white text-black rounded-lg font-bold mt-4">Select Enterprise</button></div>
+                  <div class="sub-card flex flex-col justify-between" id="plan-card-starter">
+                      <div><div class="plan-badge">PLAN LEVEL 01</div><h3 class="text-3xl font-black mb-1 text-white">Starter</h3><p class="text-slate-400 text-sm mb-6">Entry-level plan for new businesses.</p>
+                      <div class="space-y-3 mb-8"><div class="flex items-center gap-3 text-sm text-slate-300"><i class="fa-solid fa-check text-emerald-500 text-xs"></i> 10 Products</div><div class="flex items-center gap-3 text-sm text-slate-300"><i class="fa-solid fa-check text-emerald-500 text-xs"></i> 1 Staff Seat (Owner)</div></div></div>
+                      <button onclick="upgradePlan('starter')" class="w-full py-3 bg-white text-black rounded-xl font-bold">Select Starter</button>
+                  </div>
+                  <div class="sub-card flex flex-col justify-between" id="plan-card-growth">
+                      <div><div class="plan-badge">PLAN LEVEL 02</div><h3 class="text-3xl font-black mb-1 text-white">Growth</h3><p class="text-slate-400 text-sm mb-6">Unlock Staff Management features.</p>
+                      <div class="space-y-3 mb-8"><div class="flex items-center gap-3 text-sm text-slate-300"><i class="fa-solid fa-check text-emerald-500 text-xs"></i> 50 Products</div><div class="flex items-center gap-3 text-sm text-slate-300"><i class="fa-solid fa-check text-emerald-500 text-xs"></i> 3 Staff Accounts</div></div></div>
+                      <button onclick="upgradePlan('growth')" class="w-full py-3 bg-white text-black rounded-xl font-bold">Select Growth</button>
+                  </div>
+                  <div class="sub-card flex flex-col justify-between" id="plan-card-business">
+                      <div><div class="plan-badge">PLAN LEVEL 03</div><h3 class="text-3xl font-black mb-1 text-white">Business</h3><p class="text-slate-400 text-sm mb-6">Robust tools for enterprises.</p>
+                      <div class="space-y-3 mb-8"><div class="flex items-center gap-3 text-sm text-slate-300"><i class="fa-solid fa-check text-emerald-500 text-xs"></i> 200 Products</div><div class="flex items-center gap-3 text-sm text-slate-300"><i class="fa-solid fa-check text-emerald-500 text-xs"></i> 10 Staff Seats</div></div></div>
+                      <button onclick="upgradePlan('business')" class="w-full py-3 bg-white text-black rounded-xl font-bold">Select Business</button>
+                  </div>
+                  <div class="sub-card flex flex-col justify-between" id="plan-card-enterprise">
+                      <div><div class="plan-badge">PLAN LEVEL 04</div><h3 class="text-3xl font-black mb-1 text-white">Enterprise</h3><p class="text-slate-400 text-sm mb-6">Full customization for large scale operations.</p>
+                      <div class="space-y-3 mb-8"><div class="flex items-center gap-3 text-sm text-slate-300"><i class="fa-solid fa-check text-emerald-500 text-xs"></i> Unlimited Products</div><div class="flex items-center gap-3 text-sm text-slate-300"><i class="fa-solid fa-check text-emerald-500 text-xs"></i> Unlimited Staff</div></div></div>
+                      <button onclick="upgradePlan('enterprise')" class="w-full py-3 bg-white text-black rounded-xl font-bold">Select Enterprise</button>
+                  </div>
               </div>
           </div>
 
-          <div id="tab-messages" class="hidden"><h2 class="text-xl font-bold mb-6 text-black">Booking & Rental Notifications</h2><div class="card p-0 overflow-hidden"><div id="messages-list" class="divide-y divide-gray-100"></div></div></div>
+          <div id="tab-messages" class="hidden"><h2 class="text-xl font-bold mb-6 text-black">Booking Notifications</h2><div class="card p-0 overflow-hidden"><div id="messages-list" class="divide-y divide-gray-100"></div></div></div>
           <div id="tab-orders" class="hidden"><h2 class="text-xl font-bold mb-6">Orders</h2><div class="table-container"><table><thead><tr><th>Order ID</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead><tbody id="orders-table-body"></tbody></table></div></div>
           <div id="tab-customers" class="hidden"><h2 class="text-xl font-bold mb-6">Customers</h2><div class="table-container"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Spent</th></tr></thead><tbody id="customers-table-body"></tbody></table></div></div>
       </div>
+  </div>
+
+  <div id="modal-add-staff" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6">
+        <h3 class="font-bold text-xl mb-4">Invite Staff Member</h3>
+        <form id="form-add-staff" class="space-y-4">
+            <input type="text" id="staff-name" required placeholder="Staff Full Name" class="w-full p-3 border rounded-xl bg-slate-50 outline-none">
+            <input type="email" id="staff-email" required placeholder="Staff Email Address" class="w-full p-3 border rounded-xl bg-slate-50 outline-none">
+            <button type="submit" class="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg transition">Send Invitation</button>
+        </form>
+        <button onclick="document.getElementById('modal-add-staff').classList.add('hidden')" class="w-full mt-2 text-sm text-gray-400">Cancel</button>
+    </div>
   </div>
 
   <div id="modal-add" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
@@ -209,12 +312,6 @@
             <button type="submit" id="btn-publish" class="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-700 transition">Publish Item</button>
         </form>
     </div>
-    <div class="mt-4 mb-2 text-center">
-  <p class="text-[10px] text-slate-400">
-    By registering, you agree to our 
-    <a href="privacy.html" class="text-slate-900 font-bold underline decoration-emerald-500">Privacy Policy</a>.
-  </p>
-</div>
   </div>
 
 <script type="module">
@@ -224,7 +321,31 @@
 
     const firebaseConfig = { apiKey: "AIzaSyDZHr-xXgx3tLnsUfF2RPxppZjE6cvirNY", authDomain: "rentify-93c05.firebaseapp.com", projectId: "rentify-93c05", storageBucket: "rentify-93c05.firebasestorage.app", messagingSenderId: "652243130812", appId: "1:652243130812:web:628fd64b4a69628eae73b9" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
-    let currentUser = null; let salesChartInstance = null;
+    
+    let currentUser = null; 
+    let salesChartInstance = null;
+    let currentProductCount = 0;
+    let currentStaffCount = 0;
+    let userPlan = 'starter'; 
+
+    const PLAN_CONFIG = {
+        'starter': { maxProducts: 10, maxStaff: 1, analytics: 'basic', storeCustom: false, staffEnabled: false },
+        'growth': { maxProducts: 50, maxStaff: 3, analytics: 'priority', storeCustom: true, staffEnabled: true },
+        'business': { maxProducts: 200, maxStaff: 10, analytics: 'full', storeCustom: true, staffEnabled: true },
+        'enterprise': { maxProducts: 99999, maxStaff: 999, analytics: 'full', storeCustom: true, staffEnabled: true }
+    };
+    // Helper to preview images before uploading
+    window.previewLocalImage = (input, imgId) => {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(imgId);
+                img.src = e.target.result;
+                img.classList.remove('hidden');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) return window.location.href = "loginpage.html";
@@ -232,12 +353,64 @@
         try {
             const snap = await getDoc(doc(db, "partners", currentUser.uid));
             document.getElementById('state-loading').style.display = 'none';
-            let status = snap.exists() ? (snap.data().verificationStatus || 'new') : 'new';
+            
+            const data = snap.data();
+            let status = snap.exists() ? (data.verificationStatus || 'new') : 'new';
+            userPlan = data.plan || 'starter';
+
             if (status === 'approved') {
                 document.getElementById('main-body').className = "h-screen overflow-hidden bg-gray-50"; 
                 document.getElementById('view-verification').classList.add('hidden-force');
                 document.getElementById('view-dashboard').classList.remove('hidden-force');
-                highlightCurrentPlan(snap.exists() ? snap.data().plan : 'starter'); startDashboard();
+                
+                // VALIDATION: Navigation Access
+                const navStore = document.getElementById('nav-store');
+                if (!PLAN_CONFIG[userPlan].storeCustom) {
+                    navStore.classList.add('locked');
+                    navStore.onclick = () => alert(`Upgrade to Level 02 (Growth) to unlock Store Customization.`);
+                } else {
+                    navStore.classList.remove('locked');
+                    navStore.onclick = () => switchTab('store');
+                }
+
+                const navStaff = document.getElementById('nav-staff');
+                if (!PLAN_CONFIG[userPlan].staffEnabled) {
+                    navStaff.classList.add('locked');
+                    navStaff.onclick = () => alert(`Upgrade to Level 02 (Growth) to unlock Staff Management.`);
+                } else {
+                    navStaff.classList.remove('locked');
+                    navStaff.onclick = () => switchTab('staff');
+                }
+
+                // LOAD STORE SETTINGS
+                if (data.storeSettings) {
+                    if(data.storeSettings.cover) {
+                        document.getElementById('preview-store-cover').src = data.storeSettings.cover;
+                        document.getElementById('preview-store-cover').classList.remove('hidden');
+                    }
+                    if(data.storeSettings.logo) document.getElementById('preview-store-logo').src = data.storeSettings.logo;
+                    if(data.storeSettings.desc) document.getElementById('inp-store-desc').value = data.storeSettings.desc;
+                    if(data.storeSettings.color) document.getElementById('inp-store-color').value = data.storeSettings.color;
+                    // NEW: Load HTML
+                    if(data.storeSettings.customHtml) document.getElementById('inp-store-html').value = data.storeSettings.customHtml;
+                }
+
+                // Update Badge UI based on Plan
+                const storeBadge = document.getElementById('store-plan-badge');
+                if(PLAN_CONFIG[userPlan].storeCustom) {
+                    storeBadge.className = "text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-600 px-3 py-1 rounded-full flex items-center";
+                    storeBadge.innerHTML = `<i class="fa-solid fa-check mr-1"></i> Unlocked`;
+                    document.getElementById('btn-save-store').disabled = false;
+                    document.getElementById('btn-save-store').classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    storeBadge.className = "text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-600 px-3 py-1 rounded-full flex items-center";
+                    storeBadge.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Locked (Upgrade to Growth)`;
+                    document.getElementById('btn-save-store').disabled = true;
+                    document.getElementById('btn-save-store').classList.add('opacity-50', 'cursor-not-allowed');
+                }
+
+                highlightCurrentPlan(userPlan); 
+                startDashboard();
             } else if (status === 'submitted') {
                 document.getElementById('state-pending').classList.remove('hidden-force');
             } else {
@@ -247,7 +420,6 @@
     });
 
     function startDashboard() {
-        // UPDATED: COMBINED LOGIC FOR REQUESTS, ORDERS, AND MESSAGE NOTIFICATIONS
         onSnapshot(query(collection(db, "booking_requests"), where("partnerId", "==", currentUser.uid)), (snap) => {
             const listBody = document.getElementById('requests-list-body');
             const msgList = document.getElementById('messages-list');
@@ -270,46 +442,25 @@
                 const r = d.data();
                 const today = new Date().toISOString().split('T')[0];
 
-                // 1. Logic for "Rent Requests" Tab (Submitted only)
                 if (r.status === 'submitted') {
                     pendingCount++;
-                    listBody.innerHTML += `
-                        <tr class="hover:bg-slate-50 border-b">
-                            <td class="p-4 font-bold text-sm text-black">${r.customerName || "Customer"}<br><span class="text-[10px] text-emerald-600 font-bold">${r.customerPhone || 'N/A'}</span></td>
-                            <td class="p-4 text-sm font-medium uppercase text-black">${r.productName}</td>
-                            <td class="p-4">${r.customerAadhar ? `<img src="${r.customerAadhar}" class="h-8 w-12 object-cover rounded cursor-pointer" onclick="const w=window.open(); w.document.write('<img src=\\'${r.customerAadhar}\\' style=\\'width:100%\\'>');">` : 'N/A'}</td>
-                            <td class="p-4 text-xs font-bold text-gray-400">${r.startDate} to ${r.endDate}</td>
-                            <td class="p-4 font-black">₹${r.totalPrice}</td>
-                            <td class="p-4 flex gap-2 justify-center">
-                                <button onclick="handleRequest('${d.id}', 'approved')" class="bg-black text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Approve</button>
-                                <button onclick="handleRequest('${d.id}', 'rejected')" class="bg-red-500 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Reject</button>
-                            </td>
-                        </tr>`;
-                    
-                    // Add Message for New Request
+                    listBody.innerHTML += `<tr class="hover:bg-slate-50 border-b"><td class="p-4 font-bold text-sm text-black">${r.customerName || "Customer"}<br><span class="text-[10px] text-emerald-600 font-bold">${r.customerPhone || 'N/A'}</span></td><td class="p-4 text-sm font-medium uppercase text-black">${r.productName}</td><td class="p-4">${r.customerAadhar ? `<img src="${r.customerAadhar}" class="h-8 w-12 object-cover rounded cursor-pointer" onclick="const w=window.open(); w.document.write('<img src=\\'${r.customerAadhar}\\' style=\\'width:100%\\'>');">` : 'N/A'}</td><td class="p-4 text-xs font-bold text-gray-400">${r.startDate} to ${r.endDate}</td><td class="p-4 font-black">₹${r.totalPrice}</td><td class="p-4 flex gap-2 justify-center"><button onclick="handleRequest('${d.id}', 'approved')" class="bg-black text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Approve</button><button onclick="handleRequest('${d.id}', 'rejected')" class="bg-red-500 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase">Reject</button></td></tr>`;
                     msgList.innerHTML += createMsgUI("New Rental Request", `${r.customerName} wants to rent ${r.productName}`, "blue");
                 }
 
-                // 2. Logic for "Orders" and "Customers" (Approved only)
                 if (r.status === 'approved') {
                     approvedCount++;
                     revenue += parseFloat(r.totalPrice);
                     tbodyOrders.innerHTML += `<tr class="border-b"><td class="p-4 font-mono text-xs">#${d.id.substring(0,6)}</td><td class="p-4 font-bold text-xs uppercase">${r.productName}</td><td class="p-4 font-black text-black">₹${r.totalPrice}</td><td class="p-4 text-[10px] font-black text-blue-500 uppercase">Active</td></tr>`;
-                    
                     if(!custs[r.customerId]) custs[r.customerId] = { name: r.customerName, email: r.customerEmail, phone: r.customerPhone, total: 0 };
                     custs[r.customerId].total += parseFloat(r.totalPrice);
-
-                    // Add Message for Approved Order
                     msgList.innerHTML += createMsgUI("Order Confirmed", `Rental for ${r.productName} by ${r.customerName} is active.`, "green");
-
-                    // 3. Logic for "Last Date Reminder"
                     if (r.endDate === today) {
                         msgList.innerHTML += createMsgUI("Return Reminder", `TODAY is the last day for ${r.productName} (Customer: ${r.customerName}).`, "orange");
                     }
                 }
             });
 
-            // Update Badges and Stats
             badgeRequests.innerText = pendingCount;
             badgeRequests.classList.toggle('hidden', pendingCount === 0);
             msgBadge.innerText = snap.size;
@@ -319,93 +470,255 @@
             document.getElementById('val-customers').textContent = Object.keys(custs).length;
 
             Object.values(custs).forEach(c => {
-                tbodyCust.innerHTML += `<tr class="border-b"><td class="p-4 font-black uppercase text-xs text-black">${c.name}</td><td class="p-4 text-xs text-black">${c.email}</td><td class="p-4 font-bold text-xs text-black">${c.phone}</td><td class="p-4 font-black text-black">₹${c.total}</td></tr>`;
+                tbodyCust.innerHTML += `<tr class="border-b"><td class="p-4 font-black uppercase text-xs text-black">${c.name}</td><td class="p-4 text-xs text-black">${c.email}</td><td class="p-4 font-bold text-xs text-black">${c.phone}</td><td class="p-4 font-black text-black">₹${c.total}</td></tr>`
             });
-
             updateChart(revenue);
         });
 
-        // INVENTORY LISTENER
         onSnapshot(query(collection(db, "products"), where("partnerId", "==", currentUser.uid)), (snap) => {
+            currentProductCount = snap.size;
             const grid = document.getElementById('products-grid'); grid.innerHTML = "";
+            const addBtn = document.getElementById('btn-open-add');
+            const limit = PLAN_CONFIG[userPlan].maxProducts;
+            if (currentProductCount >= limit) {
+                addBtn.innerHTML = `<i class="fa-solid fa-lock text-xs"></i> Limit Reached`;
+                addBtn.classList.replace('bg-black', 'bg-gray-400');
+            } else {
+                addBtn.innerHTML = `+ Add Item`;
+                addBtn.classList.replace('bg-gray-400', 'bg-black');
+            }
             snap.forEach(d => {
                 const p = d.data(); const stock = p.stock || 0;
-                grid.innerHTML += `
-                    <div class="card group relative border-none bg-gray-50 shadow-none ${stock <= 0 ? 'opacity-50 grayscale' : ''}">
-                        <button onclick="window.deleteProduct('${d.id}')" class="absolute top-4 left-4 w-8 h-8 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition z-10 text-red-500"><i class="fa-solid fa-trash-can text-xs"></i></button>
-                        <div class="h-40 overflow-hidden rounded-xl bg-gray-200 mb-4"><img src="${p.imageUrl}" class="w-full h-full object-cover"></div>
-                        <div class="flex justify-between items-start mb-1"><h4 class="font-black text-xs uppercase truncate text-black">${p.name}</h4><span class="text-[9px] font-black px-2 py-0.5 rounded-full ${stock > 0 ? 'bg-black text-white' : 'bg-red-500 text-white'}">${stock > 0 ? stock + ' IN STOCK' : 'OUT'}</span></div>
-                        <div class="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-tighter"><span>₹${p.rentPerDay}/Day</span><span>Dep: ₹${p.securityDeposit || 0}</span></div>
-                    </div>`;
+                grid.innerHTML += `<div class="card group relative border-none bg-gray-50 shadow-none"><button onclick="window.deleteProduct('${d.id}')" class="absolute top-4 left-4 w-8 h-8 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition z-10 text-red-500"><i class="fa-solid fa-trash-can text-xs"></i></button><div class="h-40 overflow-hidden rounded-xl bg-gray-200 mb-4"><img src="${p.imageUrl}" class="w-full h-full object-cover"></div><h4 class="font-black text-xs uppercase text-black truncate">${p.name}</h4><p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">₹${p.rentPerDay}/Day</p></div>`;
+            });
+        });
+
+        // Staff Invites Listener
+        onSnapshot(query(collection(db, "staff_invites"), where("businessOwnerId", "==", currentUser.uid)), (snap) => {
+            currentStaffCount = snap.size;
+            const body = document.getElementById('staff-list-body');
+            body.innerHTML = "";
+            snap.forEach(d => {
+                const s = d.data();
+                body.innerHTML += `<tr class="hover:bg-slate-50 border-b"><td class="p-4 font-bold text-sm text-black">${s.staffName}</td><td class="p-4 text-xs font-bold text-gray-400">${s.staffEmail}</td><td class="p-4"><span class="text-[10px] font-black uppercase text-orange-500">${s.status}</span></td><td class="p-4"><button onclick="deleteStaff('${d.id}')" class="text-red-500 hover:text-red-700 transition"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
             });
         });
     }
+// ==========================================
+    // 1. ENSURE THIS IMAGE UTILITY EXISTS
+    // ==========================================
+    const compressImage = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    // Resize to max 800px to save database space
+                    const scaleFactor = 800 / img.width;
+                    canvas.width = 800;
+                    canvas.height = img.height * scaleFactor;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7)); // Quality 0.7
+                };
+                img.onerror = (err) => reject(err);
+            };
+            reader.onerror = (err) => reject(err);
+        });
+    };
 
-    // Helper function for creating Message UI
+    // ==========================================
+    // 2. THE FIXED SAVE HANDLER
+    // ==========================================
+    document.getElementById('form-store-settings').onsubmit = async (e) => {
+        e.preventDefault();
+        console.log("Attempting to save...");
+
+        // Safety Check: Ensure User is Logged In
+        if (!currentUser) return alert("You are not logged in.");
+
+        // PLAN CHECK: If you want to test this without upgrading, 
+        // comment out the 3 lines below:
+        if (userPlan === 'starter') {
+             return alert("Upgrade to 'Growth' plan to publish changes.");
+        }
+
+        const btn = document.getElementById('btn-save-store');
+        const originalText = btn.innerHTML;
+        
+        try {
+            // Show Loading State
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...`;
+            btn.disabled = true;
+
+            // Prepare Data Object
+            const updates = {};
+            
+            // Get Text Values
+            const desc = document.getElementById('inp-store-desc').value;
+            const color = document.getElementById('inp-store-color').value;
+            // NEW: Get HTML
+            const customHtml = document.getElementById('inp-store-html').value;
+            
+            if(desc) updates["storeSettings.desc"] = desc;
+            if(color) updates["storeSettings.color"] = color;
+            if(customHtml !== undefined) updates["storeSettings.customHtml"] = customHtml;
+            
+            updates["updatedAt"] = serverTimestamp();
+
+            // Process Cover Image
+            const coverInput = document.getElementById('inp-cover-upload');
+            if (coverInput.files.length > 0) {
+                console.log("Processing cover image...");
+                const base64Cover = await compressImage(coverInput.files[0]);
+                updates["storeSettings.cover"] = base64Cover;
+            }
+
+            // Process Logo Image
+            const logoInput = document.getElementById('inp-logo-upload');
+            if (logoInput.files.length > 0) {
+                console.log("Processing logo image...");
+                const base64Logo = await compressImage(logoInput.files[0]);
+                updates["storeSettings.logo"] = base64Logo;
+            }
+
+            console.log("Sending to Firestore:", updates);
+
+            // SAVE TO FIREBASE
+            const userRef = doc(db, "partners", currentUser.uid);
+            await updateDoc(userRef, updates);
+
+            alert("✅ Store Published Successfully!");
+
+        } catch (error) {
+            console.error("Save failed:", error);
+            
+            // If the error is "No document to update", we need to set it first
+            if (error.code === 'not-found' || error.message.includes("No document")) {
+                 await setDoc(doc(db, "partners", currentUser.uid), { 
+                     storeSettings: { desc: "", color: "#000000" } 
+                 }, { merge: true });
+                 alert("Account initialized. Please click Save again.");
+            } else {
+                alert("Error saving: " + error.message);
+            }
+        } finally {
+            // Reset Button
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    };
+    // Handlers
+    document.getElementById('form-add-staff').onsubmit = async (e) => {
+        e.preventDefault();
+        const limit = PLAN_CONFIG[userPlan].maxStaff;
+        if (currentStaffCount + 1 >= limit) return alert(`Staff seat limit reached for your plan.`);
+        try {
+            await addDoc(collection(db, "staff_invites"), {
+                businessOwnerId: currentUser.uid,
+                staffName: document.getElementById('staff-name').value,
+                staffEmail: document.getElementById('staff-email').value,
+                status: 'pending',
+                createdAt: serverTimestamp()
+            });
+            document.getElementById('modal-add-staff').classList.add('hidden');
+            alert("Invitation logged for staff member.");
+        } catch (err) { alert(err.message); }
+    };
+
     function createMsgUI(title, body, color) {
         const colors = { blue: "bg-blue-100 text-blue-600", green: "bg-green-100 text-green-600", orange: "bg-orange-100 text-orange-600" };
-        return `
-            <div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition border-b border-gray-100">
-                <div class="w-10 h-10 rounded-full ${colors[color] || colors.blue} flex items-center justify-center font-bold">!</div>
-                <div class="flex-1">
-                    <h4 class="font-bold text-sm text-black uppercase">${title}</h4>
-                    <p class="text-xs text-gray-500">${body}</p>
-                </div>
-            </div>`;
+        return `<div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition border-b border-gray-100"><div class="w-10 h-10 rounded-full ${colors[color]} flex items-center justify-center font-bold">!</div><div class="flex-1"><h4 class="font-bold text-sm text-black uppercase">${title}</h4><p class="text-xs text-gray-500">${body}</p></div></div>`;
     }
 
-    window.handleRequest = async (id, status) => {
-        if(!confirm(`Confirm Action?`)) return;
-        const ref = doc(db, "booking_requests", id);
-        if(status === 'approved') {
-            const reqSnap = await getDoc(ref);
-            const pRef = doc(db, "products", reqSnap.data().productId);
-            const pSnap = await getDoc(pRef);
-            if((pSnap.data().stock || 0) <= 0) return alert("ITEM OUT OF STOCK");
-            await updateDoc(pRef, { stock: pSnap.data().stock - 1 });
-        }
-        await updateDoc(ref, { status: status });
+    window.handleRequest = async (id, status) => { await updateDoc(doc(db, "booking_requests", id), { status }); };
+    window.switchTab = (t) => { 
+        if ((t === 'store' && !PLAN_CONFIG[userPlan].storeCustom) || (t === 'staff' && !PLAN_CONFIG[userPlan].staffEnabled)) return;
+        document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); 
+        const link = document.getElementById(`nav-${t}`); if(link) link.classList.add('active');
+        ['overview','products','messages','orders','customers','store','subscriptions','rent-requests','staff'].forEach(id=>document.getElementById(`tab-${id}`)?.classList.add('hidden')); 
+        document.getElementById(`tab-${t}`).classList.remove('hidden'); 
     };
+// ==========================================
+    // ADD THIS FUNCTION TO MAKE BUTTONS WORK
+    // ==========================================
+    window.upgradePlan = async (selectedPlan) => {
+        if (!currentUser) return alert("You must be logged in to change plans.");
+        if (selectedPlan === userPlan) return; // Don't reload if clicking current plan
 
-    const inpFile = document.getElementById('inp-file');
-    inpFile.onchange = () => { if(inpFile.files[0]) { const r = new FileReader(); r.onload=e=>{const preview = document.getElementById('upload-preview'); preview.src=e.target.result; preview.classList.remove('hidden'); document.getElementById('upload-placeholder').classList.add('hidden');}; r.readAsDataURL(inpFile.files[0]); } };
+        const planName = selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1);
+        
+        if (confirm(`Are you sure you want to switch to the ${planName} plan?`)) {
+            try {
+                // 1. Update the Plan in Firebase Database
+                const userRef = doc(db, "partners", currentUser.uid);
+                await updateDoc(userRef, {
+                    plan: selectedPlan,
+                    updatedAt: serverTimestamp() // Optional: track when they changed it
+                });
 
-    document.getElementById('form-add').addEventListener('submit', async (e) => {
-        e.preventDefault(); const btn = document.getElementById('btn-publish'); btn.disabled = true;
-        try {
-            const base64 = inpFile.files[0] ? await compressImage(inpFile.files[0]) : "https://placehold.co/400";
-            await addDoc(collection(db, "products"), {
-                partnerId: currentUser.uid, name: document.getElementById('inp-name').value, 
-                rentPerDay: Number(document.getElementById('inp-price').value),
-                securityDeposit: Number(document.getElementById('inp-security').value),
-                stock: Number(document.getElementById('inp-stock').value),
-                category: document.getElementById('inp-category').value, imageUrl: base64, status: "published", createdAt: serverTimestamp()
-            });
-            closeAddModal(); document.getElementById('form-add').reset(); document.getElementById('upload-preview').classList.add('hidden'); document.getElementById('upload-placeholder').classList.remove('hidden');
-        } catch(err) { alert(err.message); } finally { btn.disabled = false; }
-    });
+                // 2. Update Local State
+                userPlan = selectedPlan;
 
-    window.resetData = async () => {
-        if(!confirm("WIPE DASHBOARD?")) return;
-        const cols = ["products", "booking_requests"];
-        for(const c of cols) {
-            const snap = await getDocs(query(collection(db, c), where("partnerId", "==", currentUser.uid)));
-            await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+                // 3. Update UI Visuals (Highlight card)
+                highlightCurrentPlan(selectedPlan);
+
+                // 4. Update Permission Logic (Unlock/Lock Sidebar items immediately)
+                const navStore = document.getElementById('nav-store');
+                const navStaff = document.getElementById('nav-staff');
+
+                // Check Store Access
+                if (!PLAN_CONFIG[userPlan].storeCustom) {
+                    navStore.classList.add('locked');
+                    navStore.onclick = () => alert(`Upgrade to Level 02 (Growth) to unlock Store Customization.`);
+                    // If user is currently on this tab, boot them to overview
+                    if(!document.getElementById('tab-store').classList.contains('hidden')) switchTab('overview');
+                } else {
+                    navStore.classList.remove('locked');
+                    navStore.onclick = () => switchTab('store');
+                }
+
+                // Check Staff Access
+                if (!PLAN_CONFIG[userPlan].staffEnabled) {
+                    navStaff.classList.add('locked');
+                    navStaff.onclick = () => alert(`Upgrade to Level 02 (Growth) to unlock Staff Management.`);
+                    if(!document.getElementById('tab-staff').classList.contains('hidden')) switchTab('overview');
+                } else {
+                    navStaff.classList.remove('locked');
+                    navStaff.onclick = () => switchTab('staff');
+                }
+
+                // 5. Update "Add Item" button limit visual
+                const addBtn = document.getElementById('btn-open-add');
+                if (currentProductCount >= PLAN_CONFIG[userPlan].maxProducts) {
+                    addBtn.innerHTML = `<i class="fa-solid fa-lock text-xs"></i> Limit Reached`;
+                    addBtn.classList.replace('bg-black', 'bg-gray-400');
+                } else {
+                    addBtn.innerHTML = `+ Add Item`;
+                    addBtn.classList.replace('bg-gray-400', 'bg-black');
+                }
+
+                alert(`Success! You are now on the ${planName} plan.`);
+
+            } catch (error) {
+                console.error("Plan update failed:", error);
+                alert("Error updating plan: " + error.message);
+            }
         }
-        location.reload();
     };
-
-    window.switchTab = (t) => { document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); document.getElementById(`nav-${t}`).classList.add('active'); ['overview','products','messages','orders','customers','store','subscriptions','rent-requests'].forEach(id=>document.getElementById(`tab-${id}`)?.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden'); };
-    function highlightCurrentPlan(p) { document.querySelectorAll('.sub-card').forEach(el=>el.classList.remove('active-plan')); const activeCard = document.getElementById(`plan-card-${p}`); if(activeCard) { activeCard.classList.add('active-plan'); const btn = activeCard.querySelector('button'); if(btn) { btn.innerText = "Current Plan"; btn.disabled = true; btn.className = "w-full py-3 bg-blue-600/20 text-blue-400 border border-blue-600/50 rounded-lg font-bold cursor-default"; } } }
-    window.upgradePlan = async (p) => { if(confirm(`Switch to ${p}?`)) { await updateDoc(doc(db, "partners", currentUser.uid), { plan: p }); location.reload(); } };
-    window.openAddModal = () => document.getElementById('modal-add').classList.remove('hidden');
+    
+    window.openAddModal = () => { if (currentProductCount >= PLAN_CONFIG[userPlan].maxProducts) return alert("Limit reached."); document.getElementById('modal-add').classList.remove('hidden'); }
     window.closeAddModal = () => document.getElementById('modal-add').classList.add('hidden');
-    window.deleteProduct = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "products", id)); };
+    window.deleteProduct = async (id) => { if(confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); };
+    window.deleteStaff = async (id) => { if(confirm("Remove staff member?")) await deleteDoc(doc(db, "staff_invites", id)); };
     window.logout = () => signOut(auth).then(()=>window.location.href="loginpage.html");
-    window.visitMyStore = () => { if(currentUser) window.open(`store.html?id=${currentUser.uid}`, '_blank'); };
-    function previewImage(input, imgId) { if (input.files && input.files[0]) { const r = new FileReader(); r.onload=e=>{const img=document.getElementById(imgId); img.src=e.target.result; img.classList.remove('hidden');}; r.readAsDataURL(input.files[0]); } }
-    const compressImage = (f) => new Promise((resolve) => { const r = new FileReader(); r.readAsDataURL(f); r.onload = (e) => { const i = new Image(); i.src = e.target.result; i.onload = () => { const c = document.createElement('canvas'); c.width=500; c.height=500; c.getContext('2d').drawImage(i,0,0,500,500); resolve(c.toDataURL('image/jpeg', 0.6)); } } });
+    window.visitMyStore = () => window.open(`store.html?id=${currentUser.uid}`, '_blank');
+   
     function updateChart(e){ const ctx = document.getElementById('salesChart'); if(!ctx) return; if(salesChartInstance) salesChartInstance.destroy(); salesChartInstance = new Chart(ctx, { type:'line', data:{ labels:['W1','W2','W3','Today'], datasets:[{label:'Revenue', data:[0,e*0.3,e*0.6,e], borderColor:'#000', backgroundColor:'rgba(0,0,0,0.05)', fill:true, tension:0.4}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} } }); }
+    function highlightCurrentPlan(p) { document.querySelectorAll('.sub-card').forEach(el => el.classList.remove('active-plan')); const card = document.getElementById(`plan-card-${p}`); if(card) { card.classList.add('active-plan'); const btn = card.querySelector('button'); btn.innerText = "Current Plan"; btn.disabled = true; btn.className = "w-full py-3 bg-blue-600/20 text-blue-400 border border-blue-600/50 rounded-xl font-bold cursor-default"; } }
 </script>
 </body>
 </html>

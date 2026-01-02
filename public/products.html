@@ -34,6 +34,10 @@
         .acc-input-group { margin-bottom: 20px; }
         .acc-label { font-size: 11px; font-weight: 700; color: #0f172a; text-transform: uppercase; margin-bottom: 6px; display: block; }
         .acc-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; font-size: 14px; outline: none; background: #f8fafc; }
+        
+        /* Modal Animation */
+        .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body class="bg-white text-slate-900" onclick="closeAllDropdowns(event)">
@@ -77,10 +81,48 @@
         </div>
     </main>
 
-    <div id="modal-rent" class="fixed inset-0 bg-slate-900/60 hidden z-[2000] flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+    <div id="modal-details" class="fixed inset-0 bg-white z-[2000] hidden flex flex-col modal-enter overflow-y-auto">
+        <div class="flex justify-end p-6 fixed top-0 right-0 z-50">
+            <button onclick="closeDetailsModal()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-xl transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 h-full min-h-screen">
+            <div class="bg-gray-50 flex items-center justify-center p-10 relative">
+                <div class="absolute top-6 left-6 text-xs font-bold uppercase tracking-widest text-slate-400">Rentify Collection</div>
+                <img id="detail-img" src="" class="max-h-[80vh] w-full object-contain mix-blend-multiply">
+            </div>
+            <div class="p-8 md:p-20 flex flex-col justify-center bg-white">
+                <div class="mb-2 text-brand-green font-bold text-sm uppercase tracking-wide" id="detail-category">Category</div>
+                <h1 class="text-4xl md:text-5xl font-bold text-brand-black mb-6" id="detail-name">Product Name</h1>
+                
+                <div class="space-y-6 border-y border-gray-100 py-8 my-4">
+                    <p class="text-slate-600 leading-relaxed whitespace-pre-line" id="detail-desc">Loading description...</p>
+                    
+                    <div class="flex items-center gap-4 text-sm text-slate-500">
+                        <span><i class="fa-solid fa-shield-halved text-brand-green mr-2"></i>Security Deposit: <span class="font-bold text-slate-900" id="detail-deposit">₹0</span></span>
+                    </div>
+                </div>
+
+                <div class="flex items-end gap-4 mb-8">
+                    <div class="text-4xl font-bold text-brand-black" id="detail-price">₹0</div>
+                    <div class="text-sm text-slate-500 mb-2 font-medium">/ per day</div>
+                </div>
+
+                <div class="space-y-4">
+                    <button onclick="proceedToBook()" class="w-full bg-brand-black text-white py-4 rounded-none uppercase font-bold tracking-wider hover:bg-slate-800 transition">Rent Now</button>
+                    <button id="detail-add-cart-btn" class="w-full border border-brand-black text-brand-black py-4 rounded-none uppercase font-bold tracking-wider hover:bg-slate-50 transition">Add to Cart</button>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t border-gray-100 text-xs text-slate-400 text-center">
+                    Check in-store availability • Delivery, Exchanges and Returns
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-rent" class="fixed inset-0 bg-slate-900/60 hidden z-[2005] flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-100 my-10">
             <div class="bg-white px-6 py-4 border-b flex justify-between items-center sticky top-0 z-10">
-                <h3 class="font-bold text-xl text-brand-black">Rent Product</h3>
+                <h3 class="font-bold text-xl text-brand-black">Rental Period</h3>
                 <button onclick="closeRentModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 space-y-6" id="rental-steps-container">
@@ -108,7 +150,7 @@
                         </p>
                     </div>
 
-                    <button id="send-request-btn" onclick="submitRequest()" class="w-full bg-brand-black text-white py-3.5 rounded-full font-bold transition hover:bg-slate-800">Send Request</button>
+                    <button id="send-request-btn" onclick="submitRequest()" class="w-full bg-brand-black text-white py-3.5 rounded-full font-bold transition hover:bg-slate-800">Confirm & Send Request</button>
                 </div>
                 <div id="step-status" class="hidden text-center py-10 space-y-4">
                     <div id="status-icon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto text-3xl"></div>
@@ -218,7 +260,6 @@
         } catch(e) { alert("Error: " + e.message); }
     };
 
-    // UPDATED TOTAL CALCULATION (RENT + DEPOSIT)
     window.calcTotal = () => { 
         const d1 = new Date(document.getElementById('date-start').value);
         const d2 = new Date(document.getElementById('date-end').value);
@@ -242,6 +283,7 @@
         if(!userProfile || !userProfile.firstName || !userProfile.phone) {
             alert("Please complete your profile details first.");
             sessionStorage.setItem('pending_order_pid', selectedProduct.id);
+            closeRentModal(); // Close rent modal
             openAccountModal('my-details'); 
             return;
         }
@@ -343,9 +385,51 @@
 
     window.closeAccountModal = () => document.getElementById('modal-account').classList.add('hidden');
 
+    // --- UPDATED: PRODUCT DETAILS LOGIC ---
+    window.openDetailsModal = (pid) => {
+        selectedProduct = products.find(p => p.id === pid);
+        if(!selectedProduct) return;
+
+        // Populate Details
+        document.getElementById('detail-img').src = selectedProduct.imageUrl;
+        document.getElementById('detail-name').innerText = selectedProduct.name;
+        document.getElementById('detail-category').innerText = selectedProduct.category || "General";
+        
+        // 1. Automatic Description Linking
+        // We check for 'description' (Standard) or 'desc' (Fallback) to be safe.
+        const descText = selectedProduct.description || selectedProduct.desc || "No description provided by the seller.";
+        document.getElementById('detail-desc').innerText = descText;
+
+        document.getElementById('detail-price').innerText = `₹${selectedProduct.rentPerDay}`;
+        document.getElementById('detail-deposit').innerText = `₹${selectedProduct.securityDeposit || 0}`;
+        
+        // Setup Add to Cart Button inside Modal
+        const cartBtn = document.getElementById('detail-add-cart-btn');
+        cartBtn.onclick = () => window.addToCart(pid);
+
+        document.getElementById('modal-details').classList.remove('hidden');
+    };
+
+    window.closeDetailsModal = () => document.getElementById('modal-details').classList.add('hidden');
+
+    window.proceedToBook = () => {
+        if (!currentUser) return alert("Please login to rent products.");
+        // Close Details Modal
+        // closeDetailsModal(); // Optional: keep it open in background? Better to close.
+        
+        // Open Booking Modal (Date selection)
+        openRentModal();
+    };
+
+    // --- EXISTING RENT MODAL LOGIC (Modified to accept call from Details) ---
     window.openRentModal = (pid) => { 
-        if (!currentUser) return alert("Please login to rent products."); 
-        selectedProduct = products.find(p => p.id === pid); 
+        // If pid is provided (direct access), set selectedProduct. 
+        // If not (called from Details modal), selectedProduct is already set.
+        if(pid) {
+            if (!currentUser) return alert("Please login to rent products."); 
+            selectedProduct = products.find(p => p.id === pid);
+        }
+
         document.getElementById('modal-rent').classList.remove('hidden'); 
         document.getElementById('step-request').classList.remove('hidden'); 
         document.getElementById('step-status').classList.add('hidden'); 
@@ -393,27 +477,30 @@
         renderGrid(products); 
     }
 
+    // --- UPDATED RENDER GRID TO MATCH IMAGE 1 & LINK TO STORE ---
     window.renderGrid = (data) => {
         const grid = document.getElementById('grid'); 
         grid.innerHTML = data.length ? "" : '<div class="col-span-full text-center py-20 text-slate-400">No products found.</div>';
         data.forEach(p => {
             grid.innerHTML += `
-                <div class="group relative flex flex-col bg-white p-4 rounded-3xl border border-gray-100 hover:shadow-xl transition-all">
-                    <div class="bg-gray-100 rounded-2xl h-64 w-full flex items-center justify-center relative overflow-hidden mb-4">
-                        <button class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm text-slate-400 hover:text-red-500 z-10 transition"><i class="fa-regular fa-heart"></i></button>
-                        <a href="store.html?id=${p.partnerId}" class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-sm text-brand-black hover:bg-black hover:text-white z-10 transition"><i class="fa-solid fa-store mr-1"></i> Store</a>
+                <div class="group relative flex flex-col bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
+                    <div class="bg-gray-100 rounded-2xl h-64 w-full flex items-center justify-center relative overflow-hidden mb-4 cursor-pointer" onclick="window.location.href='store.html?id=${p.partnerId}'">
+                        <div class="absolute top-3 left-3 bg-white px-3 py-1 text-[10px] font-bold uppercase rounded-md shadow-sm text-brand-black flex items-center gap-1"><i class="fa-solid fa-shop"></i> Store</div>
+                        <button onclick="event.stopPropagation(); alert('Added to wishlist')" class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm text-slate-400 hover:text-red-500 z-10 transition"><i class="fa-regular fa-heart"></i></button>
                         <img src="${p.imageUrl}" class="h-4/5 w-4/5 object-contain mix-blend-multiply transition duration-500 group-hover:scale-110">
                     </div>
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="font-bold text-lg text-brand-black truncate flex-1 pr-2">${p.name}</h3>
-                        <div class="text-right">
-                            <div class="font-bold text-lg text-brand-black">₹${p.rentPerDay}<span class="text-[10px] font-normal text-slate-400">/day</span></div>
-                            <div class="text-[9px] font-bold text-slate-400 uppercase">Deposit: ₹${p.securityDeposit || 0}</div>
+                    <div class="flex flex-col gap-1 mb-4 px-1">
+                        <h3 class="font-bold text-lg text-brand-black truncate">${p.name}</h3>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <div class="font-bold text-lg text-brand-black">₹${p.rentPerDay}<span class="text-[10px] font-normal text-slate-400">/day</span></div>
+                                <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">DEPOSIT: ₹${p.securityDeposit || 0}</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="window.openRentModal('${p.id}')" class="flex-1 border-2 border-slate-900 rounded-full py-2.5 font-bold text-xs hover:bg-slate-900 hover:text-white transition duration-300">Rent Now</button>
-                        <button onclick="window.addToCart('${p.id}')" class="flex-1 bg-brand-green text-white rounded-full py-2.5 font-bold text-xs hover:bg-green-800 transition duration-300 shadow-md">Add to Cart</button>
+                    <div class="flex gap-3 mt-auto">
+                        <button onclick="window.openDetailsModal('${p.id}')" class="flex-1 border-2 border-slate-900 text-slate-900 rounded-full py-2.5 font-bold text-sm hover:bg-slate-900 hover:text-white transition duration-300">Rent Now</button>
+                        <button onclick="window.addToCart('${p.id}')" class="flex-1 bg-brand-green text-white rounded-full py-2.5 font-bold text-sm hover:bg-green-800 transition duration-300 shadow-md">Add to Cart</button>
                     </div>
                 </div>`;
         });

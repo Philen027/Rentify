@@ -3,43 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rentify -  Rental E-Commerce</title>
+    <title>Rentify - Rental E-Commerce</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script> 
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-<meta name="google-site-verification" content="EU6jPapkvZkDruyLK3WTTk0jKgb0IVnFQqvclXwPdtc" />
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-black': '#000000',
-                        'brand-white': '#ffffff',
-                        'brand-gray': '#111111',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Space Grotesk', 'sans-serif'],
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 3s infinite',
-                        'float': 'float 6s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        }
-                    }
-                }
+
+    <style type="text/tailwindcss">
+        @layer components {
+            /* Custom Colors */
+            :root {
+                --color-brand-black: #000000;
+                --color-brand-white: #ffffff;
+                --color-brand-gray: #111111;
+            }
+
+            /* Custom Keyframes */
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-20px); }
+            }
+            @keyframes grow {
+                0% { width: 0%; }
+                100% { width: 100%; }
             }
         }
-    </script>
+    </style>
 
     <style>
         body { 
@@ -49,16 +43,19 @@
             cursor: default;
         }
 
+        /* Lenis Scroll Settings */
         html.lenis, html.lenis body { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
         .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
         .lenis.lenis-stopped { overflow: hidden; }
         .lenis.lenis-scrolling iframe { pointer-events: none; }
 
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #fcfcfc; }
         ::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 10px; }
 
+        /* Animation Classes */
         .fade-up {
             opacity: 0;
             transform: translateY(40px);
@@ -88,7 +85,7 @@
         <div class="flex flex-col items-center gap-6">
             <div class="text-7xl md:text-9xl font-black tracking-tighter text-white">RENTIFY</div>
             <div class="h-1 w-64 bg-white/10 rounded-full overflow-hidden">
-                <div class="h-full bg-white w-full animate-[grow_1.5s_ease-in-out]"></div>
+                <div class="h-full bg-white w-full animate-grow"></div>
             </div>
         </div>
     </div>
@@ -103,7 +100,7 @@
             <div class="w-3 h-3 bg-white rounded-full group-hover:scale-150 transition-transform duration-300"></div>
             RENTIFY.
         </button>
-        <div class="hidden md:flex gap-10 font-Roboto uppercase tracking-widest text-white/80">
+        <div class="hidden md:flex gap-10 font-sans uppercase tracking-widest text-white/80">
             <button class="magnetic-btn hover:text-white transition-colors" onclick="window.location.href='#listings'">Curated</button>
             <button class="magnetic-btn hover:text-white transition-colors" onclick="window.location.href='#pricing'">Pricing</button>
             <button class="magnetic-btn hover:text-white transition-colors" onclick="window.location.href='#hero'">Login</button>
@@ -119,7 +116,7 @@
             </div>
 
             <div class="relative z-10 leading-none mb-8">
-                <div class="overflow-hidden-mt-[2vw] md:-mt-[4vw]">
+                <div class="overflow-hidden -mt-[2vw] md:-mt-[4vw]">
                     <h1 class="text-[13vw] font-black tracking-tighter text-white fade-up" style="transition-delay: 200ms;">RENT</h1>
                 </div>
                 <div class="overflow-hidden -mt-[2vw] md:-mt-[4vw]">
@@ -155,7 +152,7 @@
             </div>
 
             <div class="w-full space-y-px" id="listings-container">
-            </div>
+                </div>
         </section>
 
         <section id="pricing" class="py-32 relative z-20">
@@ -164,7 +161,7 @@
                 <h2 class="text-6xl md:text-8xl font-black text-white tracking-tighter">Choose Your Plan</h2>
             </div>
             <div id="plans-container" class="relative pb-32 px-4">
-            </div>
+                 </div>
         </section>
 
         <section id="info" class="py-40 border-t border-white/10 relative z-20 flex justify-center items-center px-4">
@@ -199,15 +196,10 @@
             <h2 onclick="window.location.href='loginpage.html'" class="text-[14vw] font-black leading-none mb-16 hover:scale-105 transition-transform duration-700 cursor-pointer tracking-tighter text-white">RENT NOW</h2>
             <div class="font-mono text-xs uppercase tracking-widest opacity-40">© 2025 Rentify Commerce. All Rights Reserved.</div>
         </div>
-        <div class="mt-4 mb-2 text-center">
-  <p class="text-[10px] text-slate-400">
-    By registering, you agree to our 
-    <a href="privacy.html" class="text-slate-900 font-bold underline decoration-emerald-500">Privacy Policy</a>.
-  </p>
-</div>
     </footer>
 
     <script>
+        // Data Arrays
         const backgrounds = [
             { src: "https://images.unsplash.com/photo-1533577116850-9cc66cad8a9b?q=80&w=2670&auto=format&fit=crop" },
             { src: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2671&auto=format&fit=crop" },
@@ -229,7 +221,9 @@
             { name: "Enterprise", desc: "Full customization for large scale operations.", features: ["Unlimited Products", "Custom Branding", "API Access"] }
         ];
 
+        // Initialization
         document.addEventListener('DOMContentLoaded', () => {
+            // Smooth Scroll (Lenis) initialization
             const lenis = new Lenis({
                 duration: 1.2,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -242,6 +236,7 @@
             }
             requestAnimationFrame(raf);
 
+            // Initialize Components
             lucide.createIcons();
             initBackgrounds();
             renderListings();
@@ -249,6 +244,7 @@
             setupMagneticButtons();
             initScrollAnimations();
             
+            // Preloader Logic
             setTimeout(() => {
                 document.getElementById('preloader').classList.add('loaded');
                 setTimeout(() => {
@@ -256,6 +252,7 @@
                 }, 500);
             }, 2000);
 
+            // Form Logic
             document.getElementById('hero-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const email = document.getElementById('email-input').value;
@@ -265,6 +262,7 @@
             });
         });
 
+        // Background Slideshow Logic
         function initBackgrounds() {
             const container = document.getElementById('background-container');
             backgrounds.forEach((bg, i) => {
@@ -306,6 +304,7 @@
             });
         }
 
+        // Render Listing Items
         function renderListings() {
             const container = document.getElementById('listings-container');
             listings.forEach((item, i) => {
@@ -327,6 +326,7 @@
             });
         }
 
+        // Render Pricing Plans
         function renderPlans() {
             const container = document.getElementById('plans-container');
             plans.forEach((plan, i) => {
@@ -363,6 +363,7 @@
             lucide.createIcons();
         }
 
+        // Magnetic Button Effect
         function setupMagneticButtons() {
             document.querySelectorAll('.magnetic-btn').forEach(btn => {
                 btn.addEventListener('mousemove', (e) => {
@@ -377,6 +378,7 @@
             });
         }
 
+        // Scroll Reveal Animations
         function initScrollAnimations() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {

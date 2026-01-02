@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rentify – Login</title>
- 
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -35,12 +35,11 @@
 
   <style>
     body {
-      background-color: #f8fafc; /* Light Gray Background */
-      color: #0f172a; /* Dark Text */
+      background-color: #f8fafc;
+      color: #0f172a;
       overflow-x: hidden;
     }
 
-    /* Video styling - Faded out for white theme */
     .video-background {
       position: fixed;
       top: 50%;
@@ -52,19 +51,17 @@
       z-index: -10;
       transform: translate(-50%, -50%);
       object-fit: cover;
-      opacity: 0.05; /* Very subtle */
+      opacity: 0.05;
     }
 
-    /* Clean White Panel */
     .glass-panel {
       background: #ffffff;
       border: 1px solid #e2e8f0;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
     }
 
-    /* Clean Input Fields */
     .input-premium {
-      background: #f1f5f9; /* Slate 100 */
+      background: #f1f5f9;
       border: 1px solid transparent;
       color: #0f172a;
       transition: all 0.2s ease;
@@ -73,7 +70,7 @@
     .input-premium:focus {
       outline: none;
       background: #ffffff;
-      border-color: #0f172a; /* Black border on focus */
+      border-color: #0f172a;
       box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.05);
     }
     
@@ -81,11 +78,6 @@
         color: #94a3b8;
     }
 
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-
-    /* Toast */
     #toast {
       opacity: 0;
       pointer-events: none;
@@ -106,29 +98,20 @@
     <source src="Video_Generation_Request.mp4" type="video/mp4" />
   </video>
   
-  <div
-    id="toast"
-    class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full bg-slate-900 shadow-xl text-sm flex items-center gap-3"
-  >
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full bg-slate-900 shadow-xl text-sm flex items-center gap-3">
     <i id="toast-icon" class="fa-solid fa-circle-info text-blue-400"></i>
     <span id="toast-message" class="text-white font-medium"></span>
   </div>
 
-  <main
-    class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-10 w-full max-w-6xl mx-auto"
-  >
-    <section
-      id="role-view"
-      class="glass-panel rounded-3xl px-8 py-10 md:px-14 md:py-16 w-full max-w-3xl"
-    >
+  <main class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-10 w-full max-w-6xl mx-auto">
+    
+    <section id="role-view" class="glass-panel rounded-3xl px-8 py-10 md:px-14 md:py-16 w-full max-w-3xl">
       <div class="flex flex-col mb-8">
         <div class="flex items-center gap-2 mb-2">
              <i class="fa-solid fa-basket-shopping text-emerald-600 text-2xl"></i>
              <span class="font-bold text-xl tracking-tight text-slate-900">Rentify.</span>
         </div>
-        <h1 id="welcome-heading" class="font-display text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">
-            Welcome to Rentify
-        </h1>
+        <h1 id="welcome-heading" class="font-display text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">Welcome to Rentify</h1>
       </div>
 
       <p class="text-slate-500 mb-8 font-medium">
@@ -136,393 +119,140 @@
       </p>
 
       <div class="grid md:grid-cols-2 gap-6">
-        <button
-          id="btn-role-partner"
-          class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 text-left hover:border-slate-900 hover:shadow-lg transition-all duration-300"
-        >
+        <button id="btn-role-partner" class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 text-left hover:border-slate-900 hover:shadow-lg transition-all duration-300">
           <div class="relative flex flex-col gap-4">
-            <div
-              class="w-12 h-12 rounded-full bg-gray-100 group-hover:bg-slate-900 transition-colors flex items-center justify-center text-slate-900 group-hover:text-white"
-            >
+            <div class="w-12 h-12 rounded-full bg-gray-100 group-hover:bg-slate-900 transition-colors flex items-center justify-center text-slate-900 group-hover:text-white">
               <i class="fa-solid fa-briefcase text-xl"></i>
             </div>
             <div>
-              <h3 class="font-bold text-lg mb-1 text-slate-900">
-                Partner / Owner
-              </h3>
-              <p class="text-sm text-slate-500">
-                List electronics, tools, and manage inventory for rentals.
-              </p>
+              <h3 class="font-bold text-lg mb-1 text-slate-900">Partner / Owner</h3>
+              <p class="text-sm text-slate-500">List electronics, tools, and manage inventory for rentals.</p>
             </div>
           </div>
         </button>
 
-        <button
-          id="btn-role-customer"
-          class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 text-left hover:border-emerald-600 hover:shadow-lg transition-all duration-300"
-        >
+        <button id="btn-role-customer" class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 text-left hover:border-emerald-600 hover:shadow-lg transition-all duration-300">
           <div class="relative flex flex-col gap-4">
-            <div
-              class="w-12 h-12 rounded-full bg-gray-100 group-hover:bg-emerald-600 transition-colors flex items-center justify-center text-slate-900 group-hover:text-white"
-            >
+            <div class="w-12 h-12 rounded-full bg-gray-100 group-hover:bg-emerald-600 transition-colors flex items-center justify-center text-slate-900 group-hover:text-white">
               <i class="fa-solid fa-user text-xl"></i>
             </div>
             <div>
-              <h3 class="font-bold text-lg mb-1 text-slate-900">
-                Customer
-              </h3>
-              <p class="text-sm text-slate-500">
-                Rent verified electrical & electronic equipment for your next project.
-              </p>
+              <h3 class="font-bold text-lg mb-1 text-slate-900">Customer</h3>
+              <p class="text-sm text-slate-500">Rent verified equipment for your project.</p>
             </div>
           </div>
         </button>
       </div>
 
-      <button
-        id="btn-back-email"
-        class="mt-8 text-xs font-bold text-slate-400 hover:text-slate-900 flex items-center gap-2 transition"
-      >
-        <i class="fa-solid fa-arrow-left"></i>
-        Back to email landing
+      <button id="btn-back-email" class="mt-8 text-xs font-bold text-slate-400 hover:text-slate-900 flex items-center gap-2 transition">
+        <i class="fa-solid fa-arrow-left"></i> Back to email landing
       </button>
     </section>
 
-    <section
-      id="partner-auth"
-      class="hidden glass-panel rounded-3xl px-6 py-8 md:px-12 md:py-12 w-full max-w-xl"
-    >
+    <section id="partner-auth" class="hidden glass-panel rounded-3xl px-6 py-8 md:px-12 md:py-12 w-full max-w-xl">
       <div class="flex items-center justify-between mb-8 border-b border-gray-100 pb-4">
         <div>
-          <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
-            Partner Access
-          </p>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Partner Access</p>
           <h2 class="font-display text-2xl font-extrabold text-slate-900">Partner / Owner</h2>
         </div>
-        <button
-          id="btn-close-partner"
-          class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-slate-500 transition"
-        >
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+        <button id="btn-close-partner" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-slate-500 transition"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
       <div class="flex mb-8 bg-gray-100 p-1.5 rounded-full">
-        <button
-          id="tab-partner-login"
-          class="flex-1 py-2.5 rounded-full text-sm font-bold bg-white text-slate-900 shadow-sm"
-        >
-          Login
-        </button>
-        <button
-          id="tab-partner-register"
-          class="flex-1 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-slate-700"
-        >
-          Register
-        </button>
+        <button id="tab-partner-login" class="flex-1 py-2.5 rounded-full text-sm font-bold bg-white text-slate-900 shadow-sm">Login</button>
+        <button id="tab-partner-register" class="flex-1 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-slate-700">Register</button>
       </div>
 
       <div id="partner-login-view">
         <div class="space-y-5 mb-6">
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">
-              Email
-            </label>
-            <input
-              id="partner-login-email"
-              type="email"
-              class="w-full h-12 rounded-xl px-4 input-premium font-medium"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">
-              Password
-            </label>
-            <input
-              id="partner-login-password"
-              type="password"
-              class="w-full h-12 rounded-xl px-4 input-premium font-medium"
-              placeholder="••••••••"
-            />
-            <div class="text-right mt-1">
-                <a href="#" onclick="forgotPassword('partner-login-email')" class="text-xs text-slate-500 hover:text-slate-900 underline">Forgot Password?</a>
-            </div>
+          <input id="partner-login-email" type="email" class="w-full h-12 rounded-xl px-4 input-premium font-medium" placeholder="Email" />
+          <input id="partner-login-password" type="password" class="w-full h-12 rounded-xl px-4 input-premium font-medium" placeholder="Password" />
+          <div class="text-right mt-1">
+            <a href="#" onclick="forgotPassword('partner-login-email')" class="text-xs text-slate-500 hover:text-slate-900 underline">Forgot Password?</a>
           </div>
         </div>
-
-        <button
-          id="btn-partner-login"
-          class="w-full h-12 rounded-xl bg-slate-900 hover:bg-black text-white font-bold flex items-center justify-center gap-2 mb-4 transition shadow-lg shadow-slate-900/20"
-        >
-          <span>Login</span>
-          <i class="fa-solid fa-arrow-right"></i>
+        <button id="btn-partner-login" class="w-full h-12 rounded-xl bg-slate-900 hover:bg-black text-white font-bold transition">Login</button>
+        <button id="btn-partner-google" class="w-full h-12 rounded-xl border-2 border-gray-200 hover:border-slate-300 hover:bg-gray-50 text-slate-700 font-bold flex items-center justify-center gap-3 transition">
+          <i class="fa-brands fa-google text-lg"></i> Continue with Google
         </button>
-
-        <button
-          id="btn-partner-google"
-          class="w-full h-12 rounded-xl border-2 border-gray-200 hover:border-slate-300 hover:bg-gray-50 text-slate-700 font-bold flex items-center justify-center gap-3 transition"
-        >
-          <i class="fa-brands fa-google text-lg"></i>
-          <span>Continue with Google</span>
-        </button>
-
-        <p class="text-[11px] text-slate-400 text-center mt-4 font-medium">
-          Only verified accounts can access the partner dashboard.
-        </p>
       </div>
 
       <div id="partner-register-view" class="hidden">
-        <div class="space-y-4 mb-6">
+        <div class="space-y-4 mb-6 text-left">
           <div class="relative">
-            <input
-              id="partner-reg-email"
-              type="email"
-              class="w-full h-11 rounded-lg px-4 input-premium pr-10"
-              placeholder="Email"
-              oninput="validateField('partner-reg-email', 'email')"
-            />
-            <span id="partner-reg-email-icon" class="absolute right-3 top-3 hidden"></span>
+            <input id="partner-reg-email" type="email" required class="w-full h-11 rounded-lg px-4 input-premium pr-10" placeholder="Email" oninput="validateField('partner-reg-email', 'email')" />
+            <span id="partner-reg-email-icon" class="absolute right-3 top-2.5 hidden"></span>
             <p id="partner-reg-email-msg" class="text-[10px] text-rose-500 mt-1 hidden"></p>
           </div>
-
-          <input
-            id="partner-reg-password"
-            type="password"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="Password (>5 chars, @, Num, Capital)"
-          />
-          <input
-            id="partner-reg-name"
-            type="text"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="Full Name"
-          />
-
+          <input id="partner-reg-password" type="password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Password (>5 chars, @, Num, Cap)" />
+          <input id="partner-reg-name" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Full Name" />
           <div class="relative">
-            <input
-              id="partner-reg-phone"
-              type="tel"
-              class="w-full h-11 rounded-lg px-4 input-premium pr-10"
-              placeholder="Phone (10 digits)"
-              oninput="validateField('partner-reg-phone', 'phone')"
-            />
-            <span id="partner-reg-phone-icon" class="absolute right-3 top-3 hidden"></span>
+            <input id="partner-reg-phone" type="tel" required class="w-full h-11 rounded-lg px-4 input-premium pr-10" placeholder="Phone (10 digits)" oninput="validateField('partner-reg-phone', 'phone')" />
+            <span id="partner-reg-phone-icon" class="absolute right-3 top-2.5 hidden"></span>
             <p id="partner-reg-phone-msg" class="text-[10px] text-rose-500 mt-1 hidden"></p>
           </div>
-
-          <input
-            id="partner-reg-address1"
-            type="text"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="Address"
-          />
+          <input id="partner-reg-address1" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Address" />
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <input
-              id="partner-reg-city"
-              type="text"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="City"
-            />
-            <input
-              id="partner-reg-state"
-              type="text"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="State"
-            />
-            <input
-              id="partner-reg-pin"
-              type="text"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="PIN"
-            />
+            <input id="partner-reg-city" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="City" />
+            <input id="partner-reg-state" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="State" />
+            <input id="partner-reg-pin" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="PIN" />
           </div>
         </div>
-
-        <button
-          id="btn-partner-register"
-          class="w-full h-12 rounded-xl bg-slate-900 hover:bg-black text-white font-bold flex items-center justify-center gap-2 mb-3 transition shadow-lg"
-        >
-          <span>Create Partner Account</span>
-          <i class="fa-solid fa-check"></i>
-        </button>
-
-        <p class="text-[11px] text-slate-400 text-center mt-1 font-medium">
-          A verification email will be sent to your address.
-        </p>
+        <button id="btn-partner-register" class="w-full h-12 rounded-xl bg-slate-900 hover:bg-black text-white font-bold transition">Create Partner Account</button>
       </div>
     </section>
 
-    <section
-      id="customer-auth"
-      class="hidden glass-panel rounded-3xl px-6 py-8 md:px-12 md:py-12 w-full max-w-xl"
-    >
+    <section id="customer-auth" class="hidden glass-panel rounded-3xl px-6 py-8 md:px-12 md:py-12 w-full max-w-xl">
       <div class="flex items-center justify-between mb-8 border-b border-gray-100 pb-4">
         <div>
-          <p class="text-xs font-bold uppercase tracking-widest text-emerald-600 mb-1">
-            Customer Access
-          </p>
+          <p class="text-xs font-bold uppercase tracking-widest text-emerald-600 mb-1">Customer Access</p>
           <h2 class="font-display text-2xl font-extrabold text-slate-900">Rent Products</h2>
         </div>
-        <button
-          id="btn-close-customer"
-          class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-slate-500 transition"
-        >
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+        <button id="btn-close-customer" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-slate-500 transition"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
       <div class="flex mb-8 bg-gray-100 p-1.5 rounded-full">
-        <button
-          id="tab-customer-login"
-          class="flex-1 py-2.5 rounded-full text-sm font-bold bg-white text-emerald-700 shadow-sm"
-        >
-          Login
-        </button>
-        <button
-          id="tab-customer-register"
-          class="flex-1 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-slate-700"
-        >
-          Register
-        </button>
+        <button id="tab-customer-login" class="flex-1 py-2.5 rounded-full text-sm font-bold bg-white text-emerald-700 shadow-sm">Login</button>
+        <button id="tab-customer-register" class="flex-1 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-slate-700">Register</button>
       </div>
 
       <div id="customer-login-view">
         <div class="space-y-5 mb-6">
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">
-              Email
-            </label>
-            <input
-              id="customer-login-email"
-              type="email"
-              class="w-full h-12 rounded-xl px-4 input-premium font-medium"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">
-              Password
-            </label>
-            <input
-              id="customer-login-password"
-              type="password"
-              class="w-full h-12 rounded-xl px-4 input-premium font-medium"
-              placeholder="••••••••"
-            />
-            <div class="text-right mt-1">
-                <a href="#" onclick="forgotPassword('customer-login-email')" class="text-xs text-slate-500 hover:text-emerald-700 underline">Forgot Password?</a>
-            </div>
+          <input id="customer-login-email" type="email" class="w-full h-12 rounded-xl px-4 input-premium font-medium" placeholder="Email" />
+          <input id="customer-login-password" type="password" class="w-full h-12 rounded-xl px-4 input-premium font-medium" placeholder="Password" />
+          <div class="text-right mt-1">
+            <a href="#" onclick="forgotPassword('customer-login-email')" class="text-xs text-slate-500 hover:text-emerald-700 underline">Forgot Password?</a>
           </div>
         </div>
-
-        <button
-          id="btn-customer-login"
-          class="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center justify-center gap-2 mb-4 transition shadow-lg shadow-emerald-600/20"
-        >
-          <span>Login</span>
-          <i class="fa-solid fa-arrow-right"></i>
+        <button id="btn-customer-login" class="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition">Login</button>
+        <button id="btn-customer-google" class="w-full h-12 rounded-xl border-2 border-gray-200 hover:border-slate-300 hover:bg-gray-50 text-slate-700 font-bold flex items-center justify-center gap-3 transition">
+          <i class="fa-brands fa-google text-lg"></i> Continue with Google
         </button>
-
-        <button
-          id="btn-customer-google"
-          class="w-full h-12 rounded-xl border-2 border-gray-200 hover:border-slate-300 hover:bg-gray-50 text-slate-700 font-bold flex items-center justify-center gap-3 transition"
-        >
-          <i class="fa-brands fa-google text-lg"></i>
-          <span>Continue with Google</span>
-        </button>
-
-        <p class="text-[11px] text-slate-400 text-center mt-4 font-medium">
-          Only verified accounts can access products.
-        </p>
       </div>
 
       <div id="customer-register-view" class="hidden">
-        <div class="space-y-4 mb-6">
+        <div class="space-y-4 mb-6 text-left">
           <div class="relative">
-            <input
-              id="customer-reg-email"
-              type="email"
-              class="w-full h-11 rounded-lg px-4 input-premium pr-10"
-              placeholder="Email"
-              oninput="validateField('customer-reg-email', 'email')"
-            />
-            <span id="customer-reg-email-icon" class="absolute right-3 top-3 hidden"></span>
+            <input id="customer-reg-email" type="email" required class="w-full h-11 rounded-lg px-4 input-premium pr-10" placeholder="Email" oninput="validateField('customer-reg-email', 'email')" />
+            <span id="customer-reg-email-icon" class="absolute right-3 top-2.5 hidden"></span>
             <p id="customer-reg-email-msg" class="text-[10px] text-rose-500 mt-1 hidden"></p>
           </div>
-
-          <input
-            id="customer-reg-password"
-            type="password"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="Password (>5 chars, @, Num, Capital)"
-          />
-          <input
-            id="customer-reg-name"
-            type="text"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="Full Name"
-          />
-
+          <input id="customer-reg-password" type="password" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Password (>5 chars, @, Num, Cap)" />
+          <input id="customer-reg-name" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Full Name" />
           <div class="relative">
-            <input
-              id="customer-reg-phone"
-              type="tel"
-              class="w-full h-11 rounded-lg px-4 input-premium pr-10"
-              placeholder="Phone (10 digits)"
-              oninput="validateField('customer-reg-phone', 'phone')"
-            />
-            <span id="customer-reg-phone-icon" class="absolute right-3 top-3 hidden"></span>
+            <input id="customer-reg-phone" type="tel" required class="w-full h-11 rounded-lg px-4 input-premium pr-10" placeholder="Phone (10 digits)" oninput="validateField('customer-reg-phone', 'phone')" />
+            <span id="customer-reg-phone-icon" class="absolute right-3 top-2.5 hidden"></span>
             <p id="customer-reg-phone-msg" class="text-[10px] text-rose-500 mt-1 hidden"></p>
           </div>
-
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <input
-              id="customer-reg-country"
-              type="text"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="Country"
-            />
-            <input
-              id="customer-reg-state"
-              type="text"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="State"
-            />
-            <input
-              id="customer-reg-city"
-              type="text"
-              class="w-full h-11 rounded-lg px-4 input-premium"
-              placeholder="City"
-            />
+            <input id="customer-reg-country" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="Country" />
+            <input id="customer-reg-state" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="State" />
+            <input id="customer-reg-city" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="City" />
           </div>
-          <input
-            id="customer-reg-pin"
-            type="text"
-            class="w-full h-11 rounded-lg px-4 input-premium"
-            placeholder="PIN / ZIP"
-          />
+          <input id="customer-reg-pin" type="text" class="w-full h-11 rounded-lg px-4 input-premium" placeholder="PIN / ZIP" />
         </div>
-
-        <button
-          id="btn-customer-register"
-          class="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center justify-center gap-2 mb-3 transition shadow-lg"
-        >
-          <span>Create Customer Account</span>
-          <i class="fa-solid fa-check"></i>
-        </button>
-
-        <p class="text-[11px] text-slate-400 text-center mt-1 font-medium">
-          A verification email will be sent to your address.
-        </p>
+        <button id="btn-customer-register" class="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition">Create Customer Account</button>
       </div>
-<div class="mt-4 mb-2 text-center">
-  <p class="text-[10px] text-slate-400">
-    By registering, you agree to our 
-    <a href="privacy.html" class="text-slate-900 font-bold underline decoration-emerald-500">Privacy Policy</a>.
-  </p>
-</div>
-</div>
     </section>
   </main>
 
@@ -534,8 +264,6 @@
         const input = document.getElementById(id);
         const icon = document.getElementById(id + '-icon');
         const msg = document.getElementById(id + '-msg');
-        if (!input || !icon || !msg) return false;
-
         const val = input.value.trim();
         let isValid = false;
         let errorMessage = "";
@@ -559,14 +287,14 @@
             icon.classList.remove('hidden');
             msg.classList.add('hidden');
             input.classList.add('border-emerald-500');
-            input.classList.remove('border-rose-500', 'border-transparent');
+            input.classList.remove('border-rose-500');
         } else {
             icon.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-500"></i>';
             icon.classList.remove('hidden');
             msg.innerText = errorMessage;
             msg.classList.remove('hidden');
             input.classList.add('border-rose-500');
-            input.classList.remove('border-emerald-500', 'border-transparent');
+            input.classList.remove('border-emerald-500');
         }
         return isValid;
     };
@@ -574,11 +302,9 @@
     const CUSTOMER_PRODUCTS_URL = 'products.html';
     const PARTNER_DASHBOARD_URL = 'partner-dashboard.html';
 
-    // --- HELPER: SET WELCOME NAME ---
     function setWelcomeName(emailString) {
         const header = document.getElementById('welcome-heading');
         const displayEmail = document.getElementById('display-email');
-        
         if (!emailString || !emailString.includes('@')) {
             header.textContent = "Welcome to Rentify";
             displayEmail.textContent = "your account";
@@ -590,7 +316,6 @@
         displayEmail.textContent = emailString;
     }
 
-    // --- HELPER: VALIDATE PASSWORD ---
     function validatePassword(password) {
         if(password.length <= 5) return false;
         if(!/[A-Z]/.test(password)) return false;
@@ -618,169 +343,105 @@
       const helpers = window.firebaseHelpers || {};
       const db = window.firebaseDb;
 
-      if (!auth || !helpers) { console.error('Firebase not initialised'); return; }
+      if (!auth || !helpers) return;
 
       const { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, sendEmailVerification, sendPasswordResetEmail, signOut, googleProvider, doc, setDoc, serverTimestamp } = helpers;
 
-      const roleView = document.getElementById('role-view');
-      const partnerAuth = document.getElementById('partner-auth');
-      const customerAuth = document.getElementById('customer-auth');
-
-      // 1. Check URL for email & set Welcome text
       const urlParams = new URLSearchParams(window.location.search);
       const emailFromLanding = urlParams.get('email');
-      
       if (emailFromLanding) {
           setWelcomeName(emailFromLanding);
           document.getElementById('partner-login-email').value = emailFromLanding;
           document.getElementById('customer-login-email').value = emailFromLanding;
       }
 
-      // 2. FORGOT PASSWORD FUNCTION
       window.forgotPassword = async (inputId) => {
           const email = document.getElementById(inputId).value.trim();
-          if(!email) { showToast("Please enter your email first to reset.", "error"); return; }
+          if(!email) { showToast("Enter your email first", "error"); return; }
           try {
               await sendPasswordResetEmail(auth, email);
-              showToast("Reset link sent! Check your email.", "success");
-          } catch(e) {
-              showToast("Error: " + e.message, "error");
-          }
+              showToast("Reset link sent! Check email.", "success");
+          } catch(e) { showToast(e.message, "error"); }
       };
 
-      // 3. Auth State
       auth.onAuthStateChanged(user => {
         if (user) {
-            let displayName = user.displayName;
-            if (!displayName && user.email) displayName = user.email.split('@')[0];
-            if (displayName) {
-                displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-                document.getElementById('welcome-heading').textContent = `Welcome, ${displayName}`;
-            }
+            let displayName = user.displayName || user.email.split('@')[0];
+            displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+            document.getElementById('welcome-heading').textContent = `Welcome, ${displayName}`;
         }
       });
 
-      // UI Toggles
-      function openPartner() { roleView.classList.add('hidden'); partnerAuth.classList.remove('hidden'); }
-      function openCustomer() { roleView.classList.add('hidden'); customerAuth.classList.remove('hidden'); }
-      function backToRoleView() { partnerAuth.classList.add('hidden'); customerAuth.classList.add('hidden'); roleView.classList.remove('hidden'); }
-
-      // Tabs
-      function setPartnerTab(tab) {
-        const loginView = document.getElementById('partner-login-view');
-        const regView = document.getElementById('partner-register-view');
-        if (tab === 'login') { loginView.classList.remove('hidden'); regView.classList.add('hidden'); }
-        else { regView.classList.remove('hidden'); loginView.classList.add('hidden'); }
-      }
-      function setCustomerTab(tab) {
-        const loginView = document.getElementById('customer-login-view');
-        const regView = document.getElementById('customer-register-view');
-        if (tab === 'login') { loginView.classList.remove('hidden'); regView.classList.add('hidden'); }
-        else { regView.classList.remove('hidden'); loginView.classList.add('hidden'); }
+      function backToRoleView() {
+          document.getElementById('partner-auth').classList.add('hidden');
+          document.getElementById('customer-auth').classList.add('hidden');
+          document.getElementById('role-view').classList.remove('hidden');
       }
 
-      document.getElementById('btn-role-partner').addEventListener('click', openPartner);
-      document.getElementById('btn-role-customer').addEventListener('click', openCustomer);
-      document.getElementById('btn-close-partner').addEventListener('click', backToRoleView);
-      document.getElementById('btn-close-customer').addEventListener('click', backToRoleView);
-      document.getElementById('btn-back-email').addEventListener('click', () => window.location.href = 'index.html');
+      document.getElementById('btn-role-partner').onclick = () => { document.getElementById('role-view').classList.add('hidden'); document.getElementById('partner-auth').classList.remove('hidden'); };
+      document.getElementById('btn-role-customer').onclick = () => { document.getElementById('role-view').classList.add('hidden'); document.getElementById('customer-auth').classList.remove('hidden'); };
+      document.getElementById('btn-close-partner').onclick = backToRoleView;
+      document.getElementById('btn-close-customer').onclick = backToRoleView;
 
-      document.getElementById('tab-partner-login').addEventListener('click', () => setPartnerTab('login'));
-      document.getElementById('tab-partner-register').addEventListener('click', () => setPartnerTab('register'));
-      document.getElementById('tab-customer-login').addEventListener('click', () => setCustomerTab('login'));
-      document.getElementById('tab-customer-register').addEventListener('click', () => setCustomerTab('register'));
+      document.getElementById('tab-partner-login').onclick = () => { document.getElementById('partner-login-view').classList.remove('hidden'); document.getElementById('partner-register-view').classList.add('hidden'); };
+      document.getElementById('tab-partner-register').onclick = () => { document.getElementById('partner-register-view').classList.remove('hidden'); document.getElementById('partner-login-view').classList.add('hidden'); };
+      document.getElementById('tab-customer-login').onclick = () => { document.getElementById('customer-login-view').classList.remove('hidden'); document.getElementById('customer-register-view').classList.add('hidden'); };
+      document.getElementById('tab-customer-register').onclick = () => { document.getElementById('customer-register-view').classList.remove('hidden'); document.getElementById('customer-login-view').classList.add('hidden'); };
 
-      // --- AUTH ACTIONS ---
-
-      // LOGIN
-      async function handleLogin(emailId, passId, redirectUrl) {
+      async function handleLogin(emailId, passId, redirect) {
         const email = document.getElementById(emailId).value.trim();
-        const password = document.getElementById(passId).value.trim();
-        if (!email || !password) return showToast('Enter email & password', 'error');
-
+        const pass = document.getElementById(passId).value.trim();
         try {
-          const cred = await signInWithEmailAndPassword(auth, email, password);
-          if (!cred.user.emailVerified) { await signOut(auth); return showToast('Email not verified.', 'error'); }
-          
-          setWelcomeName(email);
-          showToast(`Welcome back, ${email.split('@')[0]}!`, 'success');
-          setTimeout(() => window.location.href = redirectUrl, 1500);
-        } catch (err) { console.error(err); showToast(err.message, 'error'); }
+          const cred = await signInWithEmailAndPassword(auth, email, pass);
+          if (!cred.user.emailVerified) { await signOut(auth); return showToast('Verify email first', 'error'); }
+          showToast('Login Success!', 'success');
+          setTimeout(() => location.href = redirect, 1200);
+        } catch (e) { showToast(e.message, 'error'); }
       }
 
-      // REGISTER
-      async function handleRegister(emailId, passId, nameId, collectionName) {
+      async function handleRegister(emailId, passId, nameId, collection) {
         const email = document.getElementById(emailId).value.trim();
-        const password = document.getElementById(passId).value.trim();
+        const pass = document.getElementById(passId).value.trim();
         const name = document.getElementById(nameId).value.trim();
-        const phoneId = collectionName === 'partners' ? 'partner-reg-phone' : 'customer-reg-phone';
+        const phoneId = collection === 'partners' ? 'partner-reg-phone' : 'customer-reg-phone';
         const phone = document.getElementById(phoneId).value.trim();
 
-        // BLOCK SUBMISSION IF FIELDS ARE INVALID
-        if (!window.validateField(emailId, 'email') || !window.validateField(phoneId, 'phone')) {
+        if (!validateField(emailId, 'email') || !validateField(phoneId, 'phone')) {
             showToast("Please enter a valid email and phone number", "error");
             return;
         }
 
-        if (!email || !password || !name) return showToast('All fields required', 'error');
-        if (!validatePassword(password)) return showToast('Password Complexity Error', 'error');
-
         try {
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          await helpers.sendEmailVerification(cred.user);
-          
-          await setDoc(doc(db, collectionName, cred.user.uid), { 
-              email, 
-              fullname: name, 
-              phone: phone, 
-              createdAt: serverTimestamp() 
-          }, { merge: true });
-
+          const cred = await createUserWithEmailAndPassword(auth, email, pass);
+          await sendEmailVerification(cred.user);
+          await setDoc(doc(db, collection, cred.user.uid), { email, name, phone, createdAt: serverTimestamp() }, { merge: true });
           await signOut(auth);
-          showToast('Account created! Verify email sent.', 'success');
-          
-          if(collectionName === 'partners') setPartnerTab('login');
-          else setCustomerTab('login');
-
-        } catch (err) { console.error(err); showToast(err.message, 'error'); }
+          showToast('Check email to verify!', 'success');
+        } catch (e) { showToast(e.message, 'error'); }
       }
 
-      // GOOGLE LOGIN
-      async function handleGoogleLogin(collectionName, redirectUrl) {
+      async function handleGoogleLogin(collection, redirect) {
         try {
-          const result = await signInWithPopup(auth, googleProvider);
-          const user = result.user;
-          setWelcomeName(user.email);
-
-          await setDoc(doc(db, collectionName, user.uid), {
-            email: user.email,
-            displayName: user.displayName || '',
-            phone: user.phoneNumber || '',
-            provider: 'google',
-            lastLoginAt: serverTimestamp(),
-          }, { merge: true });
-
-          showToast('Google login successful', 'success');
-          setTimeout(() => window.location.href = redirectUrl, 1500);
-        } catch (err) {
-          console.error(err);
-          showToast('Google login failed: ' + err.message, 'error');
-        }
+            const res = await signInWithPopup(auth, googleProvider);
+            await setDoc(doc(db, collection, res.user.uid), {
+                email: res.user.email,
+                name: res.user.displayName,
+                provider: "google",
+                lastLogin: serverTimestamp()
+            }, { merge: true });
+            showToast("Google login successful", "success");
+            setTimeout(() => location.href = redirect, 1200);
+        } catch (e) { showToast(e.message, "error"); }
       }
 
-      // Buttons
       document.getElementById('btn-partner-login').onclick = () => handleLogin('partner-login-email', 'partner-login-password', PARTNER_DASHBOARD_URL);
       document.getElementById('btn-customer-login').onclick = () => handleLogin('customer-login-email', 'customer-login-password', CUSTOMER_PRODUCTS_URL);
-      
       document.getElementById('btn-partner-register').onclick = () => handleRegister('partner-reg-email', 'partner-reg-password', 'partner-reg-name', 'partners');
       document.getElementById('btn-customer-register').onclick = () => handleRegister('customer-reg-email', 'customer-reg-password', 'customer-reg-name', 'customers');
-
+      
       document.getElementById('btn-partner-google').onclick = () => handleGoogleLogin('partners', PARTNER_DASHBOARD_URL);
       document.getElementById('btn-customer-google').onclick = () => handleGoogleLogin('customers', CUSTOMER_PRODUCTS_URL);
-
-      // Init Tabs
-      setPartnerTab('login');
-      setCustomerTab('login');
+      document.getElementById('btn-back-email').onclick = () => window.location.href = 'index.html';
     });
   </script>
 </body>
